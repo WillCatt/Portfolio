@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>William Catt · Data Scientist</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #faf8f4;
+      --bg2: #f2ede4;
+      --card: #ffffff;
+      --border: rgba(0,0,0,0.08);
+      --text: #1a1714;
+      --text-muted: #7a6e63;
+      --text-dim: #c4b8aa;
+      --accent: oklch(52% 0.14 50);
+      --accent-soft: oklch(52% 0.14 50 / 0.08);
+      --live: oklch(58% 0.16 145);
+      --wip: oklch(62% 0.17 60);
+      --font-display: 'Space Grotesk', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-display); min-height: 100vh; }
+    a { color: inherit; text-decoration: none; }
+
+    @keyframes pulseLive {
+      0%, 100% { box-shadow: 0 0 0 0 var(--live), 0 0 8px var(--live); }
+      50% { box-shadow: 0 0 0 4px transparent, 0 0 12px var(--live); }
+    }
+    @keyframes pulseWip {
+      0%, 100% { box-shadow: 0 0 0 0 var(--wip); opacity: 0.6; }
+      50% { box-shadow: 0 0 0 3px transparent; opacity: 1; }
+    }
+    .status-dot {
+      display: inline-block; width: 9px; height: 9px; border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .status-dot.live {
+      background: var(--live);
+      animation: pulseLive 2s ease-in-out infinite;
+    }
+    .status-dot.wip {
+      background: var(--wip);
+      animation: pulseWip 1.6s ease-in-out infinite;
+    }
+    .status-dot.planned {
+      background: var(--text-dim);
+    }
+    .status-pill {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-family: var(--font-mono); font-size: 10px;
+      letter-spacing: 0.12em; padding: 4px 10px;
+      border-radius: 999px; border: 1px solid currentColor;
+    }
+    .status-pill.live { color: var(--live); background: oklch(58% 0.16 145 / 0.08); }
+    .status-pill.wip { color: var(--wip); background: oklch(62% 0.17 60 / 0.08); }
+    .status-pill.planned { color: var(--text-dim); background: rgba(0,0,0,0.02); }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect } = React;
+
+// ─── PROJECT DATA — edit here to add/remove projects ───────────────────────────
+const PROJECTS = [
+  { id: "kaggle", index: "01", title: "Kaggle Competitions",
+    subtitle: "Competitive ML — tabular, NLP, vision",
+    color: "oklch(52% 0.14 50)", status: "live", featured: true,
+    tags: ["Kaggle", "ML", "XGBoost"], year: 2026, q: "Q1" },
+  { id: "rag", index: "02", title: "RAG Chatbot",
+    subtitle: "Retrieval-augmented generation over custom KBs",
+    color: "oklch(52% 0.14 200)", status: "live", featured: true,
+    tags: ["LLM", "RAG", "FastAPI"], year: 2026, q: "Q2" },
+  { id: "anonymiser", index: "03", title: "Legal Text Anonymiser",
+    subtitle: "PII redaction NER pipeline",
+    color: "oklch(52% 0.14 145)", status: "wip", featured: true,
+    tags: ["NLP", "NER", "spaCy"], year: 2026, q: "Q2" },
+  { id: "blackjack", index: "04", title: "Blackjack Simulator",
+    subtitle: "Monte Carlo strategy analysis",
+    color: "oklch(52% 0.14 25)", status: "live", featured: true,
+    tags: ["Simulation", "NumPy", "Stats"], year: 2026, q: "Q1" }
+];
+
+const FEATURED = PROJECTS.filter(p => p.featured);
+
+// ─── Notebook cell wrapper ────────────────────────────────────────────────────
+function Cell({ n, type, children, visible }) {
+  return (
+    <div style={{
+      display: "flex", gap: 16,
+      opacity: visible ? 1 : 0,
+      transform: visible ? "translateY(0)" : "translateY(10px)",
+      transition: "all 0.5s ease"
+    }}>
+      <div style={{
+        fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--text-dim)",
+        paddingTop: 14, minWidth: 64, textAlign: "right"
+      }}>
+        {type === "in" ? `In [${n}]:` : type === "out" ? `Out[${n}]:` : ""}
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>{children}</div>
+    </div>
+  );
+}
+
+function CodeLine({ children }) {
+  return (
+    <div style={{
+      background: "rgba(0,0,0,0.03)",
+      borderLeft: "3px solid var(--accent)",
+      padding: "12px 18px", borderRadius: 4,
+      fontFamily: "var(--font-mono)", fontSize: 13, lineHeight: 1.7
+    }}>{children}</div>
+  );
+}
+
+const kw = (t) => <span style={{ color: "#a35f2e" }}>{t}</span>;
+const str = (t) => <span style={{ color: "#5b8a3a" }}>{t}</span>;
+
+// ─── App ──────────────────────────────────────────────────────────────────────
+function App() {
+  const [step, setStep] = useState(0);
+
+  useEffect(() => {
+    const timers = [];
+    for (let i = 1; i <= 10; i++) {
+      timers.push(setTimeout(() => setStep(i), i * 320));
+    }
+    return () => timers.forEach(clearTimeout);
+  }, []);
+
+  return (
+    <div style={{ minHeight: "100vh", padding: "32px clamp(24px, 5vw, 64px) 80px" }}>
+      {/* Notebook header */}
+      <div style={{
+        display: "flex", justifyContent: "space-between", alignItems: "center",
+        marginBottom: 32, paddingBottom: 14, borderBottom: "1px solid var(--border)",
+        maxWidth: 1100, margin: "0 auto 32px"
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          <div style={{ display: "flex", gap: 6 }}>
+            <div style={{ width: 11, height: 11, borderRadius: "50%", background: "#e8a18a" }} />
+            <div style={{ width: 11, height: 11, borderRadius: "50%", background: "#e8c878" }} />
+            <div style={{ width: 11, height: 11, borderRadius: "50%", background: "#a8c878" }} />
+          </div>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--text-muted)" }}>
+            portfolio.ipynb
+          </span>
+        </div>
+        <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--accent)" }}>
+          ● Python 3.11 — Idle
+        </span>
+      </div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 26, maxWidth: 1100, margin: "0 auto" }}>
+
+        {/* Cell 1: Bio header */}
+        <Cell n=" " type="" visible={step >= 1}>
+          <div style={{ display: "flex", gap: 32, alignItems: "flex-start", flexWrap: "wrap" }}>
+            {/* Photo placeholder */}
+            <div style={{
+              width: 140, height: 140, borderRadius: 14,
+              background: "linear-gradient(135deg, oklch(72% 0.08 50), oklch(58% 0.12 60))",
+              flexShrink: 0,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              border: "1px solid var(--border)",
+              fontFamily: "var(--font-mono)", fontSize: 10, color: "#fff",
+              letterSpacing: "0.14em", position: "relative", overflow: "hidden"
+            }}>
+              <div style={{
+                position: "absolute", inset: 0,
+                background: "repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(255,255,255,0.06) 8px, rgba(255,255,255,0.06) 9px)"
+              }} />
+              <span style={{ zIndex: 1, opacity: 0.85 }}>[ photo ]</span>
+            </div>
+
+            <div style={{ flex: 1, minWidth: 280, paddingTop: 6 }}>
+              <h1 style={{
+                fontSize: "clamp(40px, 5vw, 56px)", fontWeight: 700,
+                letterSpacing: "-0.03em", lineHeight: 1.05, marginBottom: 10
+              }}>
+                William Catt
+              </h1>
+              <p style={{ fontSize: 16, color: "var(--text-muted)", fontWeight: 300, lineHeight: 1.6, marginBottom: 16 }}>
+                Data scientist exploring ML systems, retrieval-augmented generation, NLP, and analytical simulation. Building a public body of work — Kaggle, RAG, NER pipelines, and Monte Carlo experiments — to learn in the open and ship end-to-end.
+              </p>
+              <div style={{ display: "flex", gap: 16, flexWrap: "wrap", fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--accent)" }}>
+                <a href="https://github.com/WillCatt" target="_blank" rel="noreferrer">github.com/WillCatt ↗</a>
+                <span style={{ color: "var(--text-dim)" }}>·</span>
+                <a href="#" >linkedin.com/in/wcatt ↗</a>
+                <span style={{ color: "var(--text-dim)" }}>·</span>
+                <a href="mailto:email@here" >email@here</a>
+              </div>
+            </div>
+          </div>
+        </Cell>
+
+        {/* Cell 2: Import */}
+        <Cell n="1" type="in" visible={step >= 2}>
+          <CodeLine>
+            {kw("from")} portfolio {kw("import")} projects
+          </CodeLine>
+        </Cell>
+
+        {/* Cell 3: Query */}
+        <Cell n="2" type="in" visible={step >= 3}>
+          <CodeLine>
+            projects.featured(<span style={{ color: "var(--text-muted)" }}>limit</span>={str("4")})
+          </CodeLine>
+        </Cell>
+
+        {/* Cell 4: Project grid output */}
+        <Cell n="2" type="out" visible={step >= 4}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 14 }}>
+            {FEATURED.map((p, i) => (
+              <ProjectCard key={p.id} p={p} visible={step >= 4 + i * 0.3} />
+            ))}
+          </div>
+        </Cell>
+
+        {/* Cell 5: View all */}
+        <Cell n="3" type="in" visible={step >= 9}>
+          <CodeLine>
+            projects.all()  <span style={{ color: "var(--text-muted)" }}># view full archive</span>
+          </CodeLine>
+        </Cell>
+
+        <Cell n="3" type="out" visible={step >= 10}>
+          <a href="all-projects.html" style={{
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            padding: "20px 24px", borderRadius: 10,
+            background: "var(--card)", border: "1px solid var(--border)",
+            transition: "all 0.2s ease"
+          }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--accent)"; e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 6px 18px rgba(0,0,0,0.05)"; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+          >
+            <div>
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--accent)", letterSpacing: "0.14em", marginBottom: 4 }}>
+                ARCHIVE
+              </div>
+              <div style={{ fontSize: 17, fontWeight: 600 }}>View all projects</div>
+              <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>
+                Searchable list of every project, past and present
+              </div>
+            </div>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 18, color: "var(--accent)" }}>→</span>
+          </a>
+        </Cell>
+
+      </div>
+    </div>
+  );
+}
+
+function ProjectCard({ p, visible }) {
+  const [hovered, setHovered] = useState(false);
+  const isLive = p.status === "live";
+  return (
+    <a href={`projects/${p.id}.html`}
+       onMouseEnter={() => setHovered(true)}
+       onMouseLeave={() => setHovered(false)}
+       style={{
+         display: "block", padding: "20px 22px", borderRadius: 10,
+         background: "var(--card)",
+         border: "1px solid var(--border)",
+         borderLeft: `3px solid ${p.color}`,
+         transition: "all 0.25s ease",
+         transform: hovered ? "translateY(-3px)" : "translateY(0)",
+         boxShadow: hovered ? `0 10px 24px ${p.color.replace(")", " / 0.18)")}` : "0 2px 6px rgba(0,0,0,0.02)",
+         opacity: visible ? 1 : 0
+       }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+        <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: p.color, letterSpacing: "0.12em", fontWeight: 500 }}>
+          {p.index}
+        </span>
+        <span className={`status-pill ${p.status}`}>
+          <span className={`status-dot ${p.status}`}></span>
+          {isLive ? "LIVE" : p.status === "wip" ? "IN PROGRESS" : "PLANNED"}
+        </span>
+      </div>
+      <div style={{ fontSize: 19, fontWeight: 600, marginBottom: 4, letterSpacing: "-0.01em" }}>
+        {p.title}
+      </div>
+      <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 14, lineHeight: 1.5 }}>
+        {p.subtitle}
+      </div>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+        {p.tags.map(t => (
+          <span key={t} style={{
+            fontFamily: "var(--font-mono)", fontSize: 9, padding: "3px 8px",
+            background: "rgba(0,0,0,0.04)", borderRadius: 3, color: "var(--text-muted)",
+            letterSpacing: "0.04em"
+          }}>{t}</span>
+        ))}
+      </div>
+    </a>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

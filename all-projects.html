@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>All Projects · William Catt</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #faf8f4; --card: #ffffff;
+      --border: rgba(0,0,0,0.08);
+      --text: #1a1714; --text-muted: #7a6e63; --text-dim: #c4b8aa;
+      --accent: oklch(52% 0.14 50);
+      --live: oklch(58% 0.16 145);
+      --wip: oklch(62% 0.17 60);
+      --font-display: 'Space Grotesk', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-display); min-height: 100vh; }
+    a { color: inherit; text-decoration: none; }
+    input { font-family: inherit; }
+
+    @keyframes pulseLive {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.3); opacity: 0.7; }
+    }
+    @keyframes pulseWip {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+    .status-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .status-dot.live { background: var(--live); box-shadow: 0 0 8px var(--live); animation: pulseLive 2s ease-in-out infinite; }
+    .status-dot.wip { background: var(--wip); animation: pulseWip 1.6s ease-in-out infinite; }
+    .status-dot.archived { background: var(--text-dim); }
+
+    .status-pill {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-family: var(--font-mono); font-size: 10px;
+      letter-spacing: 0.12em; padding: 4px 10px;
+      border-radius: 999px; border: 1px solid currentColor;
+      white-space: nowrap;
+    }
+    .status-pill.live { color: var(--live); background: oklch(58% 0.16 145 / 0.08); }
+    .status-pill.wip { color: var(--wip); background: oklch(62% 0.17 60 / 0.08); }
+    .status-pill.archived { color: var(--text-dim); background: rgba(0,0,0,0.02); }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState } = React;
+
+// ─── ALL PROJECTS — add new entries as you build them ──────────────────────────
+const PROJECTS = [
+  { id: "kaggle", index: "01", title: "Kaggle Competitions",
+    subtitle: "Competitive ML — tabular, NLP, vision", color: "oklch(52% 0.14 50)",
+    status: "live", year: 2026, q: "Q1", tags: ["Kaggle", "ML", "XGBoost"] },
+  { id: "rag", index: "02", title: "RAG Chatbot",
+    subtitle: "Retrieval-augmented generation over custom KBs", color: "oklch(52% 0.14 200)",
+    status: "live", year: 2026, q: "Q2", tags: ["LLM", "RAG", "FastAPI"] },
+  { id: "anonymiser", index: "03", title: "Legal Text Anonymiser",
+    subtitle: "PII redaction NER pipeline", color: "oklch(52% 0.14 145)",
+    status: "wip", year: 2026, q: "Q2", tags: ["NLP", "NER", "spaCy"] },
+  { id: "blackjack", index: "04", title: "Blackjack Simulator",
+    subtitle: "Monte Carlo strategy analysis", color: "oklch(52% 0.14 25)",
+    status: "live", year: 2026, q: "Q1", tags: ["Simulation", "NumPy", "Stats"] },
+];
+
+function App() {
+  const [filter, setFilter] = useState("all");
+  const [search, setSearch] = useState("");
+
+  const filtered = PROJECTS.filter(p => {
+    if (filter !== "all" && p.status !== filter) return false;
+    if (search) {
+      const q = search.toLowerCase();
+      if (!p.title.toLowerCase().includes(q) &&
+          !p.subtitle.toLowerCase().includes(q) &&
+          !p.tags.some(t => t.toLowerCase().includes(q))) return false;
+    }
+    return true;
+  });
+
+  const counts = {
+    all: PROJECTS.length,
+    live: PROJECTS.filter(p => p.status === "live").length,
+    wip: PROJECTS.filter(p => p.status === "wip").length,
+    archived: PROJECTS.filter(p => p.status === "archived").length,
+  };
+
+  return (
+    <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px clamp(20px, 4vw, 48px) 80px" }}>
+      {/* Top bar */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 32 }}>
+        <a href="index.html" style={{ fontFamily: "var(--font-mono)", fontSize: 13, color: "var(--accent)", letterSpacing: "0.08em" }}>
+          william_catt<span style={{ opacity: 0.4 }}>.portfolio</span>
+        </a>
+        <a href="index.html" style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--text-muted)", letterSpacing: "0.08em" }}>
+          ← back to home
+        </a>
+      </div>
+
+      {/* Title */}
+      <h1 style={{ fontSize: "clamp(36px, 5vw, 48px)", fontWeight: 700, letterSpacing: "-0.025em", marginBottom: 8 }}>
+        All Projects
+      </h1>
+      <p style={{ fontSize: 15, color: "var(--text-muted)", marginBottom: 28 }}>
+        {PROJECTS.length} project{PROJECTS.length === 1 ? "" : "s"} · sorted by most recent
+      </p>
+
+      {/* Filter bar */}
+      <div style={{ display: "flex", gap: 10, marginBottom: 18, alignItems: "center", flexWrap: "wrap" }}>
+        <input
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Search title or tag…"
+          style={{
+            fontFamily: "var(--font-mono)", fontSize: 12,
+            padding: "9px 14px", borderRadius: 6, width: 260,
+            border: "1px solid var(--border)", background: "var(--card)",
+            color: "var(--text)", outline: "none"
+          }}
+          onFocus={e => e.target.style.borderColor = "var(--accent)"}
+          onBlur={e => e.target.style.borderColor = "var(--border)"}
+        />
+        <div style={{ display: "flex", gap: 6 }}>
+          {[
+            { key: "all", label: "ALL" },
+            { key: "live", label: "LIVE" },
+            { key: "wip", label: "IN PROGRESS" },
+            { key: "archived", label: "ARCHIVED" }
+          ].map(f => (
+            <button key={f.key} onClick={() => setFilter(f.key)} style={{
+              fontFamily: "var(--font-mono)", fontSize: 10, letterSpacing: "0.1em",
+              padding: "8px 14px", borderRadius: 6, cursor: "pointer",
+              border: `1px solid ${filter === f.key ? "var(--text)" : "var(--border)"}`,
+              background: filter === f.key ? "var(--text)" : "transparent",
+              color: filter === f.key ? "var(--bg)" : "var(--text-muted)",
+              transition: "all 0.15s"
+            }}>
+              {f.label} <span style={{ opacity: 0.5, marginLeft: 4 }}>{counts[f.key]}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Table header */}
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "44px 1fr 220px 90px 130px 28px",
+        gap: 16, padding: "10px 14px",
+        fontFamily: "var(--font-mono)", fontSize: 9,
+        color: "var(--text-dim)", letterSpacing: "0.14em",
+        borderBottom: "1px solid var(--border)"
+      }}>
+        <span>#</span><span>PROJECT</span><span>TAGS</span><span>DATE</span><span>STATUS</span><span></span>
+      </div>
+
+      {/* Rows */}
+      {filtered.length === 0 && (
+        <div style={{ padding: "60px 20px", textAlign: "center", color: "var(--text-muted)", fontSize: 13 }}>
+          No projects match your filters.
+        </div>
+      )}
+      {filtered.map(p => (
+        <a key={p.id} href={`projects/${p.id}.html`} style={{
+          display: "grid",
+          gridTemplateColumns: "44px 1fr 220px 90px 130px 28px",
+          gap: 16, padding: "16px 14px", alignItems: "center",
+          borderBottom: "1px solid rgba(0,0,0,0.05)",
+          transition: "background 0.15s"
+        }}
+        onMouseEnter={e => e.currentTarget.style.background = "rgba(0,0,0,0.025)"}
+        onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+        >
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: p.color, letterSpacing: "0.08em" }}>{p.index}</span>
+          <div>
+            <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 3 }}>{p.title}</div>
+            <div style={{ fontSize: 12, color: "var(--text-muted)" }}>{p.subtitle}</div>
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+            {p.tags.slice(0, 3).map(t => (
+              <span key={t} style={{
+                fontFamily: "var(--font-mono)", fontSize: 9, padding: "2px 7px",
+                background: "rgba(0,0,0,0.04)", borderRadius: 3, color: "var(--text-muted)"
+              }}>{t}</span>
+            ))}
+          </div>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--text-muted)" }}>
+            {p.year} {p.q}
+          </span>
+          <span className={`status-pill ${p.status}`}>
+            <span className={`status-dot ${p.status}`}></span>
+            {p.status === "live" ? "LIVE" : p.status === "wip" ? "IN PROGRESS" : "ARCHIVED"}
+          </span>
+          <span style={{ color: "var(--text-dim)", fontSize: 14 }}>→</span>
+        </a>
+      ))}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
