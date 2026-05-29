@@ -39,11 +39,13 @@
     <p>I tested the strongest free, general-purpose name-detector on 555 real court judgments. It missed or mis-flagged roughly <strong>two in five</strong> pieces of sensitive information — and caught <strong>none</strong> of the case file numbers, because it was never taught what one looks like.</p>
     <p>Re-training the same kind of model on legal documents specifically closed most of that gap, nearly doubling its reliability.</p>
     <img src="../assets/overview_accuracy.png" alt="Reliability rises from 57 to 85 out of 100 after training on legal documents." />
+    <a class="deeper" href="#" onclick="document.querySelector('[data-tab=results]')?.click();return false;">See the full per-identifier scores</a>
 
     <h2>Finding 2 — removing names isn't enough</h2>
     <p>Here's the part that surprised me. Even if you perfectly delete every name, date and ID number, the <em>ordinary</em> details left behind — someone's age, town, job, nationality — are enough to single them out.</p>
     <p>Across the 555 documents, just <strong>three</strong> everyday details were enough to uniquely identify <strong>98%</strong> of people; with their full set, every single document was unique. Deleting names treats the symptom — the real risk is the combination of small facts (the "mosaic effect").</p>
     <img src="../assets/overview_reidentification.png" alt="Three ordinary details identify 98% of people." />
+    <a class="deeper" href="#" onclick="document.querySelector('[data-tab=technical]')?.click();return false;">How the mosaic effect was measured</a>
 
     <h2>What I built</h2>
     <p>A redaction tool with two settings, so a firm can match effort to risk:</p>
@@ -51,6 +53,7 @@
       <li><strong>Redact</strong> — quickly removes the obvious identifiers (names, organisations, case numbers). Right when the worry is "the AI provider might store our text."</li>
       <li><strong>Anonymise</strong> — also blurs the everyday details (<em>Plovdiv → Bulgaria</em>, <em>47-year-old → in their 40s</em>) until a document can no longer be traced to one person. Right when the worry is a determined attacker piecing clues together.</li>
     </ul>
+    <a class="deeper" href="#" onclick="document.querySelector('[data-tab=examples]')?.click();return false;">Watch each mode run on a real document</a>
     <h2>Staying usable, not just safe — re-linkable labels</h2>
     <p>Stripping names protects privacy but can wreck usefulness: if everyone becomes a flat <strong>[name]</strong>, the AI can no longer tell who did what to whom. So the tool can instead swap each party for a stable label — <strong>Person A</strong>, <strong>Person B</strong>, <strong>Company A</strong> — and keep it consistent across the whole document.</p>
     <p>The piece that makes this work is <strong>co-reference</strong>: spotting when different wordings refer to the same person. Take a memo that reads <em>“Anya Kowalski … Ms Kowalski … she”</em> — all three are one individual. Co-reference links them so they all become the same <strong>Person A</strong>, every time it appears. The AI can then still reason that <em>“Person A negotiated with Person B and reported to the board”</em> — a faithful picture of the matter, with not a single real name in it.</p>
