@@ -17,10 +17,11 @@
     overview:  "OVERVIEW",
     writeup:   "WRITE-UP",
     technical: "TECHNICAL",
+    examples:  "WORKED EXAMPLES",
     code:      "CODE",
     app:       "APP",
   };
-  const tabsAvailable = ["overview", "writeup", "technical", "code", "app"]
+  const tabsAvailable = ["overview", "writeup", "technical", "examples", "code", "app"]
     .filter(key => document.getElementById(`tab-${key}`))
     .filter(key => key !== "app" || P.demo !== false)
     .map(key => ({ key, label: TAB_LABELS[key] }));
@@ -57,11 +58,20 @@
   const tabContent = document.getElementById("tab-content");
   const tabButtons = document.querySelectorAll(".tab");
 
+  // Highlight redaction tokens like [PERSON], [ORG_A] inside example output
+  // blocks only (class .anon-out), so the Code tab is never touched.
+  function highlightTokens(scope) {
+    scope.querySelectorAll(".anon-out").forEach(el => {
+      el.innerHTML = el.innerHTML.replace(/\[[A-Z][A-Z0-9_]*\]/g, '<mark class="tok">$&</mark>');
+    });
+  }
+
   function showTab(key) {
     tabButtons.forEach(b => b.classList.toggle("active", b.dataset.tab === key));
     const tpl = document.getElementById(`tab-${key}`);
     tabContent.innerHTML = "";
     if (tpl) tabContent.appendChild(tpl.content.cloneNode(true));
+    highlightTokens(tabContent);
   }
 
   tabButtons.forEach(b => b.addEventListener("click", () => showTab(b.dataset.tab)));

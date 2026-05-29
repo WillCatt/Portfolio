@@ -105,3 +105,48 @@ article img { max-width: 100%; border-radius: 6px; border: 1px solid var(--borde
 }
 .app-coming-soon h2 { font-size: 22px; margin-bottom: 8px; }
 .app-coming-soon p { color: var(--text-muted); font-size: 14px; }
+
+/* ─── Worked-examples tab ─────────────────────────────────────────────── */
+.run {
+  border: 1px solid var(--border); border-radius: 10px;
+  padding: 22px 24px; margin: 0 0 26px; background: var(--card);
+}
+.run h3 { margin-top: 0; display: flex; align-items: baseline; gap: 10px; }
+.run h3 .run-mode {
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em;
+  padding: 3px 9px; border-radius: 3px; background: rgba(0,0,0,0.05);
+  color: var(--accent); text-transform: uppercase;
+}
+.run > p { color: var(--text-muted); font-size: 15px; }
+.io-label {
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em;
+  color: var(--text-dim); text-transform: uppercase; margin: 14px 0 6px;
+}
+.anon-in, .anon-out {
+  font-family: var(--font-mono); font-size: 13px; line-height: 1.7;
+  padding: 14px 16px; border-radius: 4px; white-space: pre-wrap;
+  background: rgba(0,0,0,0.03);
+}
+.anon-in { border-left: 3px solid var(--text-dim); color: var(--text-muted); }
+.anon-out { border-left: 3px solid var(--live); }
+.tok {
+  font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+  background: oklch(58% 0.16 145 / 0.14); color: oklch(40% 0.12 145);
+  padding: 1px 5px; border-radius: 3px;
+}
+.ladder {
+  font-family: var(--font-mono); font-size: 12.5px; line-height: 1.9;
+  margin: 8px 0 0; list-style: none; padding-left: 0;
+}
+.ladder li { margin-bottom: 2px; }
+.ladder .lt { color: var(--text-dim); }   /* the type tag */
+.vault {
+  width: 100%; border-collapse: collapse; font-family: var(--font-mono);
+  font-size: 13px; margin-top: 6px;
+}
+.vault td { padding: 5px 10px; border-bottom: 1px solid var(--border); }
+.vault td:first-child { color: oklch(40% 0.12 145); white-space: nowrap; }
+.run-note {
+  font-size: 13.5px; color: var(--text-muted); font-style: italic;
+  border-left: 3px solid var(--text-dim); padding-left: 14px; margin-top: 16px;
+}
