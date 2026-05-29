@@ -51,7 +51,17 @@
       <li><strong>Redact</strong> — quickly removes the obvious identifiers (names, organisations, case numbers). Right when the worry is "the AI provider might store our text."</li>
       <li><strong>Anonymise</strong> — also blurs the everyday details (<em>Plovdiv → Bulgaria</em>, <em>47-year-old → in their 40s</em>) until a document can no longer be traced to one person. Right when the worry is a determined attacker piecing clues together.</li>
     </ul>
-    <p>It can also swap real names for stable labels like <strong>Person A</strong> and <strong>Person B</strong>, so the AI can still follow who did what — and the firm translates the answer back to real names locally, without the names ever leaving the building. Every decision is logged so a person can review and override it.</p>
+    <h2>Staying usable, not just safe — re-linkable labels</h2>
+    <p>Stripping names protects privacy but can wreck usefulness: if everyone becomes a flat <strong>[name]</strong>, the AI can no longer tell who did what to whom. So the tool can instead swap each party for a stable label — <strong>Person A</strong>, <strong>Person B</strong>, <strong>Company A</strong> — and keep it consistent across the whole document.</p>
+    <p>The piece that makes this work is <strong>co-reference</strong>: spotting when different wordings refer to the same person. Take a memo that reads <em>“Anya Kowalski … Ms Kowalski … she”</em> — all three are one individual. Co-reference links them so they all become the same <strong>Person A</strong>, every time it appears. The AI can then still reason that <em>“Person A negotiated with Person B and reported to the board”</em> — a faithful picture of the matter, with not a single real name in it.</p>
+    <p>Without that step you get the worst of both worlds: either the same person picks up several different labels (the AI loses the thread), or you fall back to flat redaction (the AI can’t follow the parties at all).</p>
+    <p><strong>Why a law firm should care:</strong></p>
+    <ul>
+      <li><strong>The AI’s answer stays useful.</strong> Because the relationships survive the swap, summaries, chronologies and “who agreed to what” still come back correct — you’re not trading away the reason you wanted AI in the first place.</li>
+      <li><strong>No name ever leaves the building.</strong> Only the labelled text is sent to the AI. The firm keeps the key — a local “vault” — and translates the answer back to real names on its own machines, so privilege and client confidentiality are never put on the wire.</li>
+      <li><strong>It’s reversible and auditable.</strong> The round-trip is lossless, and every redaction is logged, so a fee-earner can review, override and sign off — the human-in-the-loop that regulators and professional duties expect.</li>
+    </ul>
+    <p>Net effect: a firm gets the productivity of modern AI on its real files, while the confidential parts stay in-house. <a href="#" onclick="document.querySelector('[data-tab=results]')?.click();return false;">See a real round-trip in the results →</a></p>
 
     <blockquote>Bottom line: safely using AI on confidential legal text isn't just "find the names." It needs a second check — "could this still be traced back to someone?" — and a human in the loop. <a href="#" onclick="document.querySelector('[data-tab=technical]')?.click();return false;">See the technical write-up →</a></blockquote>
   </article>
