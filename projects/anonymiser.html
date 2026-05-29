@@ -128,6 +128,23 @@
     </ul>
     <p>For redaction, <strong>recall is the safety-critical number</strong> — a missed identifier is a leak, while a false positive just over-redacts. The model reaches <strong>86.4% recall</strong> overall.</p>
 
+    <h2>What each identifier is</h2>
+    <p>The benchmark tags eight categories of identifying information. The pipeline treats them in two groups: <strong>direct</strong> identifiers name someone outright and are <em>removed</em> by Redact mode; <strong>quasi</strong> identifiers are only identifying in combination, and are <em>generalised</em> by Anonymise mode rather than deleted.</p>
+    <table class="defs">
+      <thead><tr><th>Identifier</th><th>What it is</th><th>Examples</th><th>Handled by</th></tr></thead>
+      <tbody>
+        <tr><td>PERSON</td><td>Names of individuals — including titles and bare surname / partial mentions.</td><td class="eg">“Dr. Eleanor Whitcombe”, “Whitcombe”, “Ms Kowalski”</td><td class="role direct">DIRECT · Redact</td></tr>
+        <tr><td>ORG</td><td>Organisations: companies, institutions, courts-as-parties, law firms, chambers, hospitals.</td><td class="eg">“St. Andrew's Regional Hospital Trust”, “Patel &amp; Rosenthal LLP”</td><td class="role direct">DIRECT · Redact</td></tr>
+        <tr><td>CODE</td><td>Structured reference identifiers: case / application numbers, file refs, IBANs, account numbers. Off-the-shelf NER has no equivalent label — recall 0% before fine-tuning.</td><td class="eg">“Application no. 12345/67”, “Case no. 2402319/2021”, an IBAN</td><td class="role direct">DIRECT · Redact</td></tr>
+        <tr><td>MISC</td><td>Other uniquely-identifying details that fit no other bucket: diagnoses, named operations, court orders. Over-redacted by default to stay safe.</td><td class="eg">a distinctive case-specific fact or named order</td><td class="role direct">DIRECT · Redact</td></tr>
+        <tr><td>LOC</td><td>Places: cities, regions, countries, addresses, facilities.</td><td class="eg">“Plovdiv”, “Manchester”, “Frankfurt”</td><td class="role quasi">QUASI · Anonymise</td></tr>
+        <tr><td>DATETIME</td><td>Dates and times.</td><td class="eg">“4 February 2021”, “since 2010”</td><td class="role quasi">QUASI · Anonymise</td></tr>
+        <tr><td>DEM</td><td>Demographic descriptors: nationality, ethnicity, religion, social group.</td><td class="eg">“Bulgarian national”, “Roma ethnicity”, “asylum-seeker”</td><td class="role quasi">QUASI · Anonymise</td></tr>
+        <tr><td>QUANTITY</td><td>Legally or medically relevant numbers: ages, sums, durations, counts.</td><td class="eg">“47-year-old”, “EUR 4.2 million”, “three children”</td><td class="role quasi">QUASI · Anonymise</td></tr>
+      </tbody>
+    </table>
+    <p class="run-note">Why the split matters: removing names alone leaves a residual <em>fingerprint</em> — a 47-year-old Bulgarian nurse in Plovdiv who filed in 2018 can still be unique even with the name gone. That mosaic effect is what Anonymise's generalisation of the quasi-identifiers addresses; see the Technical and Worked Examples tabs.</p>
+
     <h2>Per-identifier breakdown</h2>
     <p>Partial-match results on the 555-document test split (<code>tp</code> / <code>fp</code> / <code>fn</code> = true positives / false positives / false negatives):</p>
     <table class="metrics">
@@ -187,6 +204,28 @@
       <div class="io-label">Output — fine-tuned RoBERTa (Redact mode)</div>
       <div class="anon-out">[PERSON] of [ORG] met with [PERSON], general counsel of [ORG], in Frankfurt on 12 March 2022 to finalise the settlement under [CODE]. [PERSON] confirmed that payment of EUR 4.2 million would be wired to the account held at [ORG] (IBAN [CODE]).</div>
       <p class="run-note">Handles a non-Anglo name (“Tomás Ferreira”), a German <code>GmbH</code>, an ECHR application number and a Portuguese IBAN — names and structured codes all removed in one pass.</p>
+    </div>
+
+    <div class="run">
+      <h3><span class="run-mode">Pseudonymise</span> Re-linkable labels + vault round-trip</h3>
+      <p>Flat <code>[PERSON]</code> tags lose track of <em>who is who</em>. Pseudonymise mode instead assigns each party a stable label — <code>[PERSON_A]</code>, <code>[ORG_A]</code> — so an external AI can still reason about the parties, while the real names stay in a local vault. This is the same settlement note as above, run by the fine-tune with pseudonymisation on:</p>
+      <div class="io-label">Output — safe to send to an external LLM</div>
+      <div class="anon-out">[PERSON_A] of [ORG_A] met with [PERSON_B], general counsel of [ORG_B], in Frankfurt on 12 March 2022 to finalise the settlement under [CODE_A]. [PERSON_A] confirmed that payment of EUR 4.2 million would be wired to the account held at [ORG_C] (IBAN [CODE_B]).</div>
+      <div class="io-label">Vault — kept locally, never sent out</div>
+      <table class="vault">
+        <tr><td>[PERSON_A]</td><td>Anya Kowalski</td></tr>
+        <tr><td>[ORG_A]</td><td>Meridian Capital Partners</td></tr>
+        <tr><td>[PERSON_B]</td><td>Tomás Ferreira</td></tr>
+        <tr><td>[ORG_B]</td><td>Halcyon Biotech GmbH</td></tr>
+        <tr><td>[CODE_A]</td><td>Application no. 41872/19</td></tr>
+        <tr><td>[ORG_C]</td><td>Banco Nacional de Lisboa</td></tr>
+        <tr><td>[CODE_B]</td><td>PT50 0002 0123 1234 5678 9015 4</td></tr>
+      </table>
+      <div class="io-label">The external LLM answers in tokens…</div>
+      <div class="anon-out">[PERSON_A] of [ORG_A] is the acquiring party; [PERSON_B], counsel to [ORG_B], must secure board approval before [PERSON_A] proceeds.</div>
+      <div class="io-label">…and restore() puts the real names back, locally</div>
+      <div class="anon-out">Anya Kowalski of Meridian Capital Partners is the acquiring party; Tomás Ferreira, counsel to Halcyon Biotech GmbH, must secure board approval before Anya Kowalski proceeds.</div>
+      <p class="run-note">The coreference holds: “Anya Kowalski” and the later “Ms Kowalski” both resolve to the same <code>[PERSON_A]</code>, so the round-trip is lossless and the document stays internally consistent. Real names never leave the building — only the tokenised text is sent out.</p>
     </div>
 
     <p style="color:var(--text-muted);font-size:13px">Metrics: <code>phase2_baseline_comparison/results/finetuned_results.csv</code>. Live runs regenerated from source: <code>legal-anon-env/bin/python demo/build_results_showcase.py</code>.</p>

@@ -186,3 +186,14 @@ figure.fig figcaption {
 .leak { background: oklch(62% 0.17 60 / 0.16); color: oklch(45% 0.13 50);
   padding: 1px 5px; border-radius: 3px; font-weight: 600; }
 .anon-out.lite { border-left-color: var(--wip); }
+.defs { width: 100%; border-collapse: collapse; font-size: 14px; margin: 6px 0 8px; }
+.defs th, .defs td { padding: 9px 12px; text-align: left; vertical-align: top; }
+.defs th { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--text-dim); border-bottom: 1px solid var(--border); }
+.defs tbody tr { border-bottom: 1px solid var(--border); }
+.defs td:first-child { font-family: var(--font-mono); font-weight: 600;
+  color: oklch(40% 0.12 145); white-space: nowrap; }
+.defs .eg { color: var(--text-muted); }
+.defs .role { font-family: var(--font-mono); font-size: 11px; white-space: nowrap; }
+.defs .role.direct { color: oklch(45% 0.13 50); }
+.defs .role.quasi { color: var(--text-dim); }
