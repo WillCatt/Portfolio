@@ -7,15 +7,23 @@
   document.title = `${P.title} · William Catt`;
 
   const root = document.getElementById("root");
-  const hasApp = !!document.getElementById("tab-app") && P.demo !== false;
-
   const statusLabel = P.status === "live" ? "LIVE" : P.status === "wip" ? "IN PROGRESS" : "ARCHIVED";
 
-  const tabsAvailable = [
-    { key: "writeup", label: "WRITE-UP" },
-    { key: "code", label: "CODE" },
-    hasApp ? { key: "app", label: "APP" } : null
-  ].filter(Boolean);
+  // Tabs are template-driven: render a tab for whichever <template id="tab-*">
+  // blocks exist on the page, in this canonical order. A page can therefore
+  // expose any subset — e.g. a single WRITE-UP, or split OVERVIEW/TECHNICAL.
+  // The APP tab is additionally gated on P.demo (set demo:false to hide it).
+  const TAB_LABELS = {
+    overview:  "OVERVIEW",
+    writeup:   "WRITE-UP",
+    technical: "TECHNICAL",
+    code:      "CODE",
+    app:       "APP",
+  };
+  const tabsAvailable = ["overview", "writeup", "technical", "code", "app"]
+    .filter(key => document.getElementById(`tab-${key}`))
+    .filter(key => key !== "app" || P.demo !== false)
+    .map(key => ({ key, label: TAB_LABELS[key] }));
 
   root.innerHTML = `
     <div class="page">

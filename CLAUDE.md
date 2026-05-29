@@ -19,14 +19,14 @@ This is William Catt's data science portfolio. It's a **static HTML site** — n
 
 ## Your job
 
-The landing page and archive are done. **Your task is to write the real content** for each project detail page. Each page has 3 tabs: **Write-up**, **Code**, **App**.
+The landing page and archive are done. **Your task is to write the real content** for each project detail page. Pages have **Write-up · Code · App** tabs by default; a page can instead split the write-up into **Overview** (stakeholder) + **Technical** (deep dive) — see the anonymiser page and the template-driven tab note below.
 
 ## How a project page works
 
 Each `projects/<id>.html` has the same shape:
 
 1. A `<script>` block defining `window.PROJECT` — metadata (title, status, tags, repo URL).
-2. Three `<template>` elements (`tab-writeup`, `tab-code`, `tab-app`) — the HTML content for each tab.
+2. `<template>` elements — the HTML content for each tab. **Tabs are template-driven**: the loader renders a tab for whichever of these templates exist, in this canonical order — `tab-overview`, `tab-writeup`, `tab-technical`, `tab-code`, `tab-app` (labels OVERVIEW / WRITE-UP / TECHNICAL / CODE / APP). Most pages use a single `tab-writeup`; the anonymiser page uses the dual-path `tab-overview` (stakeholder) + `tab-technical` (deep dive) instead. The `tab-app` tab is also hidden when `demo: false`.
 3. `<script src="../project-page.js">` — renders the header, tabs, and swaps in the active template's content.
 
 **To edit content, only touch the `<template>` blocks.** Do not modify `project-page.js` or `project.css` unless you need to add a new CSS utility.

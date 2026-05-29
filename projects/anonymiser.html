@@ -14,12 +14,12 @@
     id: "anonymiser",
     index: "03",
     title: "Legal Text Anonymiser",
-    subtitle: "PII redaction NER pipeline for legal documents",
+    subtitle: "PII redaction + re-identification risk for legal text",
     color: "oklch(52% 0.14 145)",
-    status: "wip", // "live" | "wip" | "archived"
-    tags: ["NLP","NER","spaCy","PII"],
-    repo: "github.com/WillCatt/legal-anonymiser",
-    demo: null, // e.g. "https://demo.example.com" — null hides the App tab
+    status: "live", // "live" | "wip" | "archived"
+    tags: ["NLP","NER","RoBERTa","PII"],
+    repo: "github.com/WillCatt/Data-Anonymisation",
+    demo: "https://willxo-legal-text-anonymisation.hf.space",
   };
 </script>
 
@@ -28,24 +28,77 @@
 
 <!-- ─── TAB CONTENT — Claude Code: replace these sections with real content ──── -->
 
-<!-- WRITE-UP: markdown-style long-form writeup. Use h2/h3 for sections. -->
-<template id="tab-writeup">
+<!-- OVERVIEW: stakeholder-facing. Plain language, no jargon, simple charts. -->
+<template id="tab-overview">
   <article class="writeup">
-    <h2>Overview</h2>
-    <p>Brief 1-2 sentence summary of what this project is and why it matters.</p>
+    <h2>The problem</h2>
+    <p>Law firms want their lawyers using AI to summarise cases, draft memos and search old files. But client information is confidential — feeding a privileged document into a third-party AI tool can breach regulations, contracts and professional duty all at once.</p>
+    <p>The obvious fix is to <em>strip out the names</em> before sending anything to the AI. This project asks one question: <strong>is that actually enough?</strong> The answer is no — and the interesting part is <em>why</em>.</p>
 
-    <h2>Approach</h2>
-    <p>Describe the high-level methodology — feature engineering, model selection, validation strategy.</p>
+    <h2>Finding 1 — off-the-shelf tools miss too much</h2>
+    <p>I tested the strongest free, general-purpose name-detector on 555 real court judgments. It missed or mis-flagged roughly <strong>two in five</strong> pieces of sensitive information — and caught <strong>none</strong> of the case file numbers, because it was never taught what one looks like.</p>
+    <p>Re-training the same kind of model on legal documents specifically closed most of that gap, nearly doubling its reliability.</p>
+    <img src="../assets/overview_accuracy.png" alt="Reliability rises from 57 to 85 out of 100 after training on legal documents." />
+
+    <h2>Finding 2 — removing names isn't enough</h2>
+    <p>Here's the part that surprised me. Even if you perfectly delete every name, date and ID number, the <em>ordinary</em> details left behind — someone's age, town, job, nationality — are enough to single them out.</p>
+    <p>Across the 555 documents, just <strong>three</strong> everyday details were enough to uniquely identify <strong>98%</strong> of people; with their full set, every single document was unique. Deleting names treats the symptom — the real risk is the combination of small facts (the "mosaic effect").</p>
+    <img src="../assets/overview_reidentification.png" alt="Three ordinary details identify 98% of people." />
+
+    <h2>What I built</h2>
+    <p>A redaction tool with two settings, so a firm can match effort to risk:</p>
     <ul>
-      <li>Bullet point one</li>
-      <li>Bullet point two</li>
+      <li><strong>Lite</strong> — quickly removes the obvious identifiers (names, organisations, case numbers). Right when the worry is "the AI provider might store our text."</li>
+      <li><strong>Pro</strong> — also blurs the everyday details (<em>Plovdiv → Bulgaria</em>, <em>47-year-old → in their 40s</em>) until a document can no longer be traced to one person. Right when the worry is a determined attacker piecing clues together.</li>
     </ul>
+    <p>It can also swap real names for stable labels like <strong>Person A</strong> and <strong>Person B</strong>, so the AI can still follow who did what — and the firm translates the answer back to real names locally, without the names ever leaving the building. Every decision is logged so a person can review and override it.</p>
 
-    <h2>Results</h2>
-    <p>Quantify outcomes — leaderboard rank, accuracy, business metric, etc.</p>
+    <blockquote>Bottom line: safely using AI on confidential legal text isn't just "find the names." It needs a second check — "could this still be traced back to someone?" — and a human in the loop. <a href="#" onclick="document.querySelector('[data-tab=technical]')?.click();return false;">See the technical write-up →</a></blockquote>
+  </article>
+</template>
 
-    <h2>What I Learned</h2>
-    <p>The interesting parts — what surprised you, what you'd do differently.</p>
+<!-- TECHNICAL: data-science deep dive. Jargon OK, technical charts. -->
+<template id="tab-technical">
+  <article class="writeup">
+    <h2>Dataset &amp; evaluation</h2>
+    <p>Everything is grounded in the <strong>Text Anonymization Benchmark (TAB)</strong> — 1,268 European Court of Human Rights judgments, hand-annotated with entity type (<code>PERSON</code>, <code>ORG</code>, <code>LOC</code>, <code>DATETIME</code>, <code>QUANTITY</code>, <code>CODE</code>, <code>DEM</code>, <code>MISC</code>) <em>and</em> identifier role (<code>DIRECT</code> / <code>QUASI</code> / <code>NO_MASK</code>). That second axis is what makes the re-identification analysis possible.</p>
+    <p>Every model — spaCy, HuggingFace, Presidio, the fine-tunes, the ensemble — is wrapped behind one interface, <code>text → [(start, end, tab_type, span_text)]</code>, and scored by the same span-level precision/recall/F1 (partial- and exact-match) on the 555-document test split. The numbers are therefore directly comparable.</p>
+
+    <h2>Model bake-off</h2>
+    <p>Off-the-shelf spaCy <code>en_core_web_trf</code> sets the baseline at <strong>0.566 partial-match F1</strong> (0.381 exact). The failures are structural, not random: <code>CODE</code> (case numbers) at <strong>0% recall</strong> — no such label in a newswire-trained model — and <code>ORG</code> precision at 0.18 (it fires on "the Court", "the Government").</p>
+    <p>Fine-tuning <code>roberta-base</code> on TAB's label set wins at <strong>0.851 F1 (+28.5pp)</strong>, taking <code>CODE</code> recall 0 → 0.98. The gains concentrate exactly where TAB's labels diverge from newswire English.</p>
+    <img src="../assets/phase_overall_f1.png" alt="Overall F1 across models — spaCy 0.57 up to RoBERTa 0.85, ensemble 0.55." />
+    <img src="../assets/phase_f1_by_entity.png" alt="Per-entity-type F1 by model." />
+
+    <h2>The mosaic effect</h2>
+    <p>Mask every <code>DIRECT</code> identifier perfectly, fingerprint each document by its remaining <code>QUASI</code> mentions, and ask how often that fingerprint is unique. Result: <strong>1,268 / 1,268 documents are unique</strong> — 58% singled out by one quasi-identifier, 98% by three, none reaching k ≥ 5. The median document carries 25 distinct quasi-identifiers; their joint distribution is effectively a hash. <em>Anonymisation is a re-identification problem, not just an NER problem.</em></p>
+    <img src="../assets/mosaic_reidentification.png" alt="Re-identification curve plus signature-size histogram." />
+
+    <h2>The pipeline</h2>
+    <ul>
+      <li><strong>Lite</strong> — suppress <code>DIRECT</code> spans (NER + a regex pass for case numbers, IBANs, emails).</li>
+      <li><strong>Pro</strong> — Lite plus an <em>iterate-until-safe</em> loop: a <code>MosaicScorer</code> measures k-anonymity against a haystack corpus, and quasi-identifiers are progressively generalised (Plovdiv → Bulgaria → Europe; 47 → ~40s → suppressed) until k ≥ target, else it falls back to full suppression.</li>
+      <li><strong>Pseudonymisation</strong> — referential tokens (<code>[PERSON_A]</code>…) with a local vault and a <code>restore()</code> round-trip, so an LLM answer is re-identified locally and names never leave the firm.</li>
+      <li>Every decision is recorded in a per-span <strong>audit log</strong> (source, confidence, role, generalisation level) for human review.</li>
+    </ul>
+    <img src="../assets/pipeline_architecture.png" alt="Lite + Pro + pseudonymisation pipeline architecture diagram." />
+
+    <h2>Honest negatives</h2>
+    <p>Three results kept because the null <em>is</em> the finding:</p>
+    <ul>
+      <li><strong>LegalBERT ≈ RoBERTa</strong> (0.849 vs 0.851) — domain pretraining helps with vocabulary, not with a general-NER label set.</li>
+      <li><strong>3-way ensemble backfired</strong> (0.553, below baseline) — union voting inherits Presidio's 0.14 <code>ORG</code> precision.</li>
+      <li><strong>Coreference post-processor: +0.0001 recall</strong> — spaCy is already at the ceiling on the PERSON/ORG mentions a substring rule could recover.</li>
+    </ul>
+    <img src="../assets/ensemble_backfire.png" alt="Per-entity precision collapse of the 3-way ensemble." />
+
+    <h2>Training &amp; caveats</h2>
+    <ul>
+      <li>Fine-tune: <code>roberta-base</code>, full 8-class BIO tagging, 384-token windows with 64-token overlap, span-deduped at inference.</li>
+      <li>Partial-match scoring is lenient and uses greedy first-overlap matching; exact-match (0.78 for the fine-tune) is the strict boundary-sensitive number — a CRF head is the standard next step to close the gap.</li>
+      <li>Mosaic fingerprints match on exact surface form; fuzzy matching would shift the crossing points but not the qualitative finding. The demo uses TAB itself as the haystack — a stand-in for a firm's own corpus.</li>
+    </ul>
+    <p><a href="https://github.com/WillCatt/Data-Anonymisation/blob/main/writeup/README.md" target="_blank" rel="noreferrer">Full write-up, all six phases →</a></p>
   </article>
 </template>
 
@@ -54,38 +107,72 @@
   <article class="code-tab">
     <h2>Repository</h2>
     <p>
-      <a href="https://github.com/WillCatt/legal-anonymiser" target="_blank" rel="noreferrer">
-        ⌥ github.com/WillCatt/legal-anonymiser ↗
+      <a href="https://github.com/WillCatt/Data-Anonymisation" target="_blank" rel="noreferrer">
+        ⌥ github.com/WillCatt/Data-Anonymisation ↗
       </a>
     </p>
 
-    <h2>Structure</h2>
-    <pre class="tree"><code>anonymiser/
-├── notebooks/
-│   ├── eda.ipynb
-│   └── modeling.ipynb
-├── src/
-│   ├── features.py
-│   └── models.py
-└── README.md</code></pre>
+    <p style="color:var(--text-muted);font-size:14px">Python · spaCy · HuggingFace Transformers · Gradio. Pytest suite + GitHub Actions CI; the live demo runs as a HuggingFace Space.</p>
 
-    <h2>Key snippet</h2>
-    <pre><code class="lang-python">def cv_score(model, X, y, n_splits=5):
-    kf = KFold(n_splits=n_splits, shuffle=True, random_state=42)
-    return cross_val_score(model, X, y, cv=kf).mean()</code></pre>
+    <h2>Structure</h2>
+    <pre class="tree"><code>src/anonymisation/
+├── data.py  mapping.py        TAB loader + spaCy↔TAB label mapping
+├── evaluation.py              span-level P/R/F1 (the shared scorer)
+├── predictors.py  ensemble.py model adapters + vote combiner
+├── mosaic.py                  k-anonymity over quasi-identifier fingerprints
+└── pipeline/
+    ├── base.py                detect spans → classify role → redact
+    ├── lite.py  pro.py        the two pipeline variants
+    ├── scorer.py              MosaicScorer (iterate-until-safe)
+    ├── generalization.py      per-type QUASI generalisation rules
+    └── pseudonymise.py        referential tokens + restore()
+notebooks/ · phase2..phase6/   experiments: baseline → fine-tune → ensemble
+demo/ · spaces/                Gradio app + HuggingFace Space bundle
+tests/                         pytest suite (pure-logic modules)</code></pre>
+
+    <h2>The predictor contract</h2>
+    <p>Every NER backend conforms to one interface, so the same evaluator and both pipelines drive all of them:</p>
+    <pre><code class="lang-python"># text -> [(start_char, end_char, tab_type, span_text), ...]
+SpanPredictor = Callable[[str], List[Tuple[int, int, str, str]]]</code></pre>
+
+    <h2>Pro: iterate-until-safe</h2>
+    <pre><code class="lang-python"># suppress DIRECT spans, then generalise QUASI until k-anonymity is met
+for level in range(1, MAX_LEVEL + 1):
+    for s in quasi_spans:
+        s.replacement = generalize(s.entity_type, s.text, level)
+    if scorer.k_for(signature(quasi_spans)) >= self.k_target:
+        break                      # safe — stop generalising
+# else: fall back to full suppression</code></pre>
+
+    <h2>Round-trip pseudonymisation</h2>
+    <pre><code class="lang-python">ps = Pseudonymiser()
+ps.token_for("PERSON", "Maria Petrova")   # -> "[PERSON_A]"
+ps.token_for("PERSON", "Mrs Petrova")     # -> "[PERSON_A]"  (coref)
+# ...send tokenised text to the LLM, then locally:
+restore(llm_answer, ps.vault)             # tokens -> real names</code></pre>
   </article>
 </template>
 
 <!-- APP: live demo iframe, screenshots, or "coming soon". Leave empty if no demo. -->
 <template id="tab-app">
   <article class="app-tab">
-    <div class="app-coming-soon">
-      <h2>Demo coming soon</h2>
-      <p>This project doesn't have a hosted demo yet. Check back later.</p>
-    </div>
-    <!-- When ready, replace with:
-    <iframe src="https://your-demo.com" style="width:100%;height:600px;border:1px solid var(--border);border-radius:8px"></iframe>
-    -->
+    <p>
+      Live Gradio demo — paste legal-style text and pick a redaction strategy
+      (<strong>Lite</strong> = DIRECT only, <strong>Pro</strong> = mosaic-aware
+      QUASI generalisation), toggle pseudonymisation, and inspect the full
+      per-decision audit log. Runs spaCy <code>en_core_web_sm</code> on
+      HuggingFace's free CPU tier, so the first request after a cold start may
+      take a few seconds.
+    </p>
+    <iframe
+      src="https://willxo-legal-text-anonymisation.hf.space"
+      title="Legal Text Anonymisation — live demo"
+      style="width:100%;height:720px;border:1px solid var(--border);border-radius:8px"
+      loading="lazy"></iframe>
+    <p style="font-size:13px;color:var(--text-muted)">
+      Demo not loading? Open it directly at
+      <a href="https://huggingface.co/spaces/Willxo/legal-text-anonymisation" target="_blank" rel="noreferrer">huggingface.co/spaces/Willxo/legal-text-anonymisation ↗</a>.
+    </p>
   </article>
 </template>
 
