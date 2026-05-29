@@ -105,6 +105,94 @@
   </article>
 </template>
 
+<!-- RESULTS: how good the real production model is. Metrics from
+     phase2_baseline_comparison/results/finetuned_results.csv; before/after
+     from demo/build_results_showcase.py (real fine-tuned RoBERTa). -->
+<template id="tab-results">
+  <article class="writeup">
+    <p>These are the numbers for the <strong>real production model</strong> — the RoBERTa NER fine-tuned on legal text — scored on a <strong>held-out test set of 555 documents</strong> it never saw during training. <em>(The hosted live demo runs a much smaller model to fit a free CPU; the figures below are the actual product.)</em></p>
+
+    <div class="statrow">
+      <div class="stat"><div class="num">0.851</div><div class="lbl">Overall F1 (partial-match) across all 8 identifier types</div></div>
+      <div class="stat"><div class="num">+28.5</div><div class="lbl">points over the spaCy baseline (0.566 → 0.851)</div></div>
+      <div class="stat"><div class="num">555</div><div class="lbl">held-out TAB documents (real ECHR court judgments)</div></div>
+      <div class="stat"><div class="num">0.784</div><div class="lbl">F1 under strict exact-boundary match</div></div>
+    </div>
+
+    <h2>How it's measured</h2>
+    <p>Every model in the project is scored the same way, so the numbers are directly comparable. For each document the model's predicted spans are matched against the benchmark's gold annotations at the character level:</p>
+    <ul>
+      <li><strong>True positive</strong> — predicted span has the right type <em>and</em> overlaps a gold span (<strong>partial</strong> match) or lands on the exact boundary (<strong>exact</strong> match).</li>
+      <li><strong>Precision</strong> = of everything redacted, how much should have been. <strong>Recall</strong> = of everything that should have been redacted, how much was. <strong>F1</strong> = their harmonic mean.</li>
+      <li>Only the identifiers the benchmark requires masking (<code>DIRECT</code> + <code>QUASI</code>) are scored. The test set is <a href="https://huggingface.co/datasets/mattmdjaga/text_anonymization_benchmark" target="_blank" rel="noreferrer">TAB</a> — 1,268 European Court of Human Rights cases, expert-annotated.</li>
+    </ul>
+    <p>For redaction, <strong>recall is the safety-critical number</strong> — a missed identifier is a leak, while a false positive just over-redacts. The model reaches <strong>86.4% recall</strong> overall.</p>
+
+    <h2>Per-identifier breakdown</h2>
+    <p>Partial-match results on the 555-document test split (<code>tp</code> / <code>fp</code> / <code>fn</code> = true positives / false positives / false negatives):</p>
+    <table class="metrics">
+      <thead><tr><th>Identifier</th><th>Precision</th><th>Recall</th><th>F1</th><th>tp</th><th>fp</th><th>fn</th></tr></thead>
+      <tbody>
+        <tr><td>PERSON</td><td>85.1%</td><td>92.8%</td><td class="f1">88.8%</td><td>3841</td><td>670</td><td>297</td></tr>
+        <tr><td>DATETIME</td><td>91.8%</td><td>97.0%</td><td class="f1">94.3%</td><td>9250</td><td>824</td><td>286</td></tr>
+        <tr><td>CODE</td><td>86.8%</td><td>98.4%</td><td class="f1">92.2%</td><td>1587</td><td>242</td><td>25</td></tr>
+        <tr><td>LOC</td><td>77.1%</td><td>79.4%</td><td class="f1">78.2%</td><td>1159</td><td>345</td><td>300</td></tr>
+        <tr><td>QUANTITY</td><td>66.6%</td><td>77.6%</td><td class="f1">71.7%</td><td>515</td><td>258</td><td>149</td></tr>
+        <tr><td>ORG</td><td>66.0%</td><td>63.6%</td><td class="f1">64.8%</td><td>1238</td><td>639</td><td>708</td></tr>
+        <tr><td>DEM</td><td>55.8%</td><td>38.3%</td><td class="f1">45.4%</td><td>351</td><td>278</td><td>566</td></tr>
+        <tr><td>MISC</td><td>17.1%</td><td>8.4%</td><td class="f1">11.3%</td><td>45</td><td>218</td><td>492</td></tr>
+        <tr class="overall"><td>Overall</td><td>83.8%</td><td>86.4%</td><td class="f1">85.1%</td><td>17986</td><td>3474</td><td>2823</td></tr>
+      </tbody>
+    </table>
+    <p class="run-note">The model is strongest exactly where it matters most for a leak — the high-volume PERSON, DATETIME and CODE classes (case/reference numbers) all clear 88%. The weak spots are honest: <code>DEM</code> (demographics like nationality/ethnicity) and <code>MISC</code> are sparse, fuzzy categories with few training examples — and both are quasi-identifiers that the mosaic-aware <em>Anonymise</em> mode generalises anyway, rather than relying on the detector alone.</p>
+
+    <figure class="fig">
+      <img src="../assets/finetune_results_by_entity.png" alt="Per-entity F1 for the fine-tuned RoBERTa, partial vs exact match." />
+      <figcaption>Per-identifier F1, partial vs exact match. The gap between the two bars is boundary precision — a CRF head is the standard next step to close it.</figcaption>
+    </figure>
+
+    <h2>Against the alternatives</h2>
+    <p>The fine-tune is the end of a ladder of approaches measured on the same test set — off-the-shelf NER is not enough for legal text, which is the project's core thesis:</p>
+    <figure class="fig">
+      <img src="../assets/phase_overall_f1.png" alt="Overall F1 across models — spaCy 0.57 up to the RoBERTa fine-tune 0.85." />
+      <figcaption>Overall F1 by model. The fine-tune (0.851) beats the best off-the-shelf option by a wide margin; the 3-way ensemble (0.553) is the measured null documented in the Technical tab.</figcaption>
+    </figure>
+
+    <h2>See it on real documents</h2>
+    <p>The same model, run live on two documents it had never seen. Output is verbatim; removed identifiers are highlighted.</p>
+
+    <div class="run">
+      <h3>HR grievance memorandum</h3>
+      <div class="io-label">Input</div>
+      <div class="anon-in">This memorandum concerns the grievance brought by Dr. Eleanor Whitcombe, a consultant cardiologist, against St. Andrew's Regional Hospital Trust. On 4 February 2021, Dr. Whitcombe lodged a formal complaint (Ref. HR-2021-0847) with the Trust's board, chaired by Mr. Harold Beecham. After internal mediation failed, the matter was referred to the Employment Tribunal in Manchester (Case no. 2402319/2021). Whitcombe was represented by Patel &amp; Rosenthal LLP; the Trust instructed Carrow Chambers.</div>
+      <div class="io-label">Output — fine-tuned RoBERTa (Redact mode)</div>
+      <div class="anon-out">This memorandum concerns the grievance brought by [PERSON], a consultant cardiologist, against [ORG]. On 4 February 2021, [PERSON] lodged a formal complaint (Ref. HR-[MISC]) with the Trust's board, chaired by [PERSON]. After internal mediation failed, the matter was referred to the Employment Tribunal in Manchester ([CODE]). [PERSON] was represented by [ORG]; the Trust instructed [ORG].</div>
+      <p class="run-note">Catches every person (including the bare surname “Whitcombe” and the titled “Dr.”/“Mr.” forms), all three firms, and the case number — and correctly keeps the date, “Manchester” and “consultant cardiologist” as quasi-identifiers for <em>Anonymise</em> mode to handle. It clips the internal reference to “HR-[MISC]”, the boundary miss the exact-match score reflects.</p>
+    </div>
+
+    <div class="run">
+      <h3>Why the live demo looks weaker</h3>
+      <p>The hosted demo's small model, on that <em>same</em> opening sentence, removes only “Regional Hospital Trust” and leaves a distinctive fragment of the name exposed:</p>
+      <div class="io-label">Live demo (en_core_web_sm) — partial leak</div>
+      <div class="anon-out lite">…brought by Dr. [PERSON], a consultant cardiologist, against <span class="leak">St. Andrew's</span> [ORG].</div>
+      <div class="io-label">Fine-tuned RoBERTa — clean</div>
+      <div class="anon-out">…brought by [PERSON], a consultant cardiologist, against [ORG].</div>
+      <p class="run-note">A weaker model doesn't just miss whole names — it mis-draws boundaries, leaving identifying fragments behind. That boundary quality is exactly what the +28-point F1 gap buys, and why the production pipeline uses the fine-tune.</p>
+    </div>
+
+    <div class="run">
+      <h3>Cross-border settlement note</h3>
+      <div class="io-label">Input</div>
+      <div class="anon-in">Anya Kowalski of Meridian Capital Partners met with Tomás Ferreira, general counsel of Halcyon Biotech GmbH, in Frankfurt on 12 March 2022 to finalise the settlement under Application no. 41872/19. Ms Kowalski confirmed that payment of EUR 4.2 million would be wired to the account held at Banco Nacional de Lisboa (IBAN PT50 0002 0123 1234 5678 9015 4).</div>
+      <div class="io-label">Output — fine-tuned RoBERTa (Redact mode)</div>
+      <div class="anon-out">[PERSON] of [ORG] met with [PERSON], general counsel of [ORG], in Frankfurt on 12 March 2022 to finalise the settlement under [CODE]. [PERSON] confirmed that payment of EUR 4.2 million would be wired to the account held at [ORG] (IBAN [CODE]).</div>
+      <p class="run-note">Handles a non-Anglo name (“Tomás Ferreira”), a German <code>GmbH</code>, an ECHR application number and a Portuguese IBAN — names and structured codes all removed in one pass.</p>
+    </div>
+
+    <p style="color:var(--text-muted);font-size:13px">Metrics: <code>phase2_baseline_comparison/results/finetuned_results.csv</code>. Live runs regenerated from source: <code>legal-anon-env/bin/python demo/build_results_showcase.py</code>.</p>
+  </article>
+</template>
+
 <!-- WORKED EXAMPLES: real runs of the pipeline. Output generated by
      demo/portfolio_examples.py (fine-tuned RoBERTa NER). -->
 <template id="tab-examples">

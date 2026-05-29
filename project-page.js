@@ -17,11 +17,12 @@
     overview:  "OVERVIEW",
     writeup:   "WRITE-UP",
     technical: "TECHNICAL",
+    results:   "RESULTS",
     examples:  "WORKED EXAMPLES",
     code:      "CODE",
     app:       "APP",
   };
-  const tabsAvailable = ["overview", "writeup", "technical", "examples", "code", "app"]
+  const tabsAvailable = ["overview", "writeup", "technical", "results", "examples", "code", "app"]
     .filter(key => document.getElementById(`tab-${key}`))
     .filter(key => key !== "app" || P.demo !== false)
     .map(key => ({ key, label: TAB_LABELS[key] }));

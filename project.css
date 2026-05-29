@@ -150,3 +150,39 @@ article img { max-width: 100%; border-radius: 6px; border: 1px solid var(--borde
   font-size: 13.5px; color: var(--text-muted); font-style: italic;
   border-left: 3px solid var(--text-dim); padding-left: 14px; margin-top: 16px;
 }
+
+/* ─── Results tab ─────────────────────────────────────────────────────── */
+.statrow {
+  display: flex; flex-wrap: wrap; gap: 14px; margin: 4px 0 28px;
+}
+.stat {
+  flex: 1 1 140px; border: 1px solid var(--border); border-radius: 10px;
+  padding: 16px 18px; background: var(--card);
+}
+.stat .num {
+  font-family: var(--font-mono); font-size: 26px; font-weight: 600;
+  color: oklch(40% 0.12 145); line-height: 1.1;
+}
+.stat .lbl {
+  font-size: 12.5px; color: var(--text-muted); margin-top: 6px;
+}
+.metrics {
+  width: 100%; border-collapse: collapse; font-size: 14px; margin: 6px 0 8px;
+}
+.metrics th, .metrics td { padding: 7px 10px; text-align: right; }
+.metrics th { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--text-dim); border-bottom: 1px solid var(--border); }
+.metrics td:first-child, .metrics th:first-child {
+  text-align: left; font-family: var(--font-mono); }
+.metrics tbody tr { border-bottom: 1px solid var(--border); }
+.metrics tbody tr.overall { font-weight: 600; background: rgba(0,0,0,0.02); }
+.metrics tbody tr.overall td { border-top: 2px solid var(--border); }
+.metrics .f1 { color: oklch(40% 0.12 145); font-family: var(--font-mono); }
+figure.fig { margin: 22px 0; }
+figure.fig img { width: 100%; border: 1px solid var(--border); border-radius: 8px; }
+figure.fig figcaption {
+  font-size: 13px; color: var(--text-muted); margin-top: 8px; font-style: italic;
+}
+.leak { background: oklch(62% 0.17 60 / 0.16); color: oklch(45% 0.13 50);
+  padding: 1px 5px; border-radius: 3px; font-weight: 600; }
+.anon-out.lite { border-left-color: var(--wip); }
