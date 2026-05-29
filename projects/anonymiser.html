@@ -92,6 +92,9 @@
     </ul>
     <img src="../assets/ensemble_backfire.png" alt="Per-entity precision collapse of the 3-way ensemble." />
 
+    <p>The backfire earned a <strong>follow-up</strong> — was it the <em>voting rule</em>, not the idea of ensembling? I cached each model's predictions over the test set once, then replayed every combiner against the same scorer (the replay reproduces the original 0.553 exactly, so it's trustworthy). Requiring agreement <em>does</em> recover the loss — union 0.553 → consensus 0.795 as precision climbs from 41% to 88% — so union-voting was indeed the culprit. <strong>But no combiner beats the single fine-tune (0.854).</strong> The reason is decisive: the fine-tune is the best model on <em>all eight</em> labels, so "route each label to its strongest model" picks the fine-tune every time — routing collapses to the model alone. Ensembling only pays when members are <em>complementary</em> (one wins where another loses); here one dominates everywhere, so even a second same-level fine-tune wouldn't help — it'd be correlated and still non-complementary. The single fine-tune is the ceiling.</p>
+    <img src="../assets/phase6_combiner_comparison.png" alt="Combiner comparison — consensus recovers the union backfire (0.55→0.80) but no combiner clears the single fine-tune ceiling at 0.85." />
+
     <h2>Training &amp; caveats</h2>
     <ul>
       <li>Fine-tune: <code>roberta-base</code>, full 8-class BIO tagging, 384-token windows with 64-token overlap, span-deduped at inference.</li>
