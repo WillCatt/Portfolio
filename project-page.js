@@ -75,6 +75,12 @@
     highlightTokens(tabContent);
   }
 
-  tabButtons.forEach(b => b.addEventListener("click", () => showTab(b.dataset.tab)));
-  showTab(tabsAvailable[0].key);
+  const tabsNav = document.getElementById("tabs");
+  tabButtons.forEach(b => b.addEventListener("click", () => {
+    showTab(b.dataset.tab);
+    // Reset the viewport to the top of the tab bar so a switched-to tab starts
+    // at its beginning, rather than wherever the previous tab was scrolled to.
+    tabsNav.scrollIntoView({ behavior: "smooth", block: "start" });
+  }));
+  showTab(tabsAvailable[0].key);  // initial render — no scroll on load
 })();
