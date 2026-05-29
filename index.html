@@ -71,11 +71,11 @@ const { useState, useEffect } = React;
 const PROJECTS = [
   { id: "kaggle", index: "01", title: "Kaggle Competitions",
     subtitle: "Competitive ML — tabular, NLP, vision",
-    color: "oklch(52% 0.14 50)", status: "live", featured: true,
+    color: "oklch(52% 0.14 50)", status: "planned", featured: true,
     tags: ["Kaggle", "ML", "XGBoost"], year: 2026, q: "Q1" },
   { id: "rag", index: "02", title: "RAG Chatbot",
     subtitle: "Retrieval-augmented generation over custom KBs",
-    color: "oklch(52% 0.14 200)", status: "live", featured: true,
+    color: "oklch(52% 0.14 200)", status: "planned", featured: true,
     tags: ["LLM", "RAG", "FastAPI"], year: 2026, q: "Q2" },
   { id: "anonymiser", index: "03", title: "Legal Text Anonymiser",
     subtitle: "PII redaction + re-identification risk for legal text",
@@ -83,7 +83,7 @@ const PROJECTS = [
     tags: ["NLP", "NER", "RoBERTa"], year: 2026, q: "Q2" },
   { id: "blackjack", index: "04", title: "Blackjack Simulator",
     subtitle: "Monte Carlo strategy analysis",
-    color: "oklch(52% 0.14 25)", status: "live", featured: true,
+    color: "oklch(52% 0.14 25)", status: "planned", featured: true,
     tags: ["Simulation", "NumPy", "Stats"], year: 2026, q: "Q1" }
 ];
 
@@ -188,14 +188,14 @@ function App() {
                 William Catt
               </h1>
               <p style={{ fontSize: 16, color: "var(--text-muted)", fontWeight: 300, lineHeight: 1.6, marginBottom: 16 }}>
-                Data scientist exploring ML systems, retrieval-augmented generation, NLP, and analytical simulation. Building a public body of work — Kaggle, RAG, NER pipelines, and Monte Carlo experiments — to learn in the open and ship end-to-end.
+                Data scientist building ML systems end-to-end — measurement, modelling and deployment — with a bias toward rigorous evaluation and honest results, including the experiments that don't pan out. Featured work: a legal-text PII redaction pipeline pairing a fine-tuned NER model with re-identification ("mosaic") risk analysis; more projects in progress.
               </p>
               <div style={{ display: "flex", gap: 16, flexWrap: "wrap", fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--accent)" }}>
                 <a href="https://github.com/WillCatt" target="_blank" rel="noreferrer">github.com/WillCatt ↗</a>
                 <span style={{ color: "var(--text-dim)" }}>·</span>
-                <a href="#" >linkedin.com/in/wcatt ↗</a>
+                <a href="https://www.linkedin.com/in/william-catt/" target="_blank" rel="noreferrer">linkedin.com/in/william-catt ↗</a>
                 <span style={{ color: "var(--text-dim)" }}>·</span>
-                <a href="mailto:email@here" >email@here</a>
+                <a href="mailto:wcatt98@gmail.com">wcatt98@gmail.com</a>
               </div>
             </div>
           </div>

@@ -43,6 +43,7 @@
 
     <h2>Finding 2 — removing names isn't enough</h2>
     <p>Here's the part that surprised me. Even if you perfectly delete every name, date and ID number, the <em>ordinary</em> details left behind — someone's age, town, job, nationality — are enough to single them out.</p>
+    <p>Think of a neighbour whose name you've never learned. Erasing the name changes nothing if the description gives them away: <em>“the 6&prime;3&Prime; Russian who teaches boxing two doors down”</em> points to exactly one person. Court documents are full of these accidental fingerprints.</p>
     <p>Across the 555 documents, just <strong>three</strong> everyday details were enough to uniquely identify <strong>98%</strong> of people; with their full set, every single document was unique. Deleting names treats the symptom — the real risk is the combination of small facts (the "mosaic effect").</p>
     <img src="../assets/overview_reidentification.png" alt="Three ordinary details identify 98% of people." />
     <a class="deeper" href="#" onclick="document.querySelector('[data-tab=technical]')?.click();return false;">How the mosaic effect was measured</a>
@@ -114,6 +115,18 @@
       <li>Partial-match scoring is lenient and uses greedy first-overlap matching; exact-match (0.78 for the fine-tune) is the strict boundary-sensitive number — a CRF head is the standard next step to close the gap.</li>
       <li>Mosaic fingerprints match on exact surface form; fuzzy matching would shift the crossing points but not the qualitative finding. The demo uses TAB itself as the haystack — a stand-in for a firm's own corpus.</li>
     </ul>
+    <h2>From prototype to production</h2>
+    <p>This is a research prototype that proves an approach, not a shipped product. Being honest about that gap is part of the work — here's what a real law-firm deployment would need, and how I'd frame it:</p>
+    <ul>
+      <li><strong>It's an assistant, not an autopilot.</strong> At 0.85 F1 / 0.86 recall, roughly one identifier in seven is still missed at the span level — so the right product is a <em>human-in-the-loop accelerator</em> (model proposes, fee-earner reviews via the audit log), not unattended auto-redaction. The audit trail exists precisely so a person can sign off.</li>
+      <li><strong>“Risk reduction”, not a legal guarantee.</strong> Under GDPR, true <em>anonymisation</em> takes data out of scope entirely — a high bar this project's own mosaic finding shows is hard to clear. What this delivers is measurable risk <em>reduction</em> and pseudonymisation; the honest claim avoids over-promising (and the liability that comes with it).</li>
+      <li><strong>Validate on real firm documents.</strong> Every number here is on TAB (public ECHR judgments). Contracts, attendance notes and emails are a different distribution — a pilot on de-identified firm data is the next step before any accuracy claim transfers.</li>
+      <li><strong>Handle real formats.</strong> Production input is PDF/DOCX/scans with layout, tables and OCR — not the plain text this prototype assumes.</li>
+      <li><strong>Make the mosaic haystack real.</strong> The k-anonymity score is only as meaningful as what it compares against; in deployment that's the firm's own corpus (or a defined adversary model), not the benchmark used here as a stand-in.</li>
+      <li><strong>Deployment posture.</strong> On-prem / VPC so privileged text never leaves the firm, real key management for the pseudonym vault (not an in-memory map), access control, and cross-document consistency so the same person keeps the same label across a whole matter.</li>
+    </ul>
+    <p>The defensible wedge a pitch would lead with: catch legal PII better than off-the-shelf tools, <em>measure the residual re-identification risk nobody else does</em>, and enable safe use of external LLMs on privileged text via the local round-trip — delivered as a reviewable, audit-logged assistant.</p>
+
     <p><a href="https://github.com/WillCatt/Data-Anonymisation/blob/main/writeup/README.md" target="_blank" rel="noreferrer">Full write-up, all six phases →</a></p>
   </article>
 </template>
