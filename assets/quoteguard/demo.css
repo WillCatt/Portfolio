@@ -1,0 +1,60 @@
+/* QuoteGuard in-browser demo — scoped styles, palette inherited from project.css */
+.qg-demo { margin-top: 4px; }
+.qg-loading { color: var(--text-muted); font-family: var(--font-mono); font-size: 14px; padding: 24px 0; }
+
+.qg-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.qg-chip {
+  font-family: var(--font-mono); font-size: 12.5px; color: var(--text);
+  background: var(--card); border: 1px solid var(--border); border-radius: 999px;
+  padding: 6px 12px; cursor: pointer; transition: border-color .15s, background .15s;
+}
+.qg-chip:hover { border-color: var(--accent); background: #fffaf2; }
+
+.qg-input { display: flex; gap: 10px; align-items: stretch; margin-bottom: 16px; }
+#qg-q {
+  flex: 1; font-family: var(--font-mono); font-size: 14px; color: var(--text);
+  background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+  padding: 11px 13px; resize: vertical; line-height: 1.5;
+}
+#qg-q:focus { outline: none; border-color: var(--accent); }
+.qg-ask {
+  font-family: var(--font-display); font-weight: 600; font-size: 14px; color: #fff;
+  background: var(--accent); border: none; border-radius: 10px; padding: 0 20px; cursor: pointer;
+  white-space: nowrap; transition: filter .15s;
+}
+.qg-ask:hover { filter: brightness(1.07); }
+
+.qg-grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: 16px; align-items: start; }
+@media (max-width: 720px) { .qg-grid { grid-template-columns: 1fr; } }
+
+.qg-ans { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; }
+.qg-status {
+  display: inline-block; font-family: var(--font-mono); font-size: 11.5px; font-weight: 600;
+  letter-spacing: .03em; padding: 3px 10px; border-radius: 999px; margin-bottom: 10px;
+}
+.qg-status.ok   { background: #eef7f0; color: #2f7d4f; border: 1px solid #cfe9d8; }
+.qg-status.warn { background: #fdf6e9; color: #9a6a16; border: 1px solid #f0e2c4; }
+.qg-status.block{ background: #fbece9; color: #b3261e; border: 1px solid #f3d2cc; }
+.qg-text { white-space: pre-wrap; font-size: 14.5px; line-height: 1.65; color: var(--text); }
+
+.qg-cites { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.qg-cite { font-family: var(--font-mono); font-size: 11.5px; color: var(--text-muted); background: #f6f1ea; border: 1px solid var(--border); border-radius: 6px; padding: 3px 8px; }
+
+.qg-ev { margin-top: 12px; }
+.qg-ev summary { font-family: var(--font-mono); font-size: 12.5px; color: var(--accent); cursor: pointer; }
+.qg-evi { margin-top: 8px; padding: 8px 10px; background: #f8f4ee; border: 1px solid var(--border); border-radius: 8px; }
+.qg-evh { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); }
+.qg-evi p { margin: 4px 0 0; font-size: 13px; line-height: 1.5; color: #4a4039; }
+
+.qg-trace { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+.qg-trace-h { font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
+.qg-tr { border-left: 3px solid var(--border); padding: 6px 0 6px 10px; margin-bottom: 8px; }
+.qg-tr.pass { border-color: #cfe9d8; }
+.qg-tr.warn { border-color: #f0d9a8; }
+.qg-tr.block { border-color: #e7b3aa; }
+.qg-trg { font-family: var(--font-mono); font-size: 12.5px; font-weight: 600; color: var(--text); }
+.qg-trd { font-family: var(--font-mono); font-size: 10.5px; font-weight: 600; padding: 1px 7px; border-radius: 999px; margin-left: 7px; }
+.qg-trd.pass { background: #eef7f0; color: #2f7d4f; }
+.qg-trd.warn { background: #fdf6e9; color: #9a6a16; }
+.qg-trd.block { background: #fbece9; color: #b3261e; }
+.qg-trr { font-size: 11.5px; line-height: 1.45; color: var(--text-muted); margin-top: 3px; }
