@@ -1,0 +1,60 @@
+/* QuoteGuard golden-set results explorer — scoped .gr- classes (reuses .qg- from demo.css) */
+.gr { margin-top: 4px; }
+
+.gr-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 12px; }
+@media (max-width: 720px) { .gr-stats { grid-template-columns: repeat(2, 1fr); } }
+.gr-stat { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+.gr-num { font-family: var(--font-display); font-size: 28px; font-weight: 600; color: var(--accent); line-height: 1; }
+.gr-lbl { font-size: 12px; color: var(--text-muted); margin-top: 7px; line-height: 1.4; }
+.gr-cfg { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin: 0 0 16px; }
+
+.gr-filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 10px; }
+.gr-search, .gr-filters select {
+  font-family: var(--font-mono); font-size: 13px; color: var(--text); background: var(--card);
+  border: 1px solid var(--border); border-radius: 8px; padding: 8px 11px;
+}
+.gr-search { flex: 1; min-width: 180px; }
+.gr-search:focus, .gr-filters select:focus { outline: none; border-color: var(--accent); }
+.gr-chk { font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.gr-count { font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); margin-bottom: 8px; }
+
+.gr-list { display: flex; flex-direction: column; gap: 8px; }
+.gr-item { background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.gr-q { width: 100%; display: flex; align-items: center; gap: 12px; padding: 11px 14px; background: none; border: none;
+  cursor: pointer; text-align: left; font-family: inherit; }
+.gr-q:hover { background: #fffaf2; }
+.gr-id { font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); flex: 0 0 auto; }
+.gr-qt { flex: 1; font-size: 14px; color: var(--text); line-height: 1.4; }
+.gr-tags { display: flex; flex-wrap: wrap; gap: 6px; flex: 0 0 auto; justify-content: flex-end; }
+.gr-chip { font-family: var(--font-mono); font-size: 10.5px; color: var(--text-muted); background: #f6f1ea;
+  border: 1px solid var(--border); border-radius: 999px; padding: 2px 8px; }
+.gr-b { font-family: var(--font-mono); font-size: 10.5px; font-weight: 600; border-radius: 999px; padding: 2px 8px; }
+.gr-b.ok { background: #eef7f0; color: #2f7d4f; }
+.gr-b.no { background: #fbece9; color: #b3261e; }
+.gr-goldpage { background: #eef7f0; color: #2f7d4f; font-weight: 600; padding: 0 5px; border-radius: 4px; }
+
+.gr-detail { display: none; padding: 4px 14px 16px; border-top: 1px solid var(--border); }
+.gr-item.open .gr-detail { display: block; }
+.gr-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; }
+@media (max-width: 760px) { .gr-cols { grid-template-columns: 1fr; } }
+.gr-col { background: #f8f4ee; border: 1px solid var(--border); border-radius: 8px; padding: 11px 13px; }
+.gr-col.gold { background: #eef6ff; border-color: #d3e3f5; }
+.gr-h { font-family: var(--font-mono); font-size: 11px; letter-spacing: .03em; text-transform: uppercase;
+  color: var(--text-muted); margin-bottom: 7px; }
+.gr-a { font-size: 13.5px; line-height: 1.6; color: var(--text); white-space: pre-wrap; }
+.gr-cites { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 9px; }
+
+.gr-more { margin-top: 12px; }
+.gr-more summary { font-family: var(--font-mono); font-size: 12.5px; color: var(--accent); cursor: pointer; }
+.gr-twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 10px; }
+@media (max-width: 760px) { .gr-twocol { grid-template-columns: 1fr; } }
+.gr-evwrap { max-height: 320px; overflow-y: auto; }
+
+.gr-dl { display: inline-block; font-family: var(--font-mono); font-size: 13px; color: var(--accent);
+  text-decoration: none; border: 1px solid var(--border); border-radius: 8px; padding: 7px 13px; background: var(--card); }
+.gr-dl:hover { border-color: var(--accent); background: #fffaf2; }
+.gr-raw { margin-top: 10px; }
+.gr-raw summary { font-family: var(--font-mono); font-size: 12.5px; color: var(--text-muted); cursor: pointer; }
+.gr-raw pre { margin-top: 8px; background: #f6f1ea; border: 1px solid var(--border); border-radius: 8px;
+  padding: 10px 12px; overflow-x: auto; font-family: var(--font-mono); font-size: 11.5px; line-height: 1.5;
+  color: #4a4039; max-height: 340px; }

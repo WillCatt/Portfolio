@@ -13,6 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../project.css" />
   <link rel="stylesheet" href="../assets/quoteguard/demo.css" />
+  <link rel="stylesheet" href="../assets/quoteguard/results.css" />
 </head>
 <body>
 <!-- ─── PROJECT META ────────────────────────────────────────────────────────── -->
@@ -177,7 +178,7 @@
     </figure>
 
     <h2>See it in action</h2>
-    <p>Real outputs from the engine — a grounded answer, and the guardrails refusing the four things an insurer's bot must not do. The <a href="#" onclick="document.querySelector('[data-tab=app]')?.click();return false;">App tab</a> runs the same logic live in your browser.</p>
+    <p>Real outputs from the engine — a grounded answer, and the guardrails refusing the four things an insurer's bot must not do. The <a href="#" onclick="document.querySelector('[data-tab=app]')?.click();return false;">App tab</a> runs the same logic live in your browser, and the <a href="#" onclick="document.querySelector('[data-tab=raw]')?.click();return false;">Raw Results tab</a> shows the full system's answer on all 66 golden questions.</p>
 
     <div class="run">
       <h3>Grounded answer with citation</h3>
@@ -200,6 +201,17 @@
     </div>
 
     <p style="color:var(--text-muted);font-size:13px">Reproduce: <code>scripts/run_retrieval_eval.py</code> · <code>scripts/run_adversarial_eval.py</code>. Full tables in <code>docs/eval_report.md</code> and <code>docs/adversarial_report.md</code>.</p>
+  </article>
+</template>
+
+<!-- RAW RESULTS: the full golden-set results explorer (real LLM + extractive). -->
+<template id="tab-raw">
+  <article class="writeup">
+    <p>The full, unedited output of the <strong>real</strong> system — hybrid + cross-encoder rerank retrieval and the actual LLM (<code>llama-3.1-8b</code>, run locally) — on <strong>every one of the 66 golden questions</strong>, each shown beside its gold answer and the deterministic extractive fallback. The badges are objective (did retrieval surface the gold page; did the answer cite it), and every per-question record is available as raw JSON. This is the evidence behind the headline numbers in <a href="#" onclick="document.querySelector('[data-tab=results]')?.click();return false;">Results</a>; the <a href="#" onclick="document.querySelector('[data-tab=app]')?.click();return false;">App tab</a> is a lighter in-browser version you can play with.</p>
+    <p style="font-size:14px;color:var(--text-muted)">Read it honestly: retrieval surfaces the gold page ~80% of the time, but the local 8B model cites that exact page in only ~44% of answers — citation precision is its weak spot (the guardrails block <em>fabricated</em> cites, and the extractive fallback or a stronger model close the gap). The gold answer sits beside the system's so you can judge the content yourself.</p>
+    <p><a class="gr-dl" href="../assets/quoteguard/gold_results.json" download>⤓ Download the full raw results (JSON)</a></p>
+    <div id="qg-gold" class="gr"><p class="qg-loading">Loading the full golden-set results…</p></div>
+    <p style="color:var(--text-muted);font-size:13px;margin-top:14px">Generated locally with <code>scripts/build_gold_results.py</code> (Ollama), shipped as static JSON — no API at view time. Honest by construction: the gold answer sits beside the system's, the per-question retrieval/citation badges come straight from the gold supporting pages, and each record can be expanded to its raw JSON.</p>
   </article>
 </template>
 
@@ -284,6 +296,7 @@ if cited - retrieved_pages:                    # the model cited a page it never
   </article>
 </template>
 <script src="../assets/quoteguard/demo.js" defer></script>
+<script src="../assets/quoteguard/results.js" defer></script>
 
 </body>
 </html>
