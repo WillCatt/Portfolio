@@ -83,5 +83,10 @@
     // at its beginning, rather than wherever the previous tab was scrolled to.
     tabsNav.scrollIntoView({ behavior: "smooth", block: "start" });
   }));
-  showTab(tabsAvailable[0].key);  // initial render — no scroll on load
+  const requestedTab = new URLSearchParams(window.location.search).get("tab")
+    || window.location.hash.replace(/^#/, "");
+  const initialTab = tabsAvailable.some(t => t.key === requestedTab)
+    ? requestedTab
+    : tabsAvailable[0].key;
+  showTab(initialTab);  // initial render — no scroll on load
 })();

@@ -7,86 +7,502 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../project.css" />
+  <link rel="stylesheet" href="../assets/blackjack/blackjack.css" />
 </head>
 <body>
-<!-- ─── PROJECT META — Claude Code: edit these fields ────────────────────────── -->
 <script>
   window.PROJECT = {
     id: "blackjack",
     index: "04",
     title: "Blackjack Simulator",
-    subtitle: "Monte Carlo strategy analysis and card-counting sim",
+    subtitle: "A Monte Carlo lab for betting systems, table rules, and the house edge",
     color: "oklch(52% 0.14 25)",
-    status: "live", // "live" | "wip" | "archived"
-    tags: ["Simulation","NumPy","Stats","Monte Carlo"],
+    status: "live",
+    tags: ["Simulation", "Python", "Monte Carlo", "D3"],
     repo: "github.com/WillCatt/blackjack-sim",
-    demo: null, // e.g. "https://demo.example.com" — null hides the App tab
+    demo: "../apps/blackjack_lab.html",
+  };
+  window.openBlackjackFullscreen = function (button) {
+    const shell = button.closest(".app-shell");
+    if (shell && shell.requestFullscreen) {
+      shell.requestFullscreen();
+    } else {
+      window.open("../apps/blackjack_lab.html", "_blank", "noopener");
+    }
   };
 </script>
 
 <div id="root"></div>
 <script src="../project-page.js" defer></script>
 
-<!-- ─── TAB CONTENT — Claude Code: replace these sections with real content ──── -->
+<!-- ═══════════════════════════ OVERVIEW ═══════════════════════════ -->
+<template id="tab-overview">
+  <article class="writeup blackjack-writeup">
+    <section class="thesis-panel">
+      <div class="thesis-kicker">Monte Carlo gambling lab</div>
+      <div class="thesis-title">The house edge has patience. Your bankroll does not.</div>
+      <p>
+        Every blackjack "system" comes with a story about the night it broke the
+        bank, and a quieter, much larger graveyard of nights it didn't. I built a
+        simulator that plays each system through hundreds of thousands of hands and
+        asks the only questions that matter: how often do you finish ahead, how
+        often do you walk out broke, and how much money did you push across the
+        felt to get there?
+      </p>
+    </section>
 
-<!-- WRITE-UP: markdown-style long-form writeup. Use h2/h3 for sections. -->
-<template id="tab-writeup">
-  <article class="writeup">
     <h2>Overview</h2>
-    <p>Brief 1-2 sentence summary of what this project is and why it matters.</p>
+    <p class="punch">
+      The headline is uncomfortable: bet-sizing systems mostly rearrange losing.
+      They make the ride smoother, spikier, longer or more theatrical — they do
+      not erase a negative edge. The one genuine exception is counting, and it
+      wins for a reason that has nothing to do with bet patterns: it adds
+      <em>information</em>.
+    </p>
 
-    <h2>Approach</h2>
-    <p>Describe the high-level methodology — feature engineering, model selection, validation strategy.</p>
-    <ul>
-      <li>Bullet point one</li>
-      <li>Bullet point two</li>
-    </ul>
+    <figure class="fig">
+      <img src="../assets/blackjack/fig_ranking.png" alt="Return on risk by strategy: counting strategies positive, flat near zero, progressions negative." />
+      <figcaption>
+        Return on risk — profit per dollar wagered — across all the systems, at a
+        standard 6-deck / 75%-penetration / $25 table. Bars are means over 400
+        sessions of 4,000 hands; whiskers are bootstrap 95% confidence intervals.
+        Every line above zero is a counting strategy. Everything else either bleeds
+        (flat) or detonates (the progressions). The hatched "cheat" bar is an
+        idealised perfect-information ceiling — a reference, not a strategy.
+      </figcaption>
+    </figure>
 
-    <h2>Results</h2>
-    <p>Quantify outcomes — leaderboard rank, accuracy, business metric, etc.</p>
+    <div class="takeaway">
+      <strong>The useful question isn't "which system wins?"</strong>
+      <p>
+        It's "what <em>kind</em> of loss does this system manufacture, and how much
+        bankroll does it need before that loss becomes visible?" That single
+        reframing makes martingale, flat betting, counting and team play
+        comparable — without pretending they're solving the same problem.
+      </p>
+    </div>
 
-    <h2>What I Learned</h2>
-    <p>The interesting parts — what surprised you, what you'd do differently.</p>
+    <div class="visual-grid">
+      <div class="finding-card">
+        <strong>Flat betting loses slowly.</strong>
+        <p>−0.09% per dollar wagered — within noise of the textbook house edge.
+        Boring, which is exactly what makes it the honest control group.</p>
+        <div class="mini-rule">low variance · negative edge</div>
+      </div>
+      <div class="finding-card">
+        <strong>Martingale sells certainty.</strong>
+        <p>It wins small constantly and then loses everything: ~100% of sessions
+        ruined, median outcome −$1,925. The doubling collides with the table max.</p>
+        <div class="mini-rule">survival illusion · 97% ruin</div>
+      </div>
+      <div class="finding-card">
+        <strong>Bankroll buys time, not edge.</strong>
+        <p>For the MIT team, a 40× larger roll cuts ruin from 82% to 0% while the
+        per-dollar edge holds dead flat at ~1.1%. Capital buys survival.</p>
+        <div class="mini-rule">survival ↑ · edge unchanged</div>
+      </div>
+      <div class="finding-card">
+        <strong>Counting is the real exception.</strong>
+        <p>Hi-Lo measures +1.0% ROR — the only heuristic that clears zero with its
+        whole confidence interval. But it's earned through volatility, not magic.</p>
+        <div class="mini-rule">information edge · still swingy</div>
+      </div>
+    </div>
+
+    <h2>How to read the numbers</h2>
+    <div class="detail-grid">
+      <div class="detail-card">
+        <div class="eyebrow">Median</div>
+        <strong>The typical session</strong>
+        <p>When outcomes are heavy-tailed, the mean is a fiction nobody lives. The
+        median is what actually happens to the person at the table.</p>
+      </div>
+      <div class="detail-card">
+        <div class="eyebrow">Ruin</div>
+        <strong>The cliff risk</strong>
+        <p>Did the bankroll survive long enough for the strategy's story to play
+        out? A system can have a positive edge and still go broke first.</p>
+      </div>
+      <div class="detail-card">
+        <div class="eyebrow">ROR</div>
+        <strong>The exposure test</strong>
+        <p>Return on risk divides profit by total dollars wagered, so a system
+        can't look good merely by shoving more money across the table.</p>
+      </div>
+    </div>
+
+    <p>
+      The deep dive splits into two halves: <a class="deeper" href="#" onclick="document.querySelector('[data-tab=technical]')?.click();return false;">how the engine works and where it's honest about its limits</a>,
+      and <a class="deeper" href="#" onclick="document.querySelector('[data-tab=results]')?.click();return false;">the full sweep analysis</a> —
+      decks, penetration, bankroll and bet limits, each one moved across its whole
+      range while everything else is held fixed.
+    </p>
+
+    <blockquote>
+      The project is really about variance: how it disguises losing maths, and how
+      fast a seductive story falls apart the moment you plot the whole distribution
+      instead of the one run that got told at the bar.
+    </blockquote>
   </article>
 </template>
 
-<!-- CODE: repo structure + key snippets. Use <pre><code> for code blocks. -->
+<!-- ═══════════════════════════ TECHNICAL ═══════════════════════════ -->
+<template id="tab-technical">
+  <article class="writeup blackjack-writeup">
+    <h2>Technical</h2>
+    <p>
+      The simulator runs independent Monte Carlo sessions over a configurable
+      multi-deck shoe with cut-card reshuffling. Every strategy plays
+      <strong>identical basic strategy</strong> for hit / stand / double / split /
+      late-surrender decisions — the strategies differ only in how they
+      <em>size their bets</em>. The single exception is the counters, who also
+      apply selected high-value Hi-Lo index deviations (the "Illustrious 18") and
+      take insurance at true count ≥ +3. That separation of <em>play</em> from
+      <em>bet</em> is the whole point: it isolates what bet-sizing can and cannot do.
+    </p>
+
+    <h3>Simulation design</h3>
+    <ul>
+      <li>Multi-deck shoe (1–8) with configurable penetration and cut-card reshuffle.</li>
+      <li>Rule switches for blackjack payout (3:2 vs 6:5), dealer S17/H17, table minimum and maximum.</li>
+      <li>Bankroll-aware ruin: a run dies when it can no longer legally place the bet its strategy demands — below the table minimum, above the table maximum, or above available cash.</li>
+      <li>Exposure tracking across splits, doubles and insurance, so return on risk uses <em>actual</em> dollars wagered, not the nominal base bet.</li>
+      <li>Bootstrap and Wilson confidence intervals on every headline percentage — with ~0.5% edges sitting under enormous variance, point estimates lie.</li>
+    </ul>
+
+    <h3>Why the counting edge needs big samples</h3>
+    <p>
+      A counter's advantage is on the order of half a percent to one percent of
+      money wagered, and it sits underneath the natural per-hand variance of
+      blackjack, which is roughly ±1.3 units. At 50 sessions the measured return on
+      risk for Hi-Lo can land anywhere from clearly negative to strongly positive
+      purely from luck. The figures on this page use <strong>400 sessions of 4,000
+      hands each</strong> and report bootstrap 95% intervals, which is what it takes
+      to pin the counting edge tightly enough that its confidence band clears zero.
+    </p>
+
+    <figure class="fig">
+      <img src="../assets/blackjack/fig_deck_pen_heat.png" alt="Heatmap of Hi-Lo return on risk across deck count and penetration; best at 1 deck 90% pen, worst at 8 decks 50% pen." />
+      <figcaption>
+        The counter's whole world on one grid: Hi-Lo return on risk across every
+        combination of deck count and penetration. The edge runs from <strong>+2.62%
+        in the corner counters dream of</strong> (single deck, 90% dealt) down to
+        <strong>+0.23% in the one they're stuck with</strong> (8 decks, 50% dealt) —
+        an eleven-fold span driven entirely by table conditions, not skill.
+      </figcaption>
+    </figure>
+
+    <h3>Strategies modelled</h3>
+    <table class="defs">
+      <thead><tr><th>Family</th><th>Strategies</th><th>What they test</th></tr></thead>
+      <tbody>
+        <tr><td>Baseline</td><td>Flat Bet</td><td>The pure house edge with no progression distortion.</td></tr>
+        <tr><td>Progression</td><td>Martingale, D'Alembert, Paroli, 1-3-2-6, Oscar's Grind</td><td>Whether bet sequencing can manufacture an edge. (It can't.)</td></tr>
+        <tr><td>Counting</td><td>Hi-Lo, Kelly, Half-Kelly</td><td>How information plus bankroll-aware sizing changes expected value.</td></tr>
+        <tr><td>Reference</td><td>Hi-Lo Cheat, MIT Team</td><td>A perfect-information ceiling, and a team-bankroll structure.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>The MIT-style team model</h3>
+    <p>
+      The team strategy is deliberately not a single-player ramp. A
+      <strong>Spotter</strong> sits flat at the minimum, counting silently and
+      paying a small ongoing house-edge tax to hold a seat. A
+      <strong>Controller</strong> plays a modest count-aware ramp as a second pair
+      of eyes. The <strong>Big Player</strong> wanders the floor and only sits down
+      when the shoe goes hot (true count ≥ +2), then bets 15–60× the minimum. All
+      three draw from a single shared pool, so the model attributes the team's
+      profit back to whichever role earned it — and it turns out almost all of it
+      is the Big Player's.
+    </p>
+
+    <h3 class="neg-head">Honest negatives — where the model bites back</h3>
+    <div class="takeaway neg">
+      <strong>A positive edge can still lose you money.</strong>
+      <p>
+        The starkest result in the whole project is the MIT team at a small
+        bankroll. At a $5,000 pool the team's return on risk is <em>+1.50%</em> —
+        its best per-dollar number anywhere — yet its <em>median outcome is −$5,000:
+        dead broke.</em> The edge is real and the team is, per dollar wagered,
+        winning. It just goes bankrupt from variance before the edge can pay out.
+        Positive expected value is necessary, not sufficient; you also have to
+        survive long enough to collect it. That tension only becomes visible
+        because the simulator reports edge and ruin <em>side by side</em> instead of
+        collapsing them into one flattering average.
+      </p>
+    </div>
+    <ul>
+      <li><strong>Return on risk lies on its own.</strong> D'Alembert posts a return on risk near zero (+0.06%) that looks survivable — while ruining 100% of the time with a −$9,206 median. Only reading ROR <em>with</em> ruin and median exposes it.</li>
+      <li><strong>The deterministic dealer is a simplification.</strong> The engine uses a fixed basic-strategy chart and a small index set, not a full composition-dependent solver; absolute edges are within a tenth of a percent of published figures, not to the basis point.</li>
+      <li><strong>No heat, no comps, no human error.</strong> The model assumes flawless counting and infinite tolerance from the pit. Real counters miscount, get backed off, and tip — every one of which shaves the thin edge further.</li>
+    </ul>
+
+    <h3>From prototype to production</h3>
+    <p>
+      To turn this from an analysis lab into something trustworthy at the basis-point
+      level, the next steps would be a composition-dependent play engine, the full
+      Illustrious 18 plus Fab 4 surrenders, variance-reduction (correlated sampling
+      across strategies on a shared shoe), and a calibration harness that regresses
+      the simulator's flat-bet edge against the known analytic house edge for each
+      rule set. The architecture already separates shoe, play, sizing and metrics,
+      so each of those slots in without disturbing the others.
+    </p>
+  </article>
+</template>
+
+<!-- ═══════════════════════════ RESULTS ═══════════════════════════ -->
+<template id="tab-results">
+  <article class="writeup blackjack-writeup">
+    <h2>Results</h2>
+    <p>
+      Every figure below is a <strong>parameter sweep</strong>: one knob moved across
+      its full range while everything else is held fixed, 400 sessions of 4,000 hands
+      at each setting, bootstrap 95% intervals throughout. The reproducible script is
+      <code>figures/build_portfolio_figures.py</code>.
+    </p>
+
+    <div class="statrow">
+      <div class="stat">
+        <div class="num">+1.02%</div>
+        <div class="lbl">Hi-Lo return on risk at a standard table — the only heuristic whose CI clears zero.</div>
+      </div>
+      <div class="stat">
+        <div class="num">11×</div>
+        <div class="lbl">Span of the counting edge from best to worst deck-and-penetration corner.</div>
+      </div>
+      <div class="stat">
+        <div class="num">82→0%</div>
+        <div class="lbl">MIT team ruin as the bankroll grows 40× — at constant per-dollar edge.</div>
+      </div>
+    </div>
+
+    <section class="result-section">
+      <h3>1. Decks: more of them, thinner edge</h3>
+      <p>
+        Adding decks barely touches flat betting — its return on risk wanders around
+        −0.1% at every deck count, which is just the house edge. For counters it's
+        decisive. Each extra deck dilutes how much any single seen card moves the
+        true count, so the information degrades. <strong>Hi-Lo falls from +2.80% at a
+        single deck to +0.52% at eight</strong> — more than a five-fold collapse —
+        and Kelly, which sizes hardest when the edge is most reliable, falls even
+        more steeply from +3.51% to +0.33%.
+      </p>
+      <figure class="fig">
+        <img src="../assets/blackjack/fig_decks.png" alt="Return on risk vs deck count: flat stays near zero, Hi-Lo and Kelly decline sharply from 1 to 8 decks." />
+        <figcaption>
+          Return on risk against deck count at 75% penetration. The flat line is
+          the tell: deck count is almost invisible to a non-counter and existential
+          to a counter. Single- and double-deck games are where the edge lives —
+          which is exactly why casinos pushed players toward 6- and 8-deck shoes.
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="result-section">
+      <h3>2. Penetration: the counter's oxygen</h3>
+      <p>
+        Penetration — how deep the shoe is dealt before the reshuffle — is the
+        single most important rule a counter can shop for, and it's invisible to
+        everyone else. A rich count is worthless if the dealer shuffles it away
+        before you can bet into it. The edge scales almost linearly with depth:
+        <strong>Hi-Lo climbs from +0.48% at 50% penetration to +1.58% at 90%</strong>,
+        and Kelly fans out even harder, from +0.19% to +1.79% — a ten-fold swing
+        from one rule the pit controls with a coloured plastic card.
+      </p>
+      <figure class="fig">
+        <img src="../assets/blackjack/fig_penetration.png" alt="Return on risk vs penetration: flat flat near zero, Hi-Lo and Kelly rising roughly linearly from 50% to 90%." />
+        <figcaption>
+          Return on risk against penetration at 6 decks. Flat betting doesn't care
+          how deep the cut card sits; the counters' edge rises in a near-straight
+          line. This is why a deeply-dealt double-deck game is a counter's paradise
+          and a shallow 8-deck shoe is the trap that looks identical from across the
+          floor.
+        </figcaption>
+      </figure>
+      <p class="result-note">
+        Decks and penetration are the two axes of the same story, which is why the
+        <a class="deeper" href="#" onclick="document.querySelector('[data-tab=technical]')?.click();return false;">heatmap in the Technical tab</a>
+        plots them together — the counting edge ranges 11× across that grid, and
+        never quite turns negative, but +0.23% in the worst corner is close enough to
+        break-even that ordinary human counting error would erase it.
+      </p>
+    </section>
+
+    <section class="result-section">
+      <h3>3. Bankroll and the MIT team — capital buys survival, not edge</h3>
+      <p>
+        This is the sweep that reframes everything. As the team's shared bankroll
+        grows from $5k to $200k, its <strong>return on risk holds essentially flat
+        between +1.1% and +1.5%</strong> — the edge is a property of the game and
+        the strategy, and money cannot buy more of it. What money buys is
+        <em>survival</em>: <strong>ruin collapses from 82% to 0%</strong>, and the
+        median outcome flips from −$5,000 (broke) to +$17,000.
+      </p>
+      <figure class="fig">
+        <img src="../assets/blackjack/fig_mit_bankroll.png" alt="MIT team: ruin rate falls steeply from 82% to 0% as bankroll grows, while return on risk stays flat near 1.1%." />
+        <figcaption>
+          The MIT team across a 40× range of starting bankroll. The red ruin curve
+          dives; the green edge curve is a near-flat line. The two together are the
+          entire case for team play: pooling capital didn't sharpen the edge, it
+          bought the staying power to live through the variance the Big Player's
+          huge bets generate.
+        </figcaption>
+      </figure>
+      <div class="detail-grid">
+        <div class="detail-card">
+          <div class="eyebrow">$5k pool</div>
+          <strong>Right, but broke.</strong>
+          <p>+1.50% per dollar wagered — and an 82% ruin rate with a −$5,000 median. The edge never gets to pay out.</p>
+        </div>
+        <div class="detail-card">
+          <div class="eyebrow">$50k pool</div>
+          <strong>The turn.</strong>
+          <p>Ruin down to 13%, median finally positive at +$16,138. This is roughly where capitalisation catches up to the strategy.</p>
+        </div>
+        <div class="detail-card">
+          <div class="eyebrow">$200k pool</div>
+          <strong>The edge collected.</strong>
+          <p>0% ruin, +$17,000 median — the <em>same</em> 1.17% edge, now given enough runway to actually land.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="result-section">
+      <h3>4. Table maximum — the Martingale trap</h3>
+      <p>
+        Raising the table maximum is supposed to "help" a martingale player by
+        letting the doubling chain run longer. The sweep shows what it actually
+        does: <strong>ruin stays pinned at 100%</strong> across every ceiling from
+        $250 to $20,000, while the <strong>worst single-session loss grows from
+        about $625 to over $22,000</strong>. A higher ceiling doesn't save the
+        martingale — it just enlarges the crater it eventually leaves. The cap isn't
+        the cause of failure; it's the messenger.
+      </p>
+    </section>
+
+    <section class="result-section">
+      <h3>5. Table minimum — bet-to-bankroll is the real killer</h3>
+      <p>
+        The most democratic finding in the project: hold the bankroll fixed at
+        $2,000 and raise only the table minimum, and survival collapses for
+        <em>every</em> system at once. Flat betting — the safest strategy there is —
+        goes from <strong>0% ruin when the minimum is 0.5% of the roll to 67% ruin
+        when it's 10%</strong>. No progression, no counting, no cleverness involved;
+        the bet-to-bankroll ratio alone decides who walks out. The progressions just
+        start the collapse from an already-fatal 79–87%.
+      </p>
+      <figure class="fig">
+        <img src="../assets/blackjack/fig_bet_limits.png" alt="Two panels: table-max raises Martingale's worst loss at constant 100% ruin; table-min as a fraction of bankroll collapses every system's survival together." />
+        <figcaption>
+          Left — the martingale trap: a higher ceiling buys a bigger blow-up, not a
+          lower death rate. Right — the bet-to-bankroll killer: raise the minimum
+          against a fixed roll and flat, D'Alembert and martingale all lose survival
+          together. The single most protective decision a recreational player can
+          make isn't a system — it's never letting one bet be a large fraction of
+          the bankroll.
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="result-section">
+      <h3>What the whole picture says</h3>
+      <p>
+        Read across the five sweeps and one pattern dominates: <strong>strategies
+        that add no information only ever reshape the loss</strong> — earlier or
+        later, smoother or spikier — they never remove the house edge. The only
+        thing that creates a real edge is information (counting), and even that edge
+        is small, fragile to deck count and penetration, and useless without the
+        bankroll to survive its own variance. Or, put the way the data keeps
+        insisting: the recreational player's single most profitable move isn't a
+        better system. It's a bigger bankroll relative to the bet, and a shorter
+        time at the table.
+      </p>
+    </section>
+  </article>
+</template>
+
+<!-- ═══════════════════════════ CODE ═══════════════════════════ -->
 <template id="tab-code">
   <article class="code-tab">
     <h2>Repository</h2>
     <p>
       <a href="https://github.com/WillCatt/blackjack-sim" target="_blank" rel="noreferrer">
-        ⌥ github.com/WillCatt/blackjack-sim ↗
+        github.com/WillCatt/blackjack-sim ↗
       </a>
     </p>
 
     <h2>Structure</h2>
-    <pre class="tree"><code>blackjack/
-├── notebooks/
-│   ├── eda.ipynb
-│   └── modeling.ipynb
-├── src/
-│   ├── features.py
-│   └── models.py
-└── README.md</code></pre>
+    <pre class="tree"><code>blackjack-sim/
+├── blackjack_sim.py                  # Monte Carlo engine + 11 strategies + CLI/JSON exporter
+├── blackjack_lab.html                # Standalone D3 browser app (the live demo)
+├── blackjack_writeup.md              # Long-form analysis notes
+├── test_blackjack_sim.py             # Rules + smoke tests
+└── figures/
+    └── build_portfolio_figures.py    # Parameter sweeps → the charts on this page</code></pre>
 
-    <h2>Key snippet</h2>
-    <pre><code class="lang-python">def cv_score(model, X, y, n_splits=5):
-    kf = KFold(n_splits=n_splits, shuffle=True, random_state=42)
-    return cross_val_score(model, X, y, cv=kf).mean()</code></pre>
+    <h2>The metric that does the work</h2>
+    <p>
+      Return on risk normalises away bet size, so a martingale that shoves 30× the
+      capital across the table can't hide behind raw dollars. Exposure is summed
+      from <em>actual</em> action — every split and double adds to the denominator.
+    </p>
+    <pre><code class="lang-python">total_wagered += bet * result.bet_units          # splits + doubles count
+return_on_risk = total_profit / total_wagered_all
+
+# EV per *intended* hand, so an early ruin isn't flattered by a tiny denominator
+ev_per_hand   = total_profit / (num_sims * intended_hands)
+profit_chance = sims_finished_above_start / num_sims
+ruin_rate     = sims_ruined / num_sims</code></pre>
+
+    <h2>Sweeps with honest error bars</h2>
+    <p>
+      Each figure runs the engine across a parameter grid and bootstraps a 95%
+      interval — essential when the signal (a ~0.5–1% edge) is dwarfed by blackjack's
+      per-hand variance.
+    </p>
+    <pre><code class="lang-python">def metrics(finals, ruined, wagered, start, rng):
+    profit = finals - start
+    ror = profit.sum() / wagered.sum()
+    rors = [profit[i].sum() / wagered[i].sum()
+            for i in (rng.choice(len(finals), len(finals), replace=True)
+                      for _ in range(BOOT))]
+    return {"ror": ror,
+            "ror_ci": (np.percentile(rors, 2.5), np.percentile(rors, 97.5))}</code></pre>
+
+    <p>
+      The "cheating" counter is a deliberate ceiling: it reads the exact true count
+      straight off the remaining shoe instead of tallying seen cards, so it bets a
+      steep ramp with perfect confidence. It's tagged invalid in the stats table —
+      it exists to bound what counting <em>could</em> be worth, not to recommend it.
+    </p>
   </article>
 </template>
 
-<!-- APP: live demo iframe, screenshots, or "coming soon". Leave empty if no demo. -->
+<!-- ═══════════════════════════ APP ═══════════════════════════ -->
 <template id="tab-app">
   <article class="app-tab">
-    <div class="app-coming-soon">
-      <h2>Demo coming soon</h2>
-      <p>This project doesn't have a hosted demo yet. Check back later.</p>
+    <div class="app-shell">
+      <div class="app-toolbar">
+        <p>
+          The live D3 lab — run any strategy set under your own rules, bankroll and
+          bet limits, then watch the outcome distribution, survival curves, MIT
+          role split and parameter sweeps redraw. <strong>Faithful:</strong> the
+          play engine, sizing, ruin logic and metrics are a direct port of the
+          Python. <strong>Lightweight:</strong> it runs fewer sims than the figures
+          on the Results tab, so single runs are noisier than the 400-session
+          numbers quoted here.
+        </p>
+        <div class="app-actions">
+          <button class="app-action primary" type="button" onclick="window.openBlackjackFullscreen(this)">Full screen</button>
+          <a class="app-action" href="../apps/blackjack_lab.html" target="_blank" rel="noreferrer">Open tab</a>
+        </div>
+      </div>
+      <iframe
+        src="../apps/blackjack_lab.html"
+        title="Blackjack Strategy Lab"
+        allowfullscreen
+      ></iframe>
     </div>
-    <!-- When ready, replace with:
-    <iframe src="https://your-demo.com" style="width:100%;height:600px;border:1px solid var(--border);border-radius:8px"></iframe>
-    -->
   </article>
 </template>
 

@@ -1,0 +1,25 @@
+/* Scoped styles for the Blackjack Simulator page.
+   Kept out of the shared project.css per the portfolio house rules. */
+
+/* Honest-negatives callout — a caution-tinted variant of .takeaway */
+.blackjack-writeup .takeaway.neg {
+  border-left: 3px solid var(--wip);
+  background: oklch(62% 0.17 60 / 0.05);
+}
+.blackjack-writeup h3.neg-head {
+  margin-top: 30px;
+}
+.blackjack-writeup h3.neg-head::before {
+  content: "⚠ ";
+  color: var(--wip);
+}
+
+/* Give the swept-parameter figures a touch more breathing room and a soft
+   lift so the charts read as first-class evidence, not decoration. */
+.blackjack-writeup figure.fig {
+  margin: 26px 0 10px;
+}
+.blackjack-writeup figure.fig img {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  background: #faf8f4;
+}
