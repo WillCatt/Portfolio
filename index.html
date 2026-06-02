@@ -83,14 +83,23 @@ const { useState, useEffect } = React;
 const PROJECTS = [
   { id: "anonymiser", index: "01", title: "Legal Text Anonymiser",
     subtitle: "PII redaction + re-identification risk for legal text",
+    hook: 'How redacted is *"redacted"*? Measuring re-identification risk.',
+    chips: ["F1 0.85", "re-ID risk modelled"],
+    chart: "assets/overview_accuracy.png",
     color: "oklch(52% 0.14 145)", status: "live", featured: true,
     tags: ["NLP", "NER", "RoBERTa"], year: 2026, q: "Q2" },
   { id: "quoteguard", index: "02", title: "QuoteGuard",
     subtitle: "Guardrailed, grounded RAG over an insurance policy",
+    hook: "A chatbot that *refuses to invent prices* or give advice.",
+    chips: ["72%→100% safe", "page-cited"],
+    chart: "assets/quoteguard/adversarial_iteration.png",
     color: "oklch(52% 0.14 200)", status: "live", featured: true,
     tags: ["RAG", "Guardrails", "Retrieval"], year: 2026, q: "Q2" },
   { id: "blackjack", index: "03", title: "Blackjack Simulator",
     subtitle: "Monte Carlo strategy analysis",
+    hook: "Does card counting *actually* beat the house?",
+    chips: ["1.6M hands", "+1.02% ROR"],
+    chart: "assets/blackjack/fig_ranking.png",
     color: "oklch(52% 0.14 25)", status: "live", featured: true,
     tags: ["Simulation", "Python", "Monte Carlo"], year: 2026, q: "Q2" },
   { id: "kaggle", index: "04", title: "Kaggle Competitions",
@@ -139,6 +148,9 @@ const str = (t) => <span style={{ color: "#5b8a3a" }}>{t}</span>;
 // ─── App ──────────────────────────────────────────────────────────────────────
 function App() {
   const [step, setStep] = useState(0);
+  const [openIdx, setOpenIdx] = useState(0);
+  const [hovered, setHovered] = useState(null);
+  const [reduceMotion, setReduceMotion] = useState(false);
 
   useEffect(() => {
     const timers = [];
@@ -147,6 +159,24 @@ function App() {
     }
     return () => timers.forEach(clearTimeout);
   }, []);
+
+  // Respect the OS "reduce motion" setting — no auto-cycle for those users.
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const apply = () => setReduceMotion(mq.matches);
+    apply();
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
+  }, []);
+
+  // Auto-cycle which featured card is expanded; pauses on hover / reduced motion.
+  useEffect(() => {
+    if (reduceMotion || hovered !== null) return;
+    const t = setInterval(() => setOpenIdx(i => (i + 1) % FEATURED.length), 3200);
+    return () => clearInterval(t);
+  }, [reduceMotion, hovered]);
+
+  const activeIdx = hovered !== null ? hovered : (reduceMotion ? null : openIdx);
 
   return (
     <div style={{ minHeight: "100vh", padding: "32px clamp(24px, 5vw, 64px) 80px" }}>
@@ -235,7 +265,9 @@ function App() {
         <Cell n="2" type="out" visible={step >= 4}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 14 }}>
             {FEATURED.map((p, i) => (
-              <ProjectCard key={p.id} p={p} visible={step >= 4 + i * 0.3} />
+              <ProjectCard key={p.id} p={p} visible={step >= 4 + i * 0.3}
+                expanded={activeIdx === i}
+                onEnter={() => setHovered(i)} onLeave={() => setHovered(null)} />
             ))}
           </div>
         </Cell>
@@ -275,13 +307,22 @@ function App() {
   );
 }
 
-function ProjectCard({ p, visible }) {
-  const [hovered, setHovered] = useState(false);
+// Render a hook string, colouring any *emphasised* spans in the project hue.
+function renderHook(hook, color) {
+  return hook.split("*").map((part, i) =>
+    i % 2 === 1
+      ? <span key={i} style={{ color, fontWeight: 500 }}>{part}</span>
+      : <React.Fragment key={i}>{part}</React.Fragment>
+  );
+}
+
+function ProjectCard({ p, visible, expanded, onEnter, onLeave }) {
   const isLive = p.status === "live";
+  const hasDetail = !!p.chart;
+  const open = hasDetail && expanded;
   return (
     <a href={`projects/${p.id}.html`}
-       onMouseEnter={() => setHovered(true)}
-       onMouseLeave={() => setHovered(false)}
+       onMouseEnter={onEnter} onMouseLeave={onLeave}
        style={{
          position: "relative", display: "flex", flexDirection: "column",
          padding: "20px 22px", borderRadius: 12,
@@ -289,8 +330,8 @@ function ProjectCard({ p, visible }) {
          border: "1px solid var(--border)",
          borderLeft: `3px solid ${p.color}`,
          transition: "all 0.25s ease",
-         transform: hovered ? "translateY(-4px)" : "translateY(0)",
-         boxShadow: hovered ? `0 14px 30px ${p.color.replace(")", " / 0.20)")}` : "0 2px 6px rgba(0,0,0,0.03)",
+         transform: open ? "translateY(-4px)" : "translateY(0)",
+         boxShadow: open ? `0 14px 30px ${p.color.replace(")", " / 0.20)")}` : "0 2px 6px rgba(0,0,0,0.03)",
          opacity: visible ? (isLive ? 1 : 0.9) : 0,
          minHeight: 176
        }}>
@@ -303,12 +344,38 @@ function ProjectCard({ p, visible }) {
           {isLive ? "LIVE" : p.status === "wip" ? "IN PROGRESS" : "PLANNED"}
         </span>
       </div>
-      <div style={{ fontSize: 20, fontWeight: 600, marginBottom: 5, letterSpacing: "-0.01em" }}>
+      <div style={{ fontSize: 20, fontWeight: 600, marginBottom: 6, letterSpacing: "-0.01em" }}>
         {p.title}
       </div>
-      <div style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.5 }}>
-        {p.subtitle}
+      <div style={{ fontSize: 13.5, color: p.hook ? "var(--text)" : "var(--text-muted)", lineHeight: 1.5 }}>
+        {p.hook ? renderHook(p.hook, p.color) : p.subtitle}
       </div>
+      {p.chips && (
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 10 }}>
+          {p.chips.map(c => (
+            <span key={c} style={{
+              fontFamily: "var(--font-mono)", fontSize: 10, padding: "4px 9px", borderRadius: 5,
+              color: p.color,
+              background: p.color.replace(")", " / 0.09)"),
+              border: `1px solid ${p.color.replace(")", " / 0.22)")}`,
+              letterSpacing: "0.03em"
+            }}>{c}</span>
+          ))}
+        </div>
+      )}
+      {hasDetail && (
+        <div style={{
+          maxHeight: open ? 200 : 0, opacity: open ? 1 : 0, marginTop: open ? 14 : 0,
+          overflow: "hidden",
+          transition: "max-height 0.42s cubic-bezier(.4,0,.2,1), opacity 0.3s ease, margin-top 0.42s ease"
+        }}>
+          <div style={{ height: 1, background: "var(--border)", marginBottom: 12 }} />
+          <img src={p.chart} alt={`${p.title} — key result`} loading="lazy" style={{
+            width: "100%", height: 150, objectFit: "contain", objectPosition: "center",
+            background: "#fff", padding: 6, borderRadius: 8, border: "1px solid var(--border)", display: "block"
+          }} />
+        </div>
+      )}
       <div style={{ marginTop: "auto", paddingTop: 16, display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
           {p.tags.map(t => (
@@ -321,7 +388,7 @@ function ProjectCard({ p, visible }) {
         </div>
         <span style={{
           fontFamily: "var(--font-mono)", fontSize: 16, color: p.color, alignSelf: "center",
-          opacity: hovered ? 1 : 0, transform: hovered ? "translateX(0)" : "translateX(-6px)",
+          opacity: open ? 1 : 0, transform: open ? "translateX(0)" : "translateX(-6px)",
           transition: "all 0.22s ease", flexShrink: 0, marginLeft: 8
         }}>→</span>
       </div>
