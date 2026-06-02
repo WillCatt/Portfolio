@@ -148,9 +148,7 @@ const str = (t) => <span style={{ color: "#5b8a3a" }}>{t}</span>;
 // ─── App ──────────────────────────────────────────────────────────────────────
 function App() {
   const [step, setStep] = useState(0);
-  const [openIdx, setOpenIdx] = useState(0);
-  const [hovered, setHovered] = useState(null);
-  const [reduceMotion, setReduceMotion] = useState(false);
+  const [groupHover, setGroupHover] = useState(false);
 
   useEffect(() => {
     const timers = [];
@@ -159,24 +157,6 @@ function App() {
     }
     return () => timers.forEach(clearTimeout);
   }, []);
-
-  // Respect the OS "reduce motion" setting — no auto-cycle for those users.
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const apply = () => setReduceMotion(mq.matches);
-    apply();
-    mq.addEventListener("change", apply);
-    return () => mq.removeEventListener("change", apply);
-  }, []);
-
-  // Auto-cycle which featured card is expanded; pauses on hover / reduced motion.
-  useEffect(() => {
-    if (reduceMotion || hovered !== null) return;
-    const t = setInterval(() => setOpenIdx(i => (i + 1) % FEATURED.length), 3200);
-    return () => clearInterval(t);
-  }, [reduceMotion, hovered]);
-
-  const activeIdx = hovered !== null ? hovered : (reduceMotion ? null : openIdx);
 
   return (
     <div style={{ minHeight: "100vh", padding: "32px clamp(24px, 5vw, 64px) 80px" }}>
@@ -263,11 +243,12 @@ function App() {
 
         {/* Cell 4: Project grid output */}
         <Cell n="2" type="out" visible={step >= 4}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 14 }}>
+          <div
+            onMouseEnter={() => setGroupHover(true)}
+            onMouseLeave={() => setGroupHover(false)}
+            style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 14, alignItems: "start" }}>
             {FEATURED.map((p, i) => (
-              <ProjectCard key={p.id} p={p} visible={step >= 4 + i * 0.3}
-                expanded={activeIdx === i}
-                onEnter={() => setHovered(i)} onLeave={() => setHovered(null)} />
+              <ProjectCard key={p.id} p={p} visible={step >= 4 + i * 0.3} expanded={groupHover} />
             ))}
           </div>
         </Cell>
@@ -316,13 +297,12 @@ function renderHook(hook, color) {
   );
 }
 
-function ProjectCard({ p, visible, expanded, onEnter, onLeave }) {
+function ProjectCard({ p, visible, expanded }) {
   const isLive = p.status === "live";
   const hasDetail = !!p.chart;
   const open = hasDetail && expanded;
   return (
     <a href={`projects/${p.id}.html`}
-       onMouseEnter={onEnter} onMouseLeave={onLeave}
        style={{
          position: "relative", display: "flex", flexDirection: "column",
          padding: "20px 22px", borderRadius: 12,
