@@ -1,0 +1,139 @@
+/* Penalty Geometry & Game Theory — scoped styles for the editorial scrolly + game.
+   Inherits the portfolio tokens (--bg, --text, --border …); adds a penalty accent
+   and a single warm heat ramp used for every KDE. */
+.pen {
+  --pen-accent: oklch(52% 0.17 15);      /* the "insight" colour, reserved */
+  --pen-ink: var(--text);
+  --pen-muted: var(--text-muted);
+  --pen-hair: var(--border);
+  --pen-net: rgba(26,23,20,0.14);
+  --serif: 'Fraunces', Georgia, serif;
+  color: var(--pen-ink);
+  font-family: var(--font-display);
+  line-height: 1.6;
+}
+.pen-loading { color: var(--pen-muted); font-family: var(--font-mono); font-size: 13px; padding: 40px 0; }
+
+/* ── rhythm ─────────────────────────────────────────────────────────────── */
+.pen .act { padding: 46px 0; border-top: 1px solid var(--pen-hair); }
+.pen .act:first-of-type { border-top: none; }
+.pen .kicker {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--pen-accent); margin: 0 0 10px;
+}
+.pen h2.act-title {
+  font-family: var(--serif); font-weight: 600; font-size: clamp(24px, 4.4vw, 38px);
+  line-height: 1.08; letter-spacing: -0.01em; margin: 0 0 14px;
+}
+.pen p { font-size: 16px; color: var(--pen-ink); margin: 0 0 14px; max-width: 60ch; }
+.pen p.sub { color: var(--pen-muted); }
+.pen .takeaway {
+  font-family: var(--serif); font-weight: 600; font-size: clamp(18px, 2.6vw, 23px);
+  line-height: 1.3; margin: 22px 0 0; padding-left: 16px;
+  border-left: 3px solid var(--pen-accent);
+}
+.pen .nval { color: var(--pen-muted); font-family: var(--font-mono); font-size: 13px; }
+.pen .ins { color: var(--pen-accent); font-weight: 600; }
+
+/* ── cold open ──────────────────────────────────────────────────────────── */
+.pen .coldopen { padding: 30px 0 8px; text-align: center; }
+.pen .coldopen .eyebrow {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--pen-muted);
+}
+.pen .coldopen h1 {
+  font-family: var(--serif); font-weight: 700; font-size: clamp(30px, 6vw, 56px);
+  line-height: 1.02; letter-spacing: -0.02em; margin: 8px auto 6px; max-width: 16ch;
+}
+.pen .cold-card { max-width: 560px; margin: 18px auto 0; }
+.pen .cold-meta { font-size: 15px; color: var(--pen-muted); margin-top: 12px; }
+.pen .cold-meta b { color: var(--pen-ink); }
+.pen .pgoal { color: var(--pen-accent); font-weight: 700; }
+.pen .scrollcue { margin-top: 26px; color: var(--pen-muted); font-family: var(--font-mono); font-size: 12px; }
+
+/* ── goal mouth + svg ───────────────────────────────────────────────────── */
+.pen .goalwrap { width: 100%; max-width: 620px; margin: 0 auto; }
+.pen svg { display: block; width: 100%; height: auto; overflow: visible; }
+.pen .goal-post { stroke: var(--pen-ink); stroke-width: 5; fill: none; stroke-linecap: square; }
+.pen .goal-net { stroke: var(--pen-net); stroke-width: 0.6; }
+.pen .goal-ground { stroke: var(--pen-ink); stroke-width: 2; opacity: 0.5; }
+.pen .shotdot { fill: var(--pen-accent); }
+.pen .shotdot.scored { fill: var(--pen-accent); }
+.pen .shotdot.saved { fill: #2a7d6b; }
+.pen .axlabel { font-family: var(--font-mono); font-size: 10px; fill: var(--pen-muted); letter-spacing: 0.08em; }
+
+/* ── controls ───────────────────────────────────────────────────────────── */
+.pen .controls { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 18px 0 6px; align-items: center; }
+.pen .ctlgroup { display: inline-flex; gap: 0; border: 1px solid var(--pen-hair); border-radius: 8px; overflow: hidden; }
+.pen .ctlgroup .glabel { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; color: var(--pen-muted); padding: 7px 10px; background: rgba(0,0,0,0.02); text-transform: uppercase; }
+.pen button.seg {
+  font-family: var(--font-mono); font-size: 12px; padding: 7px 12px; border: none;
+  background: var(--card); color: var(--pen-muted); cursor: pointer; border-left: 1px solid var(--pen-hair);
+}
+.pen button.seg:hover { color: var(--pen-ink); }
+.pen button.seg.on { background: var(--pen-accent); color: #fff; }
+.pen .statenote {
+  font-family: var(--font-mono); font-size: 12px; color: var(--pen-muted);
+  margin: 10px 0 0; min-height: 1.4em;
+}
+.pen .statenote b { color: var(--pen-accent); }
+
+/* ── bars / tables ──────────────────────────────────────────────────────── */
+.pen .bars { margin: 16px 0; }
+.pen table.matrix { border-collapse: collapse; width: 100%; max-width: 560px; margin: 16px 0; font-size: 14px; }
+.pen table.matrix th, .pen table.matrix td { padding: 9px 12px; border-bottom: 1px solid var(--pen-hair); text-align: right; }
+.pen table.matrix th:first-child, .pen table.matrix td:first-child { text-align: left; font-family: var(--font-mono); font-size: 12px; }
+.pen table.matrix thead th { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; color: var(--pen-muted); text-transform: uppercase; }
+.pen table.matrix tr.hi td { background: oklch(52% 0.17 15 / 0.08); }
+.pen table.matrix .ci { color: var(--pen-muted); font-size: 12px; font-family: var(--font-mono); }
+.pen .verdict {
+  background: oklch(52% 0.17 15 / 0.06); border: 1px solid oklch(52% 0.17 15 / 0.25);
+  border-radius: 10px; padding: 14px 16px; margin: 14px 0; font-size: 15px;
+}
+
+/* ── the game ───────────────────────────────────────────────────────────── */
+.pen .game {
+  background: var(--card); border: 1px solid var(--pen-hair); border-radius: 14px;
+  padding: 24px; margin: 8px 0 6px;
+}
+.pen .game h2.act-title { margin-bottom: 6px; }
+.pen .game-stage { max-width: 560px; margin: 14px auto 0; position: relative; }
+.pen .game-scoreboard { display: flex; justify-content: space-between; align-items: baseline; font-family: var(--font-mono); font-size: 12px; color: var(--pen-muted); margin-bottom: 10px; }
+.pen .game-scoreboard .saves { color: var(--pen-accent); font-weight: 600; }
+.pen .pips { display: flex; gap: 6px; }
+.pen .pip { width: 13px; height: 13px; border-radius: 50%; border: 1.5px solid var(--pen-muted); }
+.pen .pip.save { background: #2a7d6b; border-color: #2a7d6b; }
+.pen .pip.goal { background: var(--pen-accent); border-color: var(--pen-accent); }
+.pen .dive-controls { display: flex; gap: 10px; justify-content: center; margin: 16px 0 2px; }
+.pen button.dive {
+  font-family: var(--font-display); font-weight: 600; font-size: 15px; padding: 12px 18px;
+  border: 1.5px solid var(--pen-ink); background: var(--card); color: var(--pen-ink);
+  border-radius: 10px; cursor: pointer; flex: 1; max-width: 160px; transition: transform .08s, background .15s;
+}
+.pen button.dive:hover:not(:disabled) { background: var(--pen-ink); color: var(--bg); transform: translateY(-1px); }
+.pen button.dive:disabled { opacity: 0.4; cursor: default; }
+.pen .game-result { text-align: center; font-family: var(--font-mono); font-size: 13px; min-height: 1.5em; margin-top: 12px; color: var(--pen-muted); }
+.pen .game-result b { color: var(--pen-ink); }
+
+/* end card */
+.pen .endcard { text-align: center; padding: 8px 0; }
+.pen .endcard .big { font-family: var(--serif); font-weight: 700; font-size: clamp(34px, 8vw, 58px); color: var(--pen-accent); line-height: 1; }
+.pen .endcard .vs { display: flex; gap: 24px; justify-content: center; margin: 16px 0; flex-wrap: wrap; }
+.pen .endcard .vs div { font-family: var(--font-mono); font-size: 12px; color: var(--pen-muted); }
+.pen .endcard .vs b { display: block; font-size: 22px; color: var(--pen-ink); font-family: var(--font-display); }
+.pen .endcard .feedback { font-family: var(--serif); font-size: 18px; max-width: 40ch; margin: 8px auto 16px; }
+.pen button.replay {
+  font-family: var(--font-mono); font-size: 13px; padding: 10px 20px; border: 1px solid var(--pen-ink);
+  background: var(--card); color: var(--pen-ink); border-radius: 999px; cursor: pointer;
+}
+.pen button.replay:hover { background: var(--pen-ink); color: var(--bg); }
+
+/* methods note (technical tab) */
+.writeup details.methods { border: 1px solid var(--border); border-radius: 10px; padding: 4px 16px; margin: 24px 0; background: rgba(0,0,0,0.015); }
+.writeup details.methods summary { cursor: pointer; font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.04em; padding: 10px 0; color: var(--text-muted); }
+.writeup details.methods[open] summary { color: var(--text); }
+
+@media (max-width: 560px) {
+  .pen .controls { gap: 8px 10px; }
+  .pen .dive-controls { flex-direction: row; }
+}

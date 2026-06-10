@@ -105,7 +105,14 @@ const PROJECTS = [
   { id: "kaggle", index: "04", title: "Kaggle Competitions",
     subtitle: "Competitive ML — tabular, NLP, vision",
     color: "oklch(52% 0.14 50)", status: "planned", featured: true,
-    tags: ["Kaggle", "ML", "XGBoost"], year: 2026, q: "Q1" }
+    tags: ["Kaggle", "ML", "XGBoost"], year: 2026, q: "Q1" },
+  { id: "penalties", index: "05", title: "Penalty Geometry & Game Theory",
+    subtitle: "Where shooters aim, where keepers go, and whether anyone is playing Nash",
+    hook: "Penalties aren't a coin flip — they're *geometry*. Play the keeper.",
+    chips: ["StatsBomb", "playable game"],
+    chart: "assets/penalties/kde_goal.png",
+    color: "oklch(52% 0.17 15)", status: "live", featured: true,
+    tags: ["Game Theory", "StatsBomb", "D3"], year: 2026, q: "Q2" }
 ];
 
 // Landing shows the first 3 featured; the rest live in the full archive.
@@ -214,7 +221,7 @@ function App() {
                 William Catt
               </h1>
               <p style={{ fontSize: 16, color: "var(--text-muted)", fontWeight: 300, lineHeight: 1.6, marginBottom: 16 }}>
-                Data scientist building ML systems end-to-end — measurement, modelling and deployment — with a bias toward rigorous evaluation and honest results, including the experiments that don't pan out. Featured work: a legal-text PII redaction pipeline with re-identification ("mosaic") risk analysis, and QuoteGuard, a guardrailed RAG chatbot that stays grounded in an insurance policy and refuses to give advice or invent prices. More in progress.
+                Data scientist who builds things end-to-end — framing the problem, modelling it, and shipping something people can actually use — with a bias toward rigorous evaluation and honest results, including the experiments that don't pan out. I work across the stack: NLP and LLM systems, predictive modelling, and Monte Carlo simulation. Recent builds range from a legal-text PII redaction pipeline with re-identification risk analysis, to a guardrailed RAG chatbot grounded in an insurance policy, to a simulation lab quantifying betting strategies. More in progress.
               </p>
               <div style={{ display: "flex", gap: 16, flexWrap: "wrap", fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--accent)" }}>
                 <a href="https://github.com/WillCatt" target="_blank" rel="noreferrer">github.com/WillCatt ↗</a>
