@@ -7,7 +7,7 @@
   document.title = `${P.title} · William Catt`;
 
   const root = document.getElementById("root");
-  const statusLabel = P.status === "live" ? "LIVE" : P.status === "wip" ? "IN PROGRESS" : "ARCHIVED";
+  const statusLabel = P.status === "live" ? "LIVE" : P.status === "wip" ? "IN PROGRESS" : P.status === "planned" ? "PLANNED" : "ARCHIVED";
 
   // Tabs are template-driven: render a tab for whichever <template id="tab-*">
   // blocks exist on the page, in this canonical order. A page can therefore
@@ -25,7 +25,7 @@
   };
   const tabsAvailable = ["overview", "writeup", "technical", "results", "examples", "code", "app", "raw"]
     .filter(key => document.getElementById(`tab-${key}`))
-    .filter(key => key !== "app" || P.demo !== false)
+    .filter(key => key !== "app" || (P.demo !== false && P.demo != null))
     .map(key => ({ key, label: TAB_LABELS[key] }));
 
   root.innerHTML = `
@@ -54,6 +54,24 @@
       </nav>
 
       <div id="tab-content"></div>
+
+      <nav class="footnav">
+        <a href="../all-projects.html">← all projects</a>
+        ${(() => {
+          // Keep the journey going: link to the next live project in order.
+          const ORDER = [
+            { id: "anonymiser", title: "Legal Text Anonymiser", href: "anonymiser.html" },
+            { id: "quoteguard", title: "QuoteGuard", href: "quoteguard.html" },
+            { id: "blackjack", title: "Blackjack Simulator", href: "blackjack.html" },
+            { id: "penalties", title: "Penalty Geometry & Game Theory", href: "penalties.html" },
+            { id: "explorations", title: "ML in Football — Explorations", href: "../explorations/index.html" },
+          ];
+          const i = ORDER.findIndex(p => p.id === P.id);
+          if (i === -1) return "";
+          const next = ORDER[(i + 1) % ORDER.length];
+          return `<a href="${next.href}">next: ${next.title} →</a>`;
+        })()}
+      </nav>
     </div>
   `;
 

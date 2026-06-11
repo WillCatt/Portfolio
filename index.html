@@ -122,8 +122,17 @@ const PROJECTS = [
     tags: ["Game Theory", "StatsBomb", "D3"], year: 2026, q: "Q2" }
 ];
 
-// Landing shows the first 3 featured; the rest live in the full archive.
-const FEATURED = PROJECTS.filter(p => p.featured).slice(0, 3);
+// Landing shows the featured projects; the limit is *visitor-editable* in the
+// notebook cell below (default 4). The rest live in the full archive.
+const FEATURED_ALL = PROJECTS.filter(p => p.featured);
+const DEFAULT_LIMIT = 4;
+
+// Skills cell — grouped stack, evidenced by the projects above.
+const SKILLS = [
+  { group: "ml_nlp", items: ["RoBERTa fine-tuning (NER)", "HuggingFace Transformers", "spaCy", "RAG & retrieval (BM25, cross-encoders)", "guardrails & adversarial evals"] },
+  { group: "statistics", items: ["bootstrap & Wilson CIs", "logistic regression", "Kaplan–Meier survival", "hypothesis testing", "Monte Carlo simulation"] },
+  { group: "engineering", items: ["Python", "pytest + GitHub Actions CI", "D3 & front-end", "Gradio / HF Spaces", "reproducible pipelines"] },
+];
 
 // ─── Notebook cell wrapper ────────────────────────────────────────────────────
 function Cell({ n, type, children, visible }) {
@@ -163,11 +172,17 @@ const str = (t) => <span style={{ color: "#5b8a3a" }}>{t}</span>;
 function App() {
   const [step, setStep] = useState(0);
   const [groupHover, setGroupHover] = useState(false);
+  // The featured(limit=…) argument is genuinely editable by the visitor.
+  const [limitText, setLimitText] = useState(String(DEFAULT_LIMIT));
+  const parsed = parseInt(limitText, 10);
+  const featured = isNaN(parsed) || parsed < 1
+    ? []
+    : FEATURED_ALL.slice(0, Math.min(parsed, FEATURED_ALL.length));
 
   useEffect(() => {
     const timers = [];
-    for (let i = 1; i <= 10; i++) {
-      timers.push(setTimeout(() => setStep(i), i * 320));
+    for (let i = 1; i <= 12; i++) {
+      timers.push(setTimeout(() => setStep(i), i * 180));
     }
     return () => timers.forEach(clearTimeout);
   }, []);
@@ -231,6 +246,9 @@ function App() {
                 Data scientist who builds things end-to-end — framing the problem, modelling it, and shipping something people can actually use — with a bias toward rigorous evaluation and honest results, including the experiments that don't pan out. I work across the stack: NLP and LLM systems, predictive modelling, and Monte Carlo simulation. Recent builds range from a legal-text PII redaction pipeline with re-identification risk analysis, to a guardrailed RAG chatbot grounded in an insurance policy, to a simulation lab quantifying betting strategies. More in progress.
               </p>
               <div style={{ display: "flex", gap: 16, flexWrap: "wrap", fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--accent)" }}>
+                {/* CV slot — drop a PDF at assets/william-catt-cv.pdf and uncomment:
+                <a href="assets/william-catt-cv.pdf" target="_blank" rel="noreferrer" style={{ fontWeight: 600 }}>CV (PDF) ↓</a>
+                <span style={{ color: "var(--text-dim)" }}>·</span> */}
                 <a href="https://github.com/WillCatt" target="_blank" rel="noreferrer">github.com/WillCatt ↗</a>
                 <span style={{ color: "var(--text-dim)" }}>·</span>
                 <a href="https://www.linkedin.com/in/william-catt/" target="_blank" rel="noreferrer">linkedin.com/in/william-catt ↗</a>
@@ -248,33 +266,78 @@ function App() {
           </CodeLine>
         </Cell>
 
-        {/* Cell 3: Query */}
+        {/* Cell 3: Query — the limit argument is live-editable */}
         <Cell n="2" type="in" visible={step >= 3}>
           <CodeLine>
-            projects.featured(<span style={{ color: "var(--text-muted)" }}>limit</span>={str("3")})
+            projects.featured(<span style={{ color: "var(--text-muted)" }}>limit</span>=<input
+              value={limitText}
+              onChange={e => setLimitText(e.target.value.replace(/[^0-9]/g, "").slice(0, 2))}
+              aria-label="Number of featured projects to show — editable"
+              style={{
+                width: `${Math.max(1, limitText.length)}ch`,
+                background: "transparent", border: "none",
+                borderBottom: "1px dashed var(--accent)",
+                fontFamily: "var(--font-mono)", fontSize: 13, lineHeight: 1.7,
+                color: "#5b8a3a", textAlign: "center", outline: "none", padding: 0
+              }} />)
+            <span style={{ color: "var(--text-dim)", marginLeft: 14 }}># ← editable, try it</span>
           </CodeLine>
         </Cell>
 
         {/* Cell 4: Project grid output */}
         <Cell n="2" type="out" visible={step >= 4}>
+          {featured.length === 0 ? (
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: 13, color: "var(--text-muted)", padding: "12px 4px" }}>
+              []  <span style={{ color: "var(--text-dim)" }}># no projects — try limit={DEFAULT_LIMIT}</span>
+            </div>
+          ) : (
           <div
             onMouseEnter={() => setGroupHover(true)}
             onMouseLeave={() => setGroupHover(false)}
             style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 14, alignItems: "start" }}>
-            {FEATURED.map((p, i) => (
+            {featured.map((p, i) => (
               <ProjectCard key={p.id} p={p} visible={step >= 4 + i * 0.3} expanded={groupHover} />
+            ))}
+          </div>
+          )}
+        </Cell>
+
+        {/* Cell 5: Skills */}
+        <Cell n="3" type="in" visible={step >= 7}>
+          <CodeLine>
+            me.skills(<span style={{ color: "var(--text-muted)" }}>grouped</span>={str("True")})
+          </CodeLine>
+        </Cell>
+
+        <Cell n="3" type="out" visible={step >= 8}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {SKILLS.map(s => (
+              <div key={s.group} style={{ display: "flex", gap: 14, alignItems: "baseline", flexWrap: "wrap" }}>
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--accent)", minWidth: 96, letterSpacing: "0.04em" }}>
+                  {s.group}:
+                </span>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, flex: 1 }}>
+                  {s.items.map(t => (
+                    <span key={t} style={{
+                      fontFamily: "var(--font-mono)", fontSize: 10.5, padding: "4px 9px",
+                      background: "rgba(0,0,0,0.04)", borderRadius: 4, color: "var(--text-muted)",
+                      letterSpacing: "0.02em"
+                    }}>{t}</span>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         </Cell>
 
-        {/* Cell 5: View all */}
-        <Cell n="3" type="in" visible={step >= 9}>
+        {/* Cell 6: View all */}
+        <Cell n="4" type="in" visible={step >= 9}>
           <CodeLine>
             projects.all()  <span style={{ color: "var(--text-muted)" }}># view full archive</span>
           </CodeLine>
         </Cell>
 
-        <Cell n="3" type="out" visible={step >= 10}>
+        <Cell n="4" type="out" visible={step >= 10}>
           <a href="all-projects.html" style={{
             display: "flex", alignItems: "center", justifyContent: "space-between",
             padding: "20px 24px", borderRadius: 10,
@@ -295,6 +358,41 @@ function App() {
             </div>
             <span style={{ fontFamily: "var(--font-mono)", fontSize: 18, color: "var(--accent)" }}>→</span>
           </a>
+        </Cell>
+
+        {/* Cell 7: Contact CTA */}
+        <Cell n="5" type="in" visible={step >= 11}>
+          <CodeLine>
+            me.contact()  <span style={{ color: "var(--text-muted)" }}># open to junior data scientist roles</span>
+          </CodeLine>
+        </Cell>
+
+        <Cell n="5" type="out" visible={step >= 12}>
+          <div style={{
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            flexWrap: "wrap", gap: 16,
+            padding: "22px 24px", borderRadius: 10,
+            background: "var(--accent-soft)", border: "1px solid var(--border)"
+          }}>
+            <div>
+              <div style={{ fontSize: 17, fontWeight: 600, marginBottom: 3 }}>Like what you see?</div>
+              <div style={{ fontSize: 13, color: "var(--text-muted)" }}>
+                I'm looking for a junior data scientist role — happy to walk through any of these projects.
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <a href="mailto:wcatt98@gmail.com" style={{
+                fontFamily: "var(--font-mono)", fontSize: 12, padding: "10px 18px",
+                borderRadius: 7, background: "var(--accent)", color: "#fff",
+                letterSpacing: "0.04em"
+              }}>email me</a>
+              <a href="https://www.linkedin.com/in/william-catt/" target="_blank" rel="noreferrer" style={{
+                fontFamily: "var(--font-mono)", fontSize: 12, padding: "10px 18px",
+                borderRadius: 7, border: "1px solid var(--accent)", color: "var(--accent)",
+                letterSpacing: "0.04em"
+              }}>linkedin ↗</a>
+            </div>
+          </div>
         </Cell>
 
       </div>

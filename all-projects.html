@@ -77,9 +77,6 @@ const PROJECTS = [
   { id: "blackjack", index: "03", title: "Blackjack Simulator",
     subtitle: "Monte Carlo strategy analysis", color: "oklch(52% 0.14 25)",
     status: "live", year: 2026, q: "Q2", tags: ["Simulation", "Python", "Monte Carlo"] },
-  { id: "kaggle", index: "04", title: "Kaggle Competitions",
-    subtitle: "Competitive ML — tabular, NLP, vision", color: "oklch(52% 0.14 50)",
-    status: "planned", year: 2026, q: "Q1", tags: ["Kaggle", "ML", "XGBoost"] },
   { id: "penalties", index: "05", title: "Penalty Geometry & Game Theory",
     subtitle: "Where shooters aim, where keepers go, and whether anyone is playing Nash", color: "oklch(52% 0.17 15)",
     status: "live", year: 2026, q: "Q2", tags: ["Game Theory", "StatsBomb", "KDE", "D3"] },
@@ -87,6 +84,9 @@ const PROJECTS = [
     href: "explorations/index.html",
     subtitle: "A grid of self-contained football data explorations — network, travel, squads, similarity, penalties", color: "oklch(54% 0.10 190)",
     status: "live", year: 2026, q: "Q2", tags: ["D3", "Football", "Game Theory"] },
+  { id: "kaggle", index: "04", title: "Kaggle Competitions",
+    subtitle: "Competitive ML — tabular, NLP, vision", color: "oklch(52% 0.14 50)",
+    status: "planned", year: 2026, q: "Q1", tags: ["Kaggle", "ML", "XGBoost"] },
 ];
 
 function App() {
@@ -129,7 +129,7 @@ function App() {
         All Projects
       </h1>
       <p style={{ fontSize: 15, color: "var(--text-muted)", marginBottom: 28 }}>
-        {PROJECTS.length} project{PROJECTS.length === 1 ? "" : "s"} · sorted by most recent
+        {PROJECTS.length} project{PROJECTS.length === 1 ? "" : "s"} · live work first
       </p>
 
       {/* Filter bar */}
@@ -187,15 +187,21 @@ function App() {
           No projects match your filters.
         </div>
       )}
-      {filtered.map(p => (
-        <a key={p.id} href={p.href || `projects/${p.id}.html`} style={{
+      {filtered.map(p => {
+        // Planned projects have no page yet — render them as a non-clickable row.
+        const isPlanned = p.status === "planned";
+        const Row = isPlanned ? "div" : "a";
+        return (
+        <Row key={p.id} href={isPlanned ? undefined : (p.href || `projects/${p.id}.html`)} style={{
           display: "grid",
           gridTemplateColumns: "44px 1fr 220px 90px 130px 28px",
           gap: 16, padding: "16px 14px", alignItems: "center",
           borderBottom: "1px solid rgba(0,0,0,0.05)",
-          transition: "background 0.15s"
+          transition: "background 0.15s",
+          opacity: isPlanned ? 0.55 : 1,
+          cursor: isPlanned ? "default" : "pointer"
         }}
-        onMouseEnter={e => e.currentTarget.style.background = "rgba(0,0,0,0.025)"}
+        onMouseEnter={e => { if (!isPlanned) e.currentTarget.style.background = "rgba(0,0,0,0.025)"; }}
         onMouseLeave={e => e.currentTarget.style.background = "transparent"}
         >
           <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: p.color, letterSpacing: "0.08em" }}>{p.index}</span>
@@ -218,9 +224,10 @@ function App() {
             <span className={`status-dot ${p.status}`}></span>
             {p.status === "live" ? "LIVE" : p.status === "wip" ? "IN PROGRESS" : p.status === "planned" ? "PLANNED" : "ARCHIVED"}
           </span>
-          <span style={{ color: "var(--text-dim)", fontSize: 14 }}>→</span>
-        </a>
-      ))}
+          <span style={{ color: "var(--text-dim)", fontSize: 14 }}>{isPlanned ? "" : "→"}</span>
+        </Row>
+        );
+      })}
     </div>
   );
 }
