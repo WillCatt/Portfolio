@@ -80,51 +80,50 @@
 const { useState, useEffect } = React;
 
 // ─── PROJECT DATA — edit here to add/remove projects ───────────────────────────
+// `priority` controls the featured order: lower = shown first. The landing
+// pulls from ALL live projects sorted by priority; `limit` (visitor-editable)
+// just slices that ranking. Planned projects never show on the landing.
+// Penalty Geometry lives inside the ML in Football grid, not as its own card.
 const PROJECTS = [
   { id: "anonymiser", index: "01", title: "Legal Text Anonymiser",
     subtitle: "PII redaction + re-identification risk for legal text",
     hook: 'How redacted is *"redacted"*? Measuring re-identification risk.',
     chips: ["F1 0.85", "re-ID risk modelled"],
-    chart: "assets/overview_accuracy.png",
-    color: "oklch(52% 0.14 145)", status: "live", featured: true,
+    chart: "assets/overview_reidentification.png",
+    color: "oklch(52% 0.14 145)", status: "live", priority: 1,
     tags: ["NLP", "NER", "RoBERTa"], year: 2026, q: "Q2" },
   { id: "quoteguard", index: "02", title: "QuoteGuard",
     subtitle: "Guardrailed, grounded RAG over an insurance policy",
     hook: "A chatbot that *refuses to invent prices* or give advice.",
     chips: ["72%→100% safe", "page-cited"],
-    chart: "assets/quoteguard/adversarial_iteration.png",
-    color: "oklch(52% 0.14 200)", status: "live", featured: true,
+    chart: "assets/quoteguard/overview_guardrails.png",
+    color: "oklch(52% 0.14 200)", status: "live", priority: 2,
     tags: ["RAG", "Guardrails", "Retrieval"], year: 2026, q: "Q2" },
   { id: "explorations", index: "06", title: "ML in Football — Explorations",
     href: "explorations/index.html",
     subtitle: "A grid of self-contained football data explorations",
     hook: "Five football questions, each *taken as far as the data honestly goes*.",
     chips: ["5 pieces", "D3 · no build"],
-    color: "oklch(54% 0.10 190)", status: "live", featured: true,
+    chart: "assets/explorations-thumb.svg",
+    color: "oklch(54% 0.10 190)", status: "live", priority: 3,
     tags: ["D3", "Football", "Game Theory"], year: 2026, q: "Q2" },
   { id: "blackjack", index: "03", title: "Blackjack Simulator",
     subtitle: "Monte Carlo strategy analysis",
     hook: "Does card counting *actually* beat the house?",
     chips: ["1.6M hands", "+1.02% ROR"],
     chart: "assets/blackjack/fig_ranking.png",
-    color: "oklch(52% 0.14 25)", status: "live", featured: false,
+    color: "oklch(52% 0.14 25)", status: "live", priority: 4,
     tags: ["Simulation", "Python", "Monte Carlo"], year: 2026, q: "Q2" },
   { id: "kaggle", index: "04", title: "Kaggle Competitions",
     subtitle: "Competitive ML — tabular, NLP, vision",
-    color: "oklch(52% 0.14 50)", status: "planned", featured: false,
+    color: "oklch(52% 0.14 50)", status: "planned", priority: 99,
     tags: ["Kaggle", "ML", "XGBoost"], year: 2026, q: "Q1" },
-  { id: "penalties", index: "05", title: "Penalty Geometry & Game Theory",
-    subtitle: "Where shooters aim, where keepers go, and whether anyone is playing Nash",
-    hook: "Penalties aren't a coin flip — they're *geometry*. Play the keeper.",
-    chips: ["StatsBomb", "playable game"],
-    chart: "assets/penalties/kde_goal.png",
-    color: "oklch(52% 0.17 15)", status: "live", featured: true,
-    tags: ["Game Theory", "StatsBomb", "D3"], year: 2026, q: "Q2" }
 ];
 
-// Landing shows the featured projects; the limit is *visitor-editable* in the
-// notebook cell below (default 4). The rest live in the full archive.
-const FEATURED_ALL = PROJECTS.filter(p => p.featured);
+// The featured pool: every live project, ranked by priority.
+const FEATURED_ALL = PROJECTS
+  .filter(p => p.status !== "planned")
+  .sort((a, b) => (a.priority ?? 99) - (b.priority ?? 99));
 const DEFAULT_LIMIT = 4;
 
 // Skills cell — grouped stack, evidenced by the projects above.
@@ -291,53 +290,32 @@ function App() {
               []  <span style={{ color: "var(--text-dim)" }}># no projects — try limit={DEFAULT_LIMIT}</span>
             </div>
           ) : (
-          <div
-            onMouseEnter={() => setGroupHover(true)}
-            onMouseLeave={() => setGroupHover(false)}
-            style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 14, alignItems: "start" }}>
-            {featured.map((p, i) => (
-              <ProjectCard key={p.id} p={p} visible={step >= 4 + i * 0.3} expanded={groupHover} />
-            ))}
+          <div>
+            <div
+              onMouseEnter={() => setGroupHover(true)}
+              onMouseLeave={() => setGroupHover(false)}
+              style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 14, alignItems: "start" }}>
+              {featured.map((p, i) => (
+                <ProjectCard key={p.id} p={p} visible={step >= 4 + i * 0.3} expanded={groupHover} />
+              ))}
+            </div>
+            {parsed > FEATURED_ALL.length && (
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--text-dim)", marginTop: 10 }}>
+                # all {FEATURED_ALL.length} live projects shown — projects.all() has the full archive
+              </div>
+            )}
           </div>
           )}
         </Cell>
 
-        {/* Cell 5: Skills */}
+        {/* Cell 5: View all */}
         <Cell n="3" type="in" visible={step >= 7}>
-          <CodeLine>
-            me.skills(<span style={{ color: "var(--text-muted)" }}>grouped</span>={str("True")})
-          </CodeLine>
-        </Cell>
-
-        <Cell n="3" type="out" visible={step >= 8}>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {SKILLS.map(s => (
-              <div key={s.group} style={{ display: "flex", gap: 14, alignItems: "baseline", flexWrap: "wrap" }}>
-                <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--accent)", minWidth: 96, letterSpacing: "0.04em" }}>
-                  {s.group}:
-                </span>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, flex: 1 }}>
-                  {s.items.map(t => (
-                    <span key={t} style={{
-                      fontFamily: "var(--font-mono)", fontSize: 10.5, padding: "4px 9px",
-                      background: "rgba(0,0,0,0.04)", borderRadius: 4, color: "var(--text-muted)",
-                      letterSpacing: "0.02em"
-                    }}>{t}</span>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </Cell>
-
-        {/* Cell 6: View all */}
-        <Cell n="4" type="in" visible={step >= 9}>
           <CodeLine>
             projects.all()  <span style={{ color: "var(--text-muted)" }}># view full archive</span>
           </CodeLine>
         </Cell>
 
-        <Cell n="4" type="out" visible={step >= 10}>
+        <Cell n="3" type="out" visible={step >= 8}>
           <a href="all-projects.html" style={{
             display: "flex", alignItems: "center", justifyContent: "space-between",
             padding: "20px 24px", borderRadius: 10,
@@ -358,6 +336,34 @@ function App() {
             </div>
             <span style={{ fontFamily: "var(--font-mono)", fontSize: 18, color: "var(--accent)" }}>→</span>
           </a>
+        </Cell>
+
+        {/* Cell 6: Skills */}
+        <Cell n="4" type="in" visible={step >= 9}>
+          <CodeLine>
+            me.skills(<span style={{ color: "var(--text-muted)" }}>grouped</span>={str("True")})
+          </CodeLine>
+        </Cell>
+
+        <Cell n="4" type="out" visible={step >= 10}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {SKILLS.map(s => (
+              <div key={s.group} style={{ display: "flex", gap: 14, alignItems: "baseline", flexWrap: "wrap" }}>
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--accent)", minWidth: 96, letterSpacing: "0.04em" }}>
+                  {s.group}:
+                </span>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, flex: 1 }}>
+                  {s.items.map(t => (
+                    <span key={t} style={{
+                      fontFamily: "var(--font-mono)", fontSize: 10.5, padding: "4px 9px",
+                      background: "rgba(0,0,0,0.04)", borderRadius: 4, color: "var(--text-muted)",
+                      letterSpacing: "0.02em"
+                    }}>{t}</span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
         </Cell>
 
         {/* Cell 7: Contact CTA */}

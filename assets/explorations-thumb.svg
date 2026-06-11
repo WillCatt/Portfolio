@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 170" role="img" aria-label="Five football data explorations: network, travel, leagues, similarity, penalties">
+  <!-- five mini-tiles, one per exploration piece — house palette -->
+
+  <!-- 01 · network: two blocs, one amber bridge -->
+  <g>
+    <rect x="12" y="14" width="112" height="142" rx="10" fill="#ffffff" stroke="rgba(0,0,0,0.08)"/>
+    <g stroke="#2a8f8f" stroke-width="1.4" opacity=".55" fill="none">
+      <path d="M36 52 L58 38 M36 52 L52 72 M58 38 L52 72"/>
+    </g>
+    <g stroke="#4a6d8c" stroke-width="1.4" opacity=".55" fill="none">
+      <path d="M88 110 L104 92 M88 110 L100 128 M104 92 L100 128"/>
+    </g>
+    <path d="M52 72 L70 88 L88 110" stroke="#b06a16" stroke-width="2" fill="none"/>
+    <circle cx="36" cy="52" r="7" fill="#2a8f8f"/>
+    <circle cx="58" cy="38" r="5" fill="#2a8f8f"/>
+    <circle cx="52" cy="72" r="6" fill="#2a8f8f"/>
+    <circle cx="70" cy="88" r="8" fill="#b06a16"/>
+    <circle cx="88" cy="110" r="6" fill="#4a6d8c"/>
+    <circle cx="104" cy="92" r="7" fill="#4a6d8c"/>
+    <circle cx="100" cy="128" r="5" fill="#4a6d8c"/>
+  </g>
+
+  <!-- 02 · travel: dashed journey with pins -->
+  <g>
+    <rect x="140" y="14" width="112" height="142" rx="10" fill="#ffffff" stroke="rgba(0,0,0,0.08)"/>
+    <path d="M160 124 L196 56 L232 108" fill="none" stroke="#b06a16" stroke-width="2" stroke-dasharray="3 5" stroke-linecap="round"/>
+    <circle cx="160" cy="124" r="8" fill="#b06a16"/>
+    <circle cx="196" cy="56" r="8" fill="#c0533b"/>
+    <circle cx="196" cy="56" r="12" fill="none" stroke="#c0533b" stroke-width="1.5" opacity=".5"/>
+    <circle cx="232" cy="108" r="8" fill="#c0533b"/>
+  </g>
+
+  <!-- 03 · club & country: sankey fan -->
+  <g>
+    <rect x="268" y="14" width="112" height="142" rx="10" fill="#ffffff" stroke="rgba(0,0,0,0.08)"/>
+    <g fill="none" stroke-width="6" opacity=".55">
+      <path d="M288 85 C 320 85, 328 47, 358 47" stroke="#b06a16"/>
+      <path d="M288 85 C 320 85, 328 72, 358 72" stroke="#2a8f8f"/>
+      <path d="M288 85 C 320 85, 328 98, 358 98" stroke="#4a6d8c"/>
+      <path d="M288 85 C 320 85, 328 123, 358 123" stroke="#3a8f57"/>
+    </g>
+    <rect x="282" y="56" width="8" height="58" rx="2" fill="#b06a16"/>
+    <rect x="358" y="41" width="8" height="12" rx="2" fill="#b06a16"/>
+    <rect x="358" y="66" width="8" height="12" rx="2" fill="#2a8f8f"/>
+    <rect x="358" y="92" width="8" height="12" rx="2" fill="#4a6d8c"/>
+    <rect x="358" y="117" width="8" height="12" rx="2" fill="#3a8f57"/>
+  </g>
+
+  <!-- 04 · similarity: hero dot + nearest neighbours -->
+  <g>
+    <rect x="396" y="14" width="112" height="142" rx="10" fill="#ffffff" stroke="rgba(0,0,0,0.08)"/>
+    <g stroke="#b06a16" stroke-width="1.2" opacity=".5">
+      <line x1="452" y1="85" x2="424" y2="52"/>
+      <line x1="452" y1="85" x2="486" y2="56"/>
+      <line x1="452" y1="85" x2="420" y2="116"/>
+      <line x1="452" y1="85" x2="484" y2="120"/>
+    </g>
+    <circle cx="424" cy="52" r="5" fill="#7C9CB0"/>
+    <circle cx="486" cy="56" r="5" fill="#8FA88B"/>
+    <circle cx="420" cy="116" r="5" fill="#B07C9E"/>
+    <circle cx="484" cy="120" r="5" fill="#C18A5E"/>
+    <circle cx="452" cy="85" r="8" fill="#b06a16"/>
+    <circle cx="452" cy="85" r="12" fill="none" stroke="#b06a16" stroke-width="1.4" opacity=".5"/>
+  </g>
+
+  <!-- 05 · penalties: goal mouth, two corner shots, keeper -->
+  <g>
+    <rect x="524" y="14" width="112" height="142" rx="10" fill="#ffffff" stroke="rgba(0,0,0,0.08)"/>
+    <path d="M540 122 L540 52 L620 52 L620 122" fill="none" stroke="#1a1714" stroke-width="2.5"/>
+    <g stroke="#e6ded2" stroke-width="1">
+      <path d="M556 52 L556 122 M572 52 L572 122 M588 52 L588 122 M604 52 L604 122"/>
+      <path d="M540 75 L620 75 M540 99 L620 99"/>
+    </g>
+    <line x1="540" y1="122" x2="620" y2="122" stroke="#1a1714" stroke-width="1.5" opacity=".45"/>
+    <circle cx="551" cy="112" r="6" fill="#b06a16"/>
+    <circle cx="610" cy="64" r="6" fill="#c0533b"/>
+    <rect x="573" y="96" width="13" height="26" rx="5" fill="none" stroke="#7a6e63" stroke-width="1.8"/>
+  </g>
+</svg>
