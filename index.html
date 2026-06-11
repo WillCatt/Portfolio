@@ -95,6 +95,13 @@ const PROJECTS = [
     chart: "assets/quoteguard/adversarial_iteration.png",
     color: "oklch(52% 0.14 200)", status: "live", featured: true,
     tags: ["RAG", "Guardrails", "Retrieval"], year: 2026, q: "Q2" },
+  { id: "explorations", index: "06", title: "ML in Football — Explorations",
+    href: "explorations/index.html",
+    subtitle: "A grid of self-contained football data explorations",
+    hook: "Five football questions, each *taken as far as the data honestly goes*.",
+    chips: ["5 pieces", "D3 · no build"],
+    color: "oklch(54% 0.10 190)", status: "live", featured: true,
+    tags: ["D3", "Football", "Game Theory"], year: 2026, q: "Q2" },
   { id: "blackjack", index: "03", title: "Blackjack Simulator",
     subtitle: "Monte Carlo strategy analysis",
     hook: "Does card counting *actually* beat the house?",
@@ -309,7 +316,7 @@ function ProjectCard({ p, visible, expanded }) {
   const hasDetail = !!p.chart;
   const open = hasDetail && expanded;
   return (
-    <a href={`projects/${p.id}.html`}
+    <a href={p.href || `projects/${p.id}.html`}
        style={{
          position: "relative", display: "flex", flexDirection: "column",
          padding: "20px 22px", borderRadius: 12,
