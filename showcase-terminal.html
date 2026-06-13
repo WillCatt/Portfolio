@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Legal Text Anonymiser · Showcase</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:      #111009;
+  --surface: #1a1714;
+  --border:  #2e2b26;
+  --text:    #d4cec5;
+  --muted:   #6b6560;
+  --dim:     #3a3530;
+  --amber:   oklch(72% 0.20 58);
+  --green:   #4ade80;
+  --blue:    #60a5fa;
+  --purple:  #c084fc;
+  --red:     #f87171;
+  --prompt:  #4a9eff;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  background: var(--bg);
+  overflow: hidden;
+  font-family: 'Space Grotesk', sans-serif;
+  color: var(--text);
+}
+
+/* ── Phase management ── */
+.phase {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.65s ease;
+}
+.phase.on {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ═══════════════════════════════════════════════
+   PHASE 1 — Document scroll
+═══════════════════════════════════════════════ */
+#p-doc {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #0d0c09;
+}
+.doc-topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 16px;
+  background: #181510;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+}
+.doc-filename { color: #a09080; }
+.doc-pages { margin-left: auto; }
+.doc-scroll-wrap {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+.doc-scroll-inner {
+  padding: 28px 48px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  line-height: 1.85;
+  color: #706a60;
+  white-space: pre-wrap;
+  /* will be animated via JS */
+}
+/* vignettes */
+.doc-scroll-wrap::before,
+.doc-scroll-wrap::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  height: 80px;
+  z-index: 2;
+  pointer-events: none;
+}
+.doc-scroll-wrap::before {
+  top: 0;
+  background: linear-gradient(to bottom, #0d0c09 0%, transparent 100%);
+}
+.doc-scroll-wrap::after {
+  bottom: 0;
+  background: linear-gradient(to top, #0d0c09 0%, transparent 100%);
+}
+
+/* ═══════════════════════════════════════════════
+   PHASE 2 — Problem statement
+═══════════════════════════════════════════════ */
+#p-problem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 52px 72px;
+}
+.problem-inner {
+  max-width: 520px;
+  width: 100%;
+}
+.problem-line {
+  font-size: 17px;
+  font-weight: 400;
+  color: #8a8078;
+  line-height: 1.6;
+  margin-bottom: 4px;
+  min-height: 1.6em;
+  font-family: 'Space Grotesk', sans-serif;
+}
+.problem-line.big {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text);
+  margin-top: 24px;
+}
+.problem-line.accent { color: oklch(72% 0.20 58); }
+.blink-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: var(--amber);
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  animation: curBlink 1s step-end infinite;
+}
+@keyframes curBlink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+/* ═══════════════════════════════════════════════
+   PHASE 3 — Product intro
+═══════════════════════════════════════════════ */
+#p-intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+}
+.intro-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: oklch(22% 0.06 145);
+  color: oklch(68% 0.18 145);
+  padding: 5px 14px 5px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  border: 1px solid oklch(32% 0.08 145);
+}
+.intro-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: oklch(62% 0.20 145);
+  animation: idot 2s ease-in-out infinite;
+}
+@keyframes idot { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.intro-title {
+  font-size: 42px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  margin-bottom: 10px;
+  text-align: center;
+}
+.intro-sub {
+  font-size: 14px;
+  color: var(--muted);
+  text-align: center;
+  margin-bottom: 24px;
+  font-weight: 400;
+}
+.intro-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.intro-tag {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 11px;
+  padding: 3px 12px;
+  border-radius: 999px;
+  font-weight: 500;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ═══════════════════════════════════════════════
+   PHASE 4 — Terminal
+═══════════════════════════════════════════════ */
+#p-term {
+  display: flex;
+  flex-direction: column;
+}
+.titlebar {
+  background: #1a1510;
+  border-bottom: 1px solid var(--border);
+  padding: 11px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.tb-dots { display: flex; gap: 6px; }
+.tb-dot  { width: 12px; height: 12px; border-radius: 50%; }
+.tb-dot:nth-child(1) { background: #ff5f57; }
+.tb-dot:nth-child(2) { background: #febc2e; }
+.tb-dot:nth-child(3) { background: #28c840; }
+.tb-title {
+  font-size: 12px;
+  color: var(--muted);
+  flex: 1;
+  text-align: center;
+  font-family: 'Space Grotesk', sans-serif;
+}
+.term {
+  flex: 1;
+  padding: 18px 24px;
+  overflow: hidden;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.term-line { display: flex; align-items: flex-start; min-height: 1.7em; }
+.prompt-str { color: var(--prompt); flex-shrink: 0; user-select: none; }
+.cmd        { color: var(--text); }
+.t-cursor {
+  display: inline-block;
+  width: 7px; height: 14px;
+  background: var(--text);
+  margin-left: 1px;
+  vertical-align: middle;
+  animation: curBlink 1s step-end infinite;
+  opacity: 0;
+}
+.t-cursor.on { opacity: 1; }
+.t-out     { color: var(--text); }
+.t-muted   { color: var(--muted); }
+.t-dim     { color: var(--dim); }
+.t-ok      { color: var(--green); }
+.t-head    { color: var(--muted); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; }
+.tok-p  { color: var(--amber); }
+.tok-o  { color: var(--blue); }
+.tok-c  { color: var(--purple); }
+.vkey   { color: var(--amber); }
+.vval   { color: #bbb; }
+.vdim   { color: var(--dim); }
+.restored-txt { color: oklch(75% 0.16 145); }
+.t-spinner { color: var(--amber); }
+
+/* ═══════════════════════════════════════════════
+   PHASE 5 — CTA
+═══════════════════════════════════════════════ */
+#p-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 48px;
+}
+.cta-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 16px;
+  text-align: center;
+}
+.cta-headline {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  text-align: center;
+  margin-bottom: 8px;
+}
+.cta-sub {
+  font-size: 14px;
+  color: var(--muted);
+  text-align: center;
+  margin-bottom: 32px;
+}
+.cta-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 28px;
+  text-decoration: none;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+  transition: border-color 0.2s, background 0.2s;
+  cursor: pointer;
+}
+.cta-card:hover {
+  border-color: var(--amber);
+  background: oklch(14% 0.04 50);
+}
+.cta-card .arrow {
+  font-size: 18px;
+  color: var(--amber);
+  animation: arrowPulse 1.4s ease-in-out infinite;
+}
+@keyframes arrowPulse {
+  0%,100% { transform: translateX(0); }
+  50%      { transform: translateX(4px); }
+}
+.cta-meta {
+  margin-top: 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--dim);
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ PHASE 1: Document scroll ═══ -->
+<div id="p-doc" class="phase">
+  <div class="doc-topbar">
+    <span>📄</span>
+    <span class="doc-filename">settlement_kowalski_v_meridian_41872-19.txt</span>
+    <span class="doc-pages">pp. 1–14  ·  PRIVILEGED &amp; CONFIDENTIAL</span>
+  </div>
+  <div class="doc-scroll-wrap">
+    <div class="doc-scroll-inner" id="doc-inner">APPLICATION NO. 41872/19
+
+KOWALSKI v. MERIDIAN CAPITAL PARTNERS LLP AND OTHERS
+
+JUDGMENT  (Strasbourg, 12 March 2022)
+
+In the case of Kowalski v. Meridian Capital Partners LLP and Others, the European Court of Human Rights, sitting as a Chamber composed of Mr. H. Beecham, President, Ms E. Whitcombe, Vice-President, Mr. T. Ferreira, Judge, Ms A. Petrova, Judge, Mr. J. Carrow, Judge ad hoc, and Mr. R. Patel, Registrar, having deliberated in private on 3 and 10 February 2022, delivers the following judgment:
+
+FACTS
+
+I. THE CIRCUMSTANCES OF THE CASE
+
+1. The applicant, Maria Anya Kowalski, born 15 April 1975, residing at 22 Malinova Street, Plovdiv 4000, Bulgaria, is a Bulgarian national of Roma ethnicity. At the relevant time she was employed as a registered nurse at the Sofia Regional Hospital Trust (hereinafter "the Trust") under employment contract ref. HR-2010-0042, a position she had held since January 2010.
+
+2. On 4 February 2021, the applicant lodged a formal grievance (Internal Ref. HR-2021-0847) with the Trust's Board of Directors, chaired by Mr. Harold Beecham of 14 Carrow Road, Norwich NR1 1EE, United Kingdom. The applicant alleged unlawful discrimination on grounds of her Roma ethnicity and national origin, contrary to the Equality Act 2010, ss. 4, 9 and 13.
+
+3. The applicant was represented in these proceedings by Patel & Rosenthal LLP (Company Registration No. 03241187, registered at 88 Wood Street, London EC2V 7RS), a firm specialising in employment and human rights law, and from 1 March 2021 additionally by Carrow Chambers (Bar Standards Board authorisation no. 51947). The Trust instructed St. Andrew's Regional Solicitors, Manchester.
+
+4. On 12 June 2019 and again on 3 November 2020 the applicant reported incidents of discriminatory treatment to HR Director Ms Eleanor Whitcombe (employee ID EMP-0091). Neither report produced a formal investigation. Incident references: INC-2019-0612 and INC-2020-1103.
+
+5. Tomás Ferreira, born 22 September 1968, general counsel of Halcyon Biotech GmbH (Handelsregister Frankfurt, HRB 109842; registered at Bahnhofstrasse 14, 60329 Frankfurt am Main), initiated parallel settlement proceedings on behalf of the respondent. He proposed that payment of EUR 4,200,000 (four million two hundred thousand euros) be wired to IBAN PT50 0002 0123 1234 5678 9015 4, the account held at Banco Nacional de Lisboa in the name of the applicant's legal representatives.
+
+6. The matter was referred to the Employment Tribunal in Manchester (Case no. 2402319/2021) after internal mediation at St. Andrew's Regional Hospital Trust failed on 19 August 2021. The Tribunal noted that Ms Kowalski had submitted corroborating evidence from three colleagues — Dr. A. Nowak (GMC ref. 7012345), Sr. P. Dimitrov (NMC pin 12A3456E) and Mr. K. Osei (employee ID EMP-0234) — each of whom had witnessed at least one of the relevant incidents.
+
+II. SUBMISSIONS OF THE PARTIES
+
+7. The Government submitted that the domestic proceedings had been fair and that the applicant had not been subjected to any discriminatory treatment contrary to Article 14. They relied on Directive 2000/43/EC and contended that national courts had applied the relevant legal standards correctly.
+
+8. The applicant maintained that the Trust's internal investigation had been inadequate. She pointed to the fact that Mr. Beecham had previously sat on the board of a firm in which Mr. Ferreira held a directorship, raising a potential conflict of interest undisclosed at the time of the mediation.
+
+III. THE LAW
+
+9. The Court reiterates that Article 14 does not have independent existence; it applies only in conjunction with the substantive Convention rights. In the present case the Court considers it necessary to examine the complaint under Article 14 taken together with Article 8.
+
+10. Having regard to all the material before it, the Court finds that the difference in treatment of which the applicant complains was not justified by any objective and reasonable ground, and that the respondent State has therefore failed in its positive obligation under Article 14 read with Article 8 of the Convention.
+
+FOR THESE REASONS, THE COURT UNANIMOUSLY
+
+  1. Declares the application admissible;
+  2. Holds that there has been a violation of Article 14 of the Convention taken in conjunction with Article 8;
+  3. Holds that the respondent State is to pay the applicant, within three months from the date on which the judgment becomes final, EUR 24,500 (twenty-four thousand five hundred euros) in respect of non-pecuniary damage, plus any tax that may be chargeable.
+
+Done in English, and notified in writing on 12 March 2022, pursuant to Rule 77 §§ 2 and 3 of the Rules of Court.
+
+  R. Patel                H. Beecham
+  Registrar               President
+</div>
+  </div>
+</div>
+
+<!-- ═══ PHASE 2: Problem statement ═══ -->
+<div id="p-problem" class="phase">
+  <div class="problem-inner">
+    <div class="problem-line" id="prob1"></div>
+    <div class="problem-line" id="prob2"></div>
+    <div class="problem-line" id="prob3"></div>
+    <div class="problem-line big accent" id="prob4"></div>
+  </div>
+</div>
+
+<!-- ═══ PHASE 3: Product intro ═══ -->
+<div id="p-intro" class="phase">
+  <div class="intro-badge"><span class="intro-dot"></span>Live project</div>
+  <div class="intro-title">Legal Text Anonymiser</div>
+  <div class="intro-sub">Fine-tuned NER · pseudonymisation · mosaic re-identification risk</div>
+  <div class="intro-tags">
+    <span class="intro-tag">RoBERTa</span>
+    <span class="intro-tag">NLP / NER</span>
+    <span class="intro-tag">PII</span>
+    <span class="intro-tag">F1 0.851</span>
+    <span class="intro-tag">Legal AI</span>
+  </div>
+</div>
+
+<!-- ═══ PHASE 4: Terminal ═══ -->
+<div id="p-term" class="phase">
+  <div class="titlebar">
+    <div class="tb-dots">
+      <div class="tb-dot"></div>
+      <div class="tb-dot"></div>
+      <div class="tb-dot"></div>
+    </div>
+    <div class="tb-title">anonymise.py — legal-anon-env</div>
+  </div>
+  <div class="term" id="term"></div>
+</div>
+
+<!-- ═══ PHASE 5: CTA ═══ -->
+<div id="p-cta" class="phase">
+  <div class="cta-eyebrow">Want the full story?</div>
+  <div class="cta-headline">See how it actually works</div>
+  <div class="cta-sub">Dataset · model bake-off · mosaic effect · pipeline architecture</div>
+  <a class="cta-card" href="projects/anonymiser.html">
+    Read the write-up
+    <span class="arrow">→</span>
+  </a>
+  <div class="cta-meta">williamcatt.dev/projects/anonymiser</div>
+</div>
+
+<script>
+/* ── helpers ─────────────────────────────────────── */
+const sleep  = ms => new Promise(r => setTimeout(r, ms));
+const $      = id => document.getElementById(id);
+
+function showPhase(id) {
+  document.querySelectorAll('.phase').forEach(p => p.classList.remove('on'));
+  if (id) $(id)?.classList.add('on');
+}
+
+/* ── Phase 1: document scroll ───────────────────── */
+async function phaseDoc() {
+  const inner = $('doc-inner');
+  inner.style.transform = 'translateY(0)';
+
+  showPhase('p-doc');
+  await sleep(400); // let fade in settle
+
+  // Scroll the text upward over ~4s
+  const totalPx = 520;
+  const duration = 4000;
+  const start = performance.now();
+
+  await new Promise(resolve => {
+    function tick(now) {
+      const t = Math.min((now - start) / duration, 1);
+      // ease-in slightly then linear
+      const eased = t < 0.1 ? t * t * 5 : 0.05 + (t - 0.1) * (1 / 0.9) * 0.95;
+      inner.style.transform = `translateY(${-eased * totalPx}px)`;
+      if (t < 1) requestAnimationFrame(tick);
+      else resolve();
+    }
+    requestAnimationFrame(tick);
+  });
+
+  await sleep(300);
+}
+
+/* ── Phase 2: problem statement ─────────────────── */
+const PROBLEM_LINES = [
+  { id: 'prob1', text: 'Thousands of privileged client files.', delay: 36 },
+  { id: 'prob2', text: 'AI tools that could save us hours.',   delay: 36 },
+  { id: 'prob3', text: 'But none of it can leave the building.', delay: 32 },
+  { id: 'prob4', text: 'How do we use AI safely?',            delay: 40 },
+];
+
+async function typeEl(el, text, charDelay) {
+  el.textContent = '';
+  for (const ch of text) {
+    el.textContent += ch;
+    await sleep(charDelay + Math.random() * 12 - 6);
+  }
+}
+
+async function phaseProblem() {
+  // Reset
+  ['prob1','prob2','prob3','prob4'].forEach(id => $(id).textContent = '');
+
+  showPhase('p-problem');
+  await sleep(500);
+
+  for (const { id, text, delay } of PROBLEM_LINES) {
+    await typeEl($(id), text, delay);
+    await sleep(id === 'prob3' ? 600 : 350);
+  }
+
+  await sleep(1200);
+}
+
+/* ── Phase 3: intro ──────────────────────────────── */
+async function phaseIntro() {
+  showPhase('p-intro');
+  await sleep(2600);
+}
+
+/* ── Phase 4: terminal ───────────────────────────── */
+const term = $('term');
+let activeCursor = null;
+
+function addLine(html = '', cls = '') {
+  const d = document.createElement('div');
+  d.className = 'term-line' + (cls ? ' ' + cls : '');
+  d.innerHTML = html;
+  term.appendChild(d);
+  return d;
+}
+
+function mkPromptLine() {
+  const d = document.createElement('div');
+  d.className = 'term-line';
+  d.innerHTML = `<span class="prompt-str">william@mbp:~/anonymiser$&nbsp;</span><span class="cmd-txt"></span><span class="t-cursor on"></span>`;
+  term.appendChild(d);
+  activeCursor = d.querySelector('.t-cursor');
+  return d.querySelector('.cmd-txt');
+}
+
+async function typeCmd(el, text, delay = 38) {
+  for (const ch of text) {
+    el.textContent += ch;
+    await sleep(delay + Math.random() * 18 - 9);
+  }
+}
+
+function killCursor() {
+  if (activeCursor) { activeCursor.classList.remove('on'); activeCursor = null; }
+}
+
+const SPIN = ['⣾','⣽','⣻','⢿','⡿','⣟','⣯','⣷'];
+async function spin(el, ms) {
+  const end = Date.now() + ms;
+  let i = 0;
+  while (Date.now() < end) { el.textContent = SPIN[i++ % SPIN.length]; await sleep(80); }
+}
+
+async function phaseTerminal() {
+  term.innerHTML = '';
+
+  // header
+  const hdr = document.createElement('div');
+  hdr.style.cssText = 'font-size:10px;color:var(--muted);padding-bottom:12px;letter-spacing:0.08em;text-transform:uppercase;font-family:"Space Grotesk",sans-serif';
+  hdr.textContent = 'Legal Text Anonymiser  ·  RoBERTa (fine-tuned)  ·  F1 0.851  ·  555 test docs';
+  term.appendChild(hdr);
+
+  /* ── Redact command ── */
+  const cmd1 = mkPromptLine();
+  await sleep(500);
+  await typeCmd(cmd1, 'python anonymise.py --mode pseudonymise settlement.txt');
+  await sleep(380);
+  killCursor();
+
+  // spinner
+  const spinLine = addLine('', 't-out');
+  const sp = document.createElement('span');
+  sp.className = 't-spinner';
+  const lbl = document.createElement('span');
+  lbl.className = 't-muted';
+  lbl.textContent = '  Loading model and running NER pipeline...';
+  spinLine.appendChild(sp); spinLine.appendChild(lbl);
+  await spin(sp, 1300);
+  spinLine.innerHTML = '<span class="t-ok">✓</span> <span class="t-muted">8 entities detected &nbsp;·&nbsp; 0.31s &nbsp;·&nbsp; model: <span style="color:var(--text)">roberta-base fine-tuned on TAB</span></span>';
+
+  await sleep(300);
+  addLine('<span class="t-dim">' + '─'.repeat(52) + '</span>');
+  await sleep(150);
+  addLine('<span class="t-head">&nbsp;&nbsp;OUTPUT — safe to send to AI</span>');
+  await sleep(250);
+
+  // redacted doc block
+  const docBlock = document.createElement('div');
+  docBlock.style.cssText = 'padding:7px 4px 7px 16px;border-left:2px solid var(--border);margin:0 0 4px 2px;line-height:1.85;font-size:11.5px';
+  docBlock.innerHTML =
+    `<span class="tok-p">[PERSON_A]</span> of <span class="tok-o">[ORG_A]</span> met with <span class="tok-p">[PERSON_B]</span>,\n` +
+    `general counsel of <span class="tok-o">[ORG_B]</span>, to finalise\n` +
+    `settlement under <span class="tok-c">[CODE_A]</span>. <span class="tok-p">[PERSON_A]</span>\n` +
+    `confirmed payment to <span class="tok-o">[ORG_C]</span> (IBAN <span class="tok-c">[CODE_B]</span>).`;
+  docBlock.style.whiteSpace = 'pre';
+  term.appendChild(docBlock);
+
+  await sleep(500);
+  addLine('<span class="t-dim">' + '─'.repeat(52) + '</span>');
+  await sleep(150);
+  addLine('<span class="t-head">&nbsp;&nbsp;VAULT — stored locally, never transmitted</span>');
+  await sleep(200);
+
+  const vault = [
+    ['[PERSON_A]', 'Anya Kowalski'],
+    ['[ORG_A]    ', 'Meridian Capital Partners'],
+    ['[PERSON_B]', 'Tomás Ferreira'],
+    ['[ORG_B]    ', 'Halcyon Biotech GmbH'],
+    ['[CODE_A]  ', 'Application no. 41872/19'],
+    ['[CODE_B]  ', 'PT50 0002 0123 1234 5678 9015 4'],
+  ];
+  for (const [k, v] of vault) {
+    const row = addLine('', 't-out');
+    row.innerHTML = `  <span class="vkey">${k}</span>  <span class="vdim">→</span>  <span class="vval">${v}</span>`;
+    await sleep(105);
+  }
+
+  await sleep(1600);
+
+  /* ── Restore command ── */
+  addLine('');
+  const cmd2 = mkPromptLine();
+  await sleep(450);
+  await typeCmd(cmd2, 'python restore.py --vault vault.json ai_response.txt');
+  await sleep(350);
+  killCursor();
+
+  const spinLine2 = addLine('', 't-out');
+  const sp2 = document.createElement('span');
+  sp2.className = 't-spinner';
+  const lbl2 = document.createElement('span');
+  lbl2.className = 't-muted';
+  lbl2.textContent = '  Resolving tokens against vault...';
+  spinLine2.appendChild(sp2); spinLine2.appendChild(lbl2);
+  await spin(sp2, 900);
+  spinLine2.innerHTML = '<span class="t-ok">✓</span> <span class="t-muted">Round-trip complete &nbsp;·&nbsp; lossless &nbsp;·&nbsp; 0 unresolved tokens</span>';
+
+  await sleep(250);
+  addLine('<span class="t-head">&nbsp;&nbsp;RESTORED — real names back, processed locally</span>');
+  await sleep(200);
+
+  const restoreBlock = document.createElement('div');
+  restoreBlock.style.cssText = 'padding:7px 4px 7px 16px;border-left:2px solid oklch(42% 0.14 145);margin:0 0 4px 2px;line-height:1.85;font-size:11.5px;white-space:pre;color:oklch(72% 0.16 145)';
+  restoreBlock.textContent =
+    'Anya Kowalski of Meridian Capital Partners met\n' +
+    'with Tomás Ferreira, general counsel of Halcyon\n' +
+    'Biotech GmbH, to finalise under 41872/19.';
+  term.appendChild(restoreBlock);
+
+  await sleep(300);
+  addLine('');
+  addLine('<span class="t-ok">✓</span> <span class="t-muted">Real names never left the building.</span>');
+
+  await sleep(2800);
+}
+
+/* ── Phase 5: CTA ─────────────────────────────────── */
+async function phaseCTA() {
+  showPhase('p-cta');
+  await sleep(3800);
+}
+
+/* ── Main loop ─────────────────────────────────────── */
+async function main() {
+  while (true) {
+    await phaseDoc();
+    await phaseProblem();
+    await phaseIntro();
+
+    showPhase('p-term');
+    await sleep(300);
+    await phaseTerminal();
+
+    await phaseCTA();
+
+    // brief blackout before loop
+    showPhase(null);
+    await sleep(800);
+  }
+}
+
+main();
+</script>
+</body>
+</html>

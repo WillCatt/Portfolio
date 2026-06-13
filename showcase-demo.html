@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Legal Text Anonymiser · Showcase</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:         #faf8f4;
+  --surface:    #ffffff;
+  --text:       #1a1714;
+  --muted:      #6b6560;
+  --border:     #e8e4dc;
+  --amber:      #b85c00;
+  --amber-bg:   #fdf0e0;
+  --blue:       #1757b8;
+  --blue-bg:    #e8efff;
+  --purple:     #6f35d4;
+  --purple-bg:  #f0eaff;
+  --green:      #186b38;
+  --green-bg:   #e0f5e9;
+  --accent:     oklch(52% 0.14 50);
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background: var(--bg);
+  font-family: 'Space Grotesk', sans-serif;
+  color: var(--text);
+  overflow: hidden;
+}
+
+/* ── Scenes ── */
+.scene {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 52px;
+  opacity: 0;
+  transition: opacity 0.55s ease;
+  will-change: opacity;
+}
+.scene.on { opacity: 1; }
+
+/* ── S1: Title ── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--green-bg);
+  color: var(--green);
+  padding: 5px 14px 5px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.badge-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: blink 2s ease-in-out infinite;
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+.t-main {
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  text-align: center;
+  margin-bottom: 10px;
+}
+.t-sub {
+  font-size: 15px;
+  color: var(--muted);
+  text-align: center;
+}
+.tag-row { display: flex; gap: 8px; margin-top: 18px; flex-wrap: wrap; justify-content: center; }
+.tag { background: var(--border); color: var(--muted); font-size: 11px; padding: 3px 10px; border-radius: 999px; font-weight: 500; }
+
+/* ── S2: Redaction ── */
+.scene-lbl {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+  align-self: flex-start;
+  margin-bottom: 10px;
+}
+.doc-card {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 22px 26px;
+  font-size: 13px;
+  line-height: 1.8;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.045);
+}
+.entity {
+  border-radius: 3px;
+  padding: 1px 3px;
+  transition: background 0.2s, color 0.2s;
+  white-space: nowrap;
+}
+.entity.flash {
+  background: oklch(90% 0.22 78);
+  outline: 2px solid oklch(70% 0.26 72);
+  animation: pop 0.45s ease;
+}
+@keyframes pop {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+.entity.r-person { background: var(--amber-bg); color: var(--amber);  font-family: 'JetBrains Mono', monospace; font-size: 11.5px; font-weight: 500; }
+.entity.r-org    { background: var(--blue-bg);   color: var(--blue);   font-family: 'JetBrains Mono', monospace; font-size: 11.5px; font-weight: 500; }
+.entity.r-code   { background: var(--purple-bg); color: var(--purple); font-family: 'JetBrains Mono', monospace; font-size: 11.5px; font-weight: 500; }
+
+.pbar-wrap { width: 100%; height: 3px; background: var(--border); border-radius: 99px; margin-top: 14px; overflow: hidden; }
+.pbar { height: 100%; width: 0; background: var(--accent); border-radius: 99px; transition: width 0.35s ease; }
+
+/* ── S3: Stats ── */
+.stats-ctx { font-size: 11px; color: var(--muted); margin-bottom: 22px; text-align: center; text-transform: uppercase; letter-spacing: 0.07em; font-weight: 500; }
+.stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; width: 100%; max-width: 620px; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px 16px; text-align: center; }
+.stat-n { font-size: 36px; font-weight: 700; line-height: 1; margin-bottom: 8px; font-variant-numeric: tabular-nums; }
+.stat-n .hi  { color: var(--amber); }
+.stat-n .sm  { font-size: 18px; }
+.stat-d { font-size: 11.5px; color: var(--muted); line-height: 1.4; }
+
+/* ── S4: Vault ── */
+.vault-layout { display: grid; grid-template-columns: 1fr 1.15fr; gap: 16px; width: 100%; max-width: 640px; }
+.vault-box { background: #1a1714; border-radius: 12px; padding: 20px 18px; font-family: 'JetBrains Mono', monospace; }
+.vault-head { font-size: 9px; text-transform: uppercase; letter-spacing: 0.12em; color: oklch(68% 0.18 60); margin-bottom: 14px; font-weight: 600; }
+.vr { display: flex; gap: 8px; margin-bottom: 7px; font-size: 11px; }
+.vr .k { color: oklch(76% 0.20 58); flex-shrink: 0; }
+.vr .v { color: #bbb; }
+.io-stack { display: flex; flex-direction: column; gap: 10px; }
+.io-box { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 13px 15px; font-size: 11.5px; line-height: 1.55; flex: 1; }
+.io-box.ok { border-color: oklch(68% 0.14 145); background: oklch(97% 0.025 145); }
+.io-lbl { font-size: 9px; text-transform: uppercase; letter-spacing: 0.09em; color: var(--muted); font-weight: 600; margin-bottom: 7px; }
+.io-lbl.green { color: oklch(38% 0.14 145); }
+.mono { font-family: 'JetBrains Mono', monospace; }
+</style>
+</head>
+<body>
+
+<!-- S1: Title -->
+<div class="scene" id="s1">
+  <div class="badge"><span class="badge-dot"></span>Live</div>
+  <div class="t-main">Legal Text Anonymiser</div>
+  <div class="t-sub">PII redaction · mosaic re-identification risk · pseudonymisation</div>
+  <div class="tag-row">
+    <span class="tag">NLP</span>
+    <span class="tag">NER</span>
+    <span class="tag">RoBERTa</span>
+    <span class="tag">PII</span>
+    <span class="tag">Legal AI</span>
+  </div>
+</div>
+
+<!-- S2: Redaction -->
+<div class="scene" id="s2">
+  <div class="scene-lbl">Input — settlement note</div>
+  <div class="doc-card">
+    Following preliminary talks,
+    <span class="entity" data-t="person" data-tok="[PERSON_A]">Anya Kowalski</span> of
+    <span class="entity" data-t="org"    data-tok="[ORG_A]">Meridian Capital Partners</span>
+    met with
+    <span class="entity" data-t="person" data-tok="[PERSON_B]">Tomás Ferreira</span>,
+    general counsel of
+    <span class="entity" data-t="org"    data-tok="[ORG_B]">Halcyon Biotech GmbH</span>,
+    to finalise the settlement under Application no.&nbsp;<span class="entity" data-t="code" data-tok="[CODE_A]">41872/19</span>.
+    <span class="entity" data-t="person" data-tok="[PERSON_A]">Ms Kowalski</span>
+    confirmed payment would be wired to
+    <span class="entity" data-t="org"  data-tok="[ORG_C]">Banco Nacional de Lisboa</span>
+    (IBAN&nbsp;<span class="entity" data-t="code" data-tok="[CODE_B]">PT50 0002 0123 1234 5678 9015 4</span>).
+  </div>
+  <div class="pbar-wrap"><div class="pbar" id="pbar"></div></div>
+</div>
+
+<!-- S3: Stats -->
+<div class="scene" id="s3">
+  <div class="stats-ctx">Production model · 555 held-out ECHR judgments it never saw</div>
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-n">0.851</div>
+      <div class="stat-d">Overall F1<br>(partial-match)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-n"><span class="hi">+28.5</span><span class="sm">pp</span></div>
+      <div class="stat-d">Over off-the-shelf<br>spaCy baseline</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-n">0→<span class="hi">98</span><span class="sm">%</span></div>
+      <div class="stat-d">CODE recall<br>(case numbers)</div>
+    </div>
+  </div>
+</div>
+
+<!-- S4: Vault -->
+<div class="scene" id="s4">
+  <div class="scene-lbl">Pseudonymise mode — real names never leave the firm</div>
+  <div class="vault-layout">
+    <div class="vault-box">
+      <div class="vault-head">🔒 vault.json — local only</div>
+      <div class="vr"><span class="k">[PERSON_A]</span><span class="v">Anya Kowalski</span></div>
+      <div class="vr"><span class="k">[ORG_A]&nbsp;&nbsp;&nbsp;</span><span class="v">Meridian Capital Partners</span></div>
+      <div class="vr"><span class="k">[PERSON_B]</span><span class="v">Tomás Ferreira</span></div>
+      <div class="vr"><span class="k">[ORG_B]&nbsp;&nbsp;&nbsp;</span><span class="v">Halcyon Biotech GmbH</span></div>
+      <div class="vr"><span class="k">[CODE_A]&nbsp;&nbsp;</span><span class="v">41872/19</span></div>
+    </div>
+    <div class="io-stack">
+      <div class="io-box">
+        <div class="io-lbl">Sent to AI ↗</div>
+        <span class="mono">[PERSON_A] of [ORG_A] met with [PERSON_B], general counsel of [ORG_B], to finalise under [CODE_A].</span>
+      </div>
+      <div class="io-box ok">
+        <div class="io-lbl green">Restored locally · restore() ✓</div>
+        Anya Kowalski of Meridian Capital Partners met with Tomás Ferreira, general counsel of Halcyon Biotech GmbH, to finalise under 41872/19.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const allE = [...document.querySelectorAll('.entity')];
+allE.forEach(e => e.dataset.orig = e.textContent);
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const $id   = id => document.getElementById(id);
+
+function showScene(id) {
+  document.querySelectorAll('.scene').forEach(s => s.classList.remove('on'));
+  if (id) $id(id)?.classList.add('on');
+}
+
+function reset() {
+  allE.forEach(e => { e.className = 'entity'; e.textContent = e.dataset.orig; });
+  $id('pbar').style.width = '0%';
+}
+
+async function runRedaction() {
+  for (let i = 0; i < allE.length; i++) {
+    const e = allE[i];
+    e.classList.add('flash');
+    await sleep(430);
+    e.classList.remove('flash');
+    e.className = `entity r-${e.dataset.t}`;
+    e.textContent = e.dataset.tok;
+    $id('pbar').style.width = `${Math.round((i + 1) / allE.length * 100)}%`;
+    await sleep(180);
+  }
+}
+
+async function loop() {
+  while (true) {
+    reset();
+
+    showScene('s1');
+    await sleep(2600);
+
+    showScene('s2');
+    await sleep(800);
+    await runRedaction();
+    await sleep(1600);
+
+    showScene('s3');
+    await sleep(3600);
+
+    showScene('s4');
+    await sleep(4200);
+
+    showScene(null);
+    await sleep(700);
+  }
+}
+
+loop();
+</script>
+</body>
+</html>

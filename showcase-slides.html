@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Legal Text Anonymiser · Slides Showcase</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:       #faf8f4;
+  --surface:  #ffffff;
+  --text:     #1a1714;
+  --muted:    #6b6560;
+  --border:   #e8e4dc;
+  --amber:    #b85c00;
+  --amber-bg: #fdf0e0;
+  --blue:     #1757b8;
+  --blue-bg:  #e8efff;
+  --green:    #186b38;
+  --green-bg: #e0f5e9;
+  --red:      #b81717;
+  --red-bg:   #fde8e8;
+  --accent:   oklch(52% 0.14 50);
+}
+
+html, body {
+  width: 100%; height: 100%;
+  background: var(--bg);
+  font-family: 'Space Grotesk', sans-serif;
+  color: var(--text);
+  overflow: hidden;
+}
+
+/* ── Slides ── */
+.slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 60px;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.slide.on { opacity: 1; }
+
+/* ── Progress bar ── */
+.progress-track {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--border);
+}
+.progress-fill {
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.4s ease;
+  width: 0%;
+}
+
+/* ── Dot indicators ── */
+.dots {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+}
+.dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: background 0.3s, transform 0.3s;
+}
+.dot.on { background: var(--text); transform: scale(1.2); }
+
+/* ── Shared layout ── */
+.slide-kicker {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 14px;
+  text-align: center;
+}
+.slide-headline {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-align: center;
+  line-height: 1.2;
+  margin-bottom: 12px;
+}
+.slide-body {
+  font-size: 14px;
+  color: var(--muted);
+  text-align: center;
+  line-height: 1.6;
+  max-width: 520px;
+}
+
+/* ── Slide 1: Problem ── */
+.tension-row {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 28px;
+}
+.tension-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 20px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 13px;
+  min-width: 130px;
+}
+.tension-arrow {
+  font-size: 22px;
+  color: var(--muted);
+  padding: 0 8px;
+  position: relative;
+}
+.shield-blocker {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -55%);
+  font-size: 16px;
+}
+.tension-barrier {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 0 16px;
+}
+.barrier-line {
+  width: 2px;
+  height: 22px;
+  background: var(--red);
+  opacity: 0.5;
+}
+.barrier-icon { font-size: 22px; }
+.barrier-label {
+  font-size: 10px;
+  color: var(--red);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+/* ── Slide 2: Failure ── */
+.bar-compare {
+  display: flex;
+  gap: 32px;
+  align-items: flex-end;
+  height: 110px;
+  margin-bottom: 28px;
+}
+.bar-group { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.bar-wrap { display: flex; align-items: flex-end; height: 90px; }
+.bar {
+  width: 60px;
+  border-radius: 6px 6px 0 0;
+}
+.bar.bad  { height: 50px; background: var(--red-bg); border: 2px solid #e8a0a0; }
+.bar.good { height: 90px; background: var(--green-bg); border: 2px solid #7dd4a0; }
+.bar-val { font-size: 18px; font-weight: 700; }
+.bar-lbl { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.3; }
+
+.miss-callout {
+  background: var(--red-bg);
+  border: 1px solid #e8a0a0;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 13px;
+  color: var(--red);
+  font-weight: 500;
+  margin-bottom: 18px;
+  text-align: center;
+}
+
+/* ── Slide 3: Solution ── */
+.big-f1 {
+  font-size: 72px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin-bottom: 6px;
+  font-variant-numeric: tabular-nums;
+}
+.f1-label { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+.metric-pills { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.pill {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.pill .val { color: var(--green); font-weight: 700; }
+
+/* ── Slide 4: Mosaic ── */
+.mosaic-row { display: flex; gap: 12px; align-items: center; margin-bottom: 24px; }
+.fact-chip {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.3;
+}
+.fact-chip small { display: block; font-size: 10px; color: var(--muted); font-weight: 400; }
+.plus { font-size: 20px; color: var(--muted); }
+.equals { font-size: 20px; color: var(--muted); }
+.unique-chip {
+  background: var(--amber-bg);
+  border: 1px solid #e8c080;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--amber);
+  text-align: center;
+}
+.mosaic-stat { font-size: 40px; font-weight: 700; color: var(--amber); line-height: 1; margin-bottom: 4px; }
+
+/* ── Slide 5: Pipeline ── */
+.pipeline {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 24px;
+  flex-wrap: nowrap;
+}
+.pipe-node {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  min-width: 80px;
+  line-height: 1.3;
+}
+.pipe-node .icon { font-size: 20px; display: block; margin-bottom: 4px; }
+.pipe-node.highlight { background: var(--text); color: var(--bg); border-color: var(--text); }
+.pipe-arrow { font-size: 16px; color: var(--muted); padding: 0 6px; flex-shrink: 0; }
+.pipe-caption {
+  font-size: 12px;
+  color: var(--green);
+  font-weight: 600;
+  background: var(--green-bg);
+  border-radius: 6px;
+  padding: 8px 16px;
+  text-align: center;
+}
+</style>
+</head>
+<body>
+
+<!-- ── Slide 1: The Problem ── -->
+<div class="slide" id="s1">
+  <div class="slide-kicker">The challenge</div>
+  <div class="slide-headline">AI in law has a<br>privacy problem</div>
+  <div style="margin: 24px 0;">
+    <div class="tension-row">
+      <div class="tension-box">🏛️ Law firm<br><small style="font-weight:400;color:var(--muted);font-size:11px">privileged docs</small></div>
+      <div class="tension-barrier">
+        <div class="barrier-line"></div>
+        <div class="barrier-icon">🚫</div>
+        <div class="barrier-label">confidential</div>
+        <div class="barrier-line"></div>
+      </div>
+      <div class="tension-box">✨ AI tools<br><small style="font-weight:400;color:var(--muted);font-size:11px">external servers</small></div>
+    </div>
+  </div>
+  <div class="slide-body">Client names, case numbers, and financials can't be sent to third-party AI. But lawyers need AI to stay competitive.</div>
+</div>
+
+<!-- ── Slide 2: Baseline Failure ── -->
+<div class="slide" id="s2">
+  <div class="slide-kicker">The problem with off-the-shelf tools</div>
+  <div class="miss-callout">Off-the-shelf NER misses <strong>2 in 5</strong> legal identifiers — and case numbers at <strong>0%</strong> recall</div>
+  <div class="bar-compare">
+    <div class="bar-group">
+      <div class="bar-wrap"><div class="bar bad"></div></div>
+      <div class="bar-val" style="color:var(--red)">0.57</div>
+      <div class="bar-lbl">spaCy<br>off-the-shelf</div>
+    </div>
+    <div class="bar-group">
+      <div class="bar-wrap"><div class="bar good"></div></div>
+      <div class="bar-val" style="color:var(--green)">0.85</div>
+      <div class="bar-lbl">RoBERTa<br>fine-tuned</div>
+    </div>
+  </div>
+  <div class="slide-body">General-purpose models train on news articles. They've never seen a legal case number — that label simply doesn't exist.</div>
+</div>
+
+<!-- ── Slide 3: The Solution ── -->
+<div class="slide" id="s3">
+  <div class="slide-kicker">The solution</div>
+  <div class="big-f1">0.851</div>
+  <div class="f1-label">F1 — RoBERTa fine-tuned on 1,268 ECHR legal judgments</div>
+  <div class="metric-pills">
+    <div class="pill"><span class="val">+28.5pp</span> over baseline</div>
+    <div class="pill">CODE recall <span class="val">0% → 98%</span></div>
+    <div class="pill">PERSON recall <span class="val">92.8%</span></div>
+    <div class="pill">555 held-out test docs</div>
+  </div>
+</div>
+
+<!-- ── Slide 4: Mosaic Effect ── -->
+<div class="slide" id="s4">
+  <div class="slide-kicker">The deeper insight</div>
+  <div class="slide-headline">Deleting names isn't enough</div>
+  <div class="mosaic-row">
+    <div class="fact-chip">47-year-old<small>age</small></div>
+    <div class="plus">+</div>
+    <div class="fact-chip">Bulgarian<small>nationality</small></div>
+    <div class="plus">+</div>
+    <div class="fact-chip">Plovdiv<small>city</small></div>
+    <div class="equals">=</div>
+    <div class="unique-chip">Unique<br>identity</div>
+  </div>
+  <div style="margin-bottom: 16px;">
+    <div class="mosaic-stat">98%</div>
+    <div style="font-size:13px;color:var(--muted)">of people identified with just 3 quasi-identifiers</div>
+  </div>
+  <div class="slide-body">The mosaic effect: ordinary context clues left in the text can uniquely identify someone even after all names are gone.</div>
+</div>
+
+<!-- ── Slide 5: The Pipeline ── -->
+<div class="slide" id="s5">
+  <div class="slide-kicker">The full solution</div>
+  <div class="slide-headline" style="margin-bottom:24px">Safe AI on privileged text</div>
+  <div class="pipeline">
+    <div class="pipe-node"><span class="icon">📄</span>Legal<br>doc</div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-node highlight"><span class="icon">🔒</span>Anonymise<br>locally</div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-node"><span class="icon">✨</span>External<br>AI</div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-node highlight"><span class="icon">🔑</span>restore()<br>locally</div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-node"><span class="icon">✅</span>Answer<br>with names</div>
+  </div>
+  <div class="pipe-caption">Real names never leave the building. AI still reasons correctly.</div>
+</div>
+
+<!-- ── Nav ── -->
+<div class="progress-track"><div class="progress-fill" id="pfill"></div></div>
+<div class="dots">
+  <div class="dot" id="d0"></div>
+  <div class="dot" id="d1"></div>
+  <div class="dot" id="d2"></div>
+  <div class="dot" id="d3"></div>
+  <div class="dot" id="d4"></div>
+</div>
+
+<script>
+const DURATIONS = [3200, 3500, 3500, 3800, 4200]; // ms per slide
+const N = 5;
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+let current = -1;
+
+function goto(i) {
+  if (current >= 0) {
+    document.getElementById(`s${current + 1}`)?.classList.remove('on');
+    document.getElementById(`d${current}`)?.classList.remove('on');
+  }
+  current = i;
+  document.getElementById(`s${i + 1}`)?.classList.add('on');
+  document.getElementById(`d${i}`)?.classList.add('on');
+  const pct = ((i + 1) / N * 100).toFixed(1);
+  document.getElementById('pfill').style.width = pct + '%';
+}
+
+async function loop() {
+  while (true) {
+    document.getElementById('pfill').style.width = '0%';
+    for (let i = 0; i < N; i++) {
+      goto(i);
+      await sleep(DURATIONS[i]);
+    }
+    // fade all out briefly before restart
+    document.getElementById(`s${N}`)?.classList.remove('on');
+    document.getElementById(`d${N - 1}`)?.classList.remove('on');
+    current = -1;
+    await sleep(700);
+  }
+}
+
+loop();
+</script>
+</body>
+</html>
