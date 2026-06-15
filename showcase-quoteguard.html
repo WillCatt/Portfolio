@@ -200,7 +200,8 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg);
 .cta-btn { display: inline-flex; align-items: center; gap: 10px; background: var(--amber); color: var(--amber-tx); padding: 15px 30px; border-radius: 11px; font-size: 15px; font-weight: 600; text-decoration: none; border: none; }
 .cta-arrow { font-family:'JetBrains Mono',monospace; }
 .cta-meta { margin-top: 18px; font-family:'JetBrains Mono',monospace; font-size: 11px; color: var(--faint); }
-.cta-replay { margin-top: 18px; background: none; border: none; cursor: pointer; font-family:'JetBrains Mono',monospace; font-size: 12.5px; color: var(--muted); transition: color .15s ease; }
+.cta-secondary { margin-top: 20px; display: flex; gap: 26px; align-items: center; justify-content: center; }
+.cta-replay { background: none; border: none; cursor: pointer; text-decoration: none; font-family:'JetBrains Mono',monospace; font-size: 12.5px; color: var(--muted); transition: color .15s ease; }
 .cta-replay:hover { color: var(--amber); }
 
 /* ═══ PHASE — Approach (striking build) ══════════════════════════════ */
@@ -366,7 +367,10 @@ Unless specifically stated otherwise in this Policy, We will not pay for any los
   <div class="cta-s">Retrieval bake-off · guardrail pipeline · adversarial eval · live demo</div>
   <a class="cta-btn" href="projects/quoteguard.html" id="cta-link">Try the live demo <span class="cta-arrow">→</span></a>
   <div class="cta-meta">williamcatt.dev/projects/quoteguard</div>
-  <button class="cta-replay" id="qg-replay" type="button">↻ Play again</button>
+  <div class="cta-secondary">
+    <button class="cta-replay" id="qg-replay" type="button">↻ Play again</button>
+    <a class="cta-replay" href="index.html" id="qg-home">← Back to home</a>
+  </div>
 </div>
 
 <!-- ── control bar ── -->
@@ -557,6 +561,7 @@ Unless specifically stated otherwise in this Policy, We will not pay for any los
   $('controls').addEventListener("click", e=>e.stopPropagation());
   $('cta-link').addEventListener("click", e=>e.stopPropagation());
   $('qg-replay').addEventListener("click", e=>{ e.stopPropagation(); replay(); });
+  $('qg-home').addEventListener("click", e=>e.stopPropagation());
   stage.addEventListener("click", toggle);
   let wasPlaying=false;
   track.addEventListener("pointerdown", e=>{ e.stopPropagation(); e.preventDefault(); dragging=true; wasPlaying=playing&&!ended; playing=false; try{track.setPointerCapture(e.pointerId);}catch(_){} seek(e.clientX); });

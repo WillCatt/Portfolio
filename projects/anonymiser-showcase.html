@@ -64,7 +64,7 @@
   .cta-row.ended .cta{animation:ctaPulse 1.7s ease-in-out infinite}
   @keyframes ctaPulse{0%,100%{transform:scale(1);box-shadow:0 8px 22px -16px rgba(184,106,46,.55)}
     50%{transform:scale(1.035);box-shadow:0 16px 34px -14px rgba(184,106,46,.85)}}
-  .replay{background:none;border:none;cursor:pointer;font-family:"JetBrains Mono",monospace;
+  .replay{background:none;border:none;cursor:pointer;text-decoration:none;font-family:"JetBrains Mono",monospace;
     font-size:13.5px;color:var(--muted);display:inline-flex;align-items:center;gap:6px;padding:8px 6px;transition:color .15s ease}
   .replay:hover{color:var(--amber)}
   .meta{font-family:"JetBrains Mono",monospace;font-size:13px;color:var(--muted);
@@ -90,6 +90,7 @@
     <div class="cta-row" id="ctaRow">
       <a class="cta" href="anonymiser.html">Read the write-up <span class="arrow">→</span></a>
       <button class="replay" id="replayBtn" type="button">↻ Play again</button>
+      <a class="replay" href="../index.html">← Home</a>
     </div>
     <div class="meta">scrub or click to pause</div>
   </div>
