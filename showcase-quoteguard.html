@@ -200,6 +200,8 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg);
 .cta-btn { display: inline-flex; align-items: center; gap: 10px; background: var(--amber); color: var(--amber-tx); padding: 15px 30px; border-radius: 11px; font-size: 15px; font-weight: 600; text-decoration: none; border: none; }
 .cta-arrow { font-family:'JetBrains Mono',monospace; }
 .cta-meta { margin-top: 18px; font-family:'JetBrains Mono',monospace; font-size: 11px; color: var(--faint); }
+.cta-replay { margin-top: 18px; background: none; border: none; cursor: pointer; font-family:'JetBrains Mono',monospace; font-size: 12.5px; color: var(--muted); transition: color .15s ease; }
+.cta-replay:hover { color: var(--amber); }
 
 /* ═══ PHASE — Approach (striking build) ══════════════════════════════ */
 #p-approach { background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 56px 6vw; }
@@ -364,6 +366,7 @@ Unless specifically stated otherwise in this Policy, We will not pay for any los
   <div class="cta-s">Retrieval bake-off · guardrail pipeline · adversarial eval · live demo</div>
   <a class="cta-btn" href="projects/quoteguard.html" id="cta-link">Try the live demo <span class="cta-arrow">→</span></a>
   <div class="cta-meta">williamcatt.dev/projects/quoteguard</div>
+  <button class="cta-replay" id="qg-replay" type="button">↻ Play again</button>
 </div>
 
 <!-- ── control bar ── -->
@@ -506,7 +509,8 @@ Unless specifically stated otherwise in this Policy, We will not pay for any los
   const phaseEls = {pdf:$('p-pdf'),prob:$('p-problem'),intro:$('p-intro'),appr:$('p-approach'),chat:$('p-chat'),stats:$('p-stats'),cta:$('p-cta')};
   function render(t){
     for(const k in PH){
-      const a = alpha(t, PH[k]);
+      // CTA is the terminal phase: fade in, then hold full (no fade-out) so the end frame isn't blank
+      const a = (k==='cta') ? smooth(clamp((t-PH.cta[0])/0.5)) : alpha(t, PH[k]);
       const el = phaseEls[k];
       el.style.opacity = a;
       el.style.pointerEvents = a>0.6 ? 'auto' : 'none';
@@ -523,10 +527,11 @@ Unless specifically stated otherwise in this Policy, We will not pay for any los
 
   // ── player ──
   const stage=$('stage'), pbtn=$('pbtn'), track=$('track'), cfill=$('cfill'), cthumb=$('cthumb'), tlabel=$('tlabel');
-  let currentTime=0, playing=true, dragging=false, dirty=true, lastNow=null, lastDraw=-1;
+  let currentTime=0, playing=true, ended=false, dragging=false, dirty=true, lastNow=null, lastDraw=-1;
   const FRAME_MS=1000/30;
   const PLAY='<svg viewBox="0 0 24 24" width="18" height="18"><path d="M7 5 L19 12 L7 19 Z" fill="currentColor"/></svg>';
   const PAUSE='<svg viewBox="0 0 24 24" width="18" height="18"><rect x="6.5" y="5" width="3.6" height="14" rx="1.2" fill="currentColor"/><rect x="13.9" y="5" width="3.6" height="14" rx="1.2" fill="currentColor"/></svg>';
+  const REPLAY='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 2.6-6.4"/><path d="M3 3v5h5"/></svg>';
   const fmt=s=>{s=Math.max(0,Math.floor(s));return Math.floor(s/60)+":"+String(s%60).padStart(2,"0");};
 
   function ui(){
@@ -534,27 +539,29 @@ Unless specifically stated otherwise in this Policy, We will not pay for any los
     cfill.style.width=(f*100).toFixed(2)+"%";
     cthumb.style.left=(f*100).toFixed(2)+"%";
     tlabel.textContent=fmt(currentTime)+" / "+fmt(TOTAL);
-    pbtn.innerHTML=playing?PAUSE:PLAY;
+    pbtn.innerHTML=ended?REPLAY:(playing?PAUSE:PLAY);
   }
   function loop(now){
     if(lastNow===null) lastNow=now;
     const dms=now-lastNow; lastNow=now;
-    if(playing && !dragging){ currentTime+=dms/1000; if(currentTime>=TOTAL) currentTime-=TOTAL; dirty=true; }
+    if(playing && !dragging){ currentTime+=dms/1000; if(currentTime>=TOTAL){ currentTime=TOTAL; playing=false; ended=true; } dirty=true; }
     if(dirty && now-lastDraw>=FRAME_MS-1){ render(currentTime); lastDraw=now; dirty=false; }
     ui();
     requestAnimationFrame(loop);
   }
-  function toggle(){ playing=!playing; dirty=true; }
-  function seek(clientX){ const r=track.getBoundingClientRect(); currentTime=clamp((clientX-r.left)/r.width)*TOTAL; dirty=true; }
+  function replay(){ currentTime=0; ended=false; playing=true; dirty=true; }
+  function toggle(){ if(ended){ replay(); } else { playing=!playing; dirty=true; } }
+  function seek(clientX){ const r=track.getBoundingClientRect(); currentTime=clamp((clientX-r.left)/r.width)*TOTAL; ended=(currentTime>=TOTAL-0.01); dirty=true; }
 
   pbtn.addEventListener("click", e=>{ e.stopPropagation(); toggle(); });
   $('controls').addEventListener("click", e=>e.stopPropagation());
   $('cta-link').addEventListener("click", e=>e.stopPropagation());
+  $('qg-replay').addEventListener("click", e=>{ e.stopPropagation(); replay(); });
   stage.addEventListener("click", toggle);
   let wasPlaying=false;
-  track.addEventListener("pointerdown", e=>{ e.stopPropagation(); e.preventDefault(); dragging=true; wasPlaying=playing; playing=false; try{track.setPointerCapture(e.pointerId);}catch(_){} seek(e.clientX); });
+  track.addEventListener("pointerdown", e=>{ e.stopPropagation(); e.preventDefault(); dragging=true; wasPlaying=playing&&!ended; playing=false; try{track.setPointerCapture(e.pointerId);}catch(_){} seek(e.clientX); });
   track.addEventListener("pointermove", e=>{ if(dragging) seek(e.clientX); });
-  const end=()=>{ if(dragging){ dragging=false; playing=wasPlaying; dirty=true; } };
+  const end=()=>{ if(dragging){ dragging=false; if(!ended) playing=wasPlaying; dirty=true; } };
   track.addEventListener("pointerup", end);
   track.addEventListener("pointercancel", end);
 
