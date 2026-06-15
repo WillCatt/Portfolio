@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Legal Text Anonymiser — Showcase · William Catt</title>
+<meta name="description" content="A 40-second walkthrough of the Legal Text Anonymiser: redact, anonymise, pseudonymise, and a safe LLM round-trip with Claude." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#faf8f4; --ink:#1a1714; --muted:#7d7468; --border:#e7e0d4;
+    --amber:#b86a2e; --amber-bg:#f5e7d6; --amber-bd:#dcab78;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Space Grotesk",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;
+    justify-content:center;gap:28px;padding:40px 24px}
+  .stage-frame{position:relative;width:min(1180px,94vw);aspect-ratio:16/9;
+    border:1px solid var(--border);border-radius:14px;overflow:hidden;
+    box-shadow:0 18px 50px -28px rgba(40,28,16,.32);cursor:pointer;background:var(--bg)}
+  #stage{display:block;width:100%;height:100%}
+  .pause-badge{position:absolute;inset:0;display:none;align-items:center;justify-content:center;
+    background:rgba(250,248,244,.35)}
+  .pause-badge svg{width:74px;height:74px;filter:drop-shadow(0 4px 12px rgba(40,28,16,.25))}
+  .stage-frame.paused .pause-badge{display:flex}
+  .cta{display:inline-flex;align-items:center;gap:12px;text-decoration:none;
+    font-family:"Space Grotesk";font-weight:600;font-size:20px;color:var(--amber);
+    background:var(--amber-bg);border:1.6px solid var(--amber-bd);
+    padding:15px 34px;border-radius:999px;transition:transform .15s ease, box-shadow .15s ease}
+  .cta:hover{transform:translateY(-1px);box-shadow:0 10px 24px -14px rgba(184,106,46,.7)}
+  .cta .arrow{font-family:"JetBrains Mono",monospace}
+  .meta{font-family:"JetBrains Mono",monospace;font-size:13px;color:var(--muted);
+    letter-spacing:.3px;text-align:center}
+  @media (prefers-reduced-motion: reduce){ .stage-frame{cursor:default} }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="stage-frame" id="frame" title="Click to pause / play">
+      <svg id="stage" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet"
+           xmlns="http://www.w3.org/2000/svg" aria-label="Legal Text Anonymiser showcase animation"></svg>
+      <div class="pause-badge" aria-hidden="true">
+        <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="#fffdf9" stroke="#dcab78" stroke-width="2"/>
+          <path d="M40 33 L68 50 L40 67 Z" fill="#b86a2e"/></svg>
+      </div>
+    </div>
+    <a class="cta" href="anonymiser.html">Read the write-up <span class="arrow">→</span></a>
+    <div class="meta">~40s · silent · loops · vector (crisp at any size)</div>
+  </div>
+
+  <script src="anonymiser-showcase.js"></script>
+  <script>
+    (function(){
+      var S = window.AnonShowcase;
+      var stage = document.getElementById("stage");
+      var frame = document.getElementById("frame");
+      var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var paused = false, startMs = null, pauseStart = 0, lastDraw = -1;
+      var FRAME_MS = 1000 / S.FPS;
+
+      function draw(t){ stage.innerHTML = S.buildInner(t); }
+
+      function loop(now){
+        if(startMs === null) startMs = now;
+        if(!paused){
+          var t = ((now - startMs) / 1000) % S.TOTAL;
+          if(now - lastDraw >= FRAME_MS - 1){ draw(t); lastDraw = now; }  // ~30fps
+        }
+        requestAnimationFrame(loop);
+      }
+
+      function begin(){
+        if(reduce){ draw(31.3 + 5.4); return; }  // static key frame (the workflow) for reduced motion
+        requestAnimationFrame(loop);
+      }
+
+      // start once fonts are ready so text doesn't reflow mid-animation
+      if(document.fonts && document.fonts.ready){
+        var started = false;
+        var go = function(){ if(!started){ started = true; begin(); } };
+        document.fonts.ready.then(go);
+        setTimeout(go, 1200); // fallback
+      } else { begin(); }
+
+      if(!reduce){
+        frame.addEventListener("click", function(){
+          if(!paused){ paused = true; pauseStart = performance.now(); frame.classList.add("paused"); }
+          else { paused = false; if(startMs !== null){ startMs += performance.now() - pauseStart; } frame.classList.remove("paused"); }
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

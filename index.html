@@ -86,6 +86,7 @@ const { useState, useEffect } = React;
 // Penalty Geometry lives inside the ML in Football grid, not as its own card.
 const PROJECTS = [
   { id: "anonymiser", index: "01", title: "Legal Text Anonymiser",
+    href: "projects/anonymiser-showcase.html",
     subtitle: "PII redaction + re-identification risk for legal text",
     hook: 'How redacted is *"redacted"*? Measuring re-identification risk.',
     chips: ["F1 0.85", "re-ID risk modelled"],
@@ -93,6 +94,7 @@ const PROJECTS = [
     color: "oklch(52% 0.14 145)", status: "live", priority: 1,
     tags: ["NLP", "NER", "RoBERTa"], year: 2026, q: "Q2" },
   { id: "quoteguard", index: "02", title: "QuoteGuard",
+    href: "showcase-quoteguard.html",
     subtitle: "Guardrailed, grounded RAG over an insurance policy",
     hook: "A chatbot that *refuses to invent prices* or give advice.",
     chips: ["72%→100% safe", "page-cited"],
