@@ -90,16 +90,17 @@
 
   // ---- scene timings ----
   const INTRO=[0.0,8.5], O=8.5;
-  const S0=[O+0.0,O+5.5], S1=[O+5.5,O+12.1], S2=[O+12.1,O+18.7],
-        S3=[O+18.7,O+25.3], SW=[O+25.3,O+37.3], S4=[O+37.3,O+41.5];
-  const TOTAL=O+41.5;
+  const S0=[O+0.0,O+5.5], S1=[O+5.5,O+14.2], S2=[O+14.2,O+22.9],
+        S3=[O+22.9,O+31.6], SW=[O+31.6,O+43.6], S4=[O+43.6,O+47.8];
+  const TOTAL=O+47.8;
+  const LEAD=3.4;   // each demo opens with a centered scene-setter that holds before the demo plays
   function scene_alpha(t,s,e,fin=0.5,fout=0.4){
     if(t<s-0.001||t>e+0.001) return 0;
     return smooth(Math.min(clamp((t-s)/fin),clamp((e-t)/fout)));
   }
 
   // ---- persistent chrome ----
-  function chrome(t){
+  function chrome(t, hideBottom){
     let out=[];
     const ia=smooth(clamp((t-(O+0.4))/0.6));
     if(ia>0){
@@ -109,12 +110,15 @@
         + txt(170+TITLE23+18,80,"PII redaction · re-identification risk",18,{fill:MUTED,family:FT_MONO}),
         {op:ia}));
     }
-    const pa=smooth(clamp((t-0.4)/0.8));
-    if(pa>0){
-      const bx=150,by=1012,bw=W-300,prog=clamp(t/TOTAL);
-      out.push(line(bx,by,bx+bw,by,BORDER,{sw:3,op:pa}));
-      out.push(line(bx,by,bx+bw*prog,by,AMBER,{sw:3,op:pa}));
-      out.push(txt(W-150,1006,"williamcatt.dev",18,{fill:FAINT,family:FT_MONO,anchor:"end",op:pa}));
+    // drawn progress bar — omitted in the HTML player, which has a real scrub bar
+    if(!hideBottom){
+      const pa=smooth(clamp((t-0.4)/0.8));
+      if(pa>0){
+        const bx=150,by=1012,bw=W-300,prog=clamp(t/TOTAL);
+        out.push(line(bx,by,bx+bw,by,BORDER,{sw:3,op:pa}));
+        out.push(line(bx,by,bx+bw*prog,by,AMBER,{sw:3,op:pa}));
+        out.push(txt(W-150,1006,"williamcatt.dev",18,{fill:FAINT,family:FT_MONO,anchor:"end",op:pa}));
+      }
     }
     return out.join("");
   }
@@ -127,6 +131,17 @@
     s.push(txt(x+70,y-6,title,30,{fill:INK,family:FT_SEMI,op:op*ap,ls:0.5}));
     s.push(txt(x+70,y+22,sub,20,{fill:MUTED,family:FT_MONO,op:op*ap}));
     return group(s.join(""),{ty:dy});
+  }
+  // standalone centered "scene-setter" shown before a demo plays (lt in [0,LEAD])
+  function _setter(lt, num, head, sub, color, a, cx){
+    const op=smooth(clamp((lt-0.15)/0.5))*(1-smooth(clamp((lt-(LEAD-0.5))/0.45)));
+    if(op<=0.01) return "";
+    const dy=(1-ease_out(clamp((lt-0.15)/0.6)))*16;
+    return group(
+      txt(cx,432,num,21,{fill:color,family:FT_MONO,anchor:"middle",op:a*op,weight:600,ls:4})
+      + txt(cx,504,head,50,{fill:INK,family:FT_SEMI,anchor:"middle",op:a*op})
+      + txt(cx,552,sub,23,{fill:MUTED,family:FT_MONO,anchor:"middle",op:a*op}),
+      {ty:dy});
   }
   function card(x,y,w,h,label,color,o={}){
     const {op=1,fill=CARD}=o; let s=[];
@@ -268,47 +283,46 @@
   function scene_redact(t){
     const [s,e]=S1, a=scene_alpha(t,s,e);
     if(a<=0) return "";
-    const lt=t-s, msize=25, lh=42;
-    let out=[section_header("01","REDACT","strip the direct identifiers",AMBER,{op:a,lt})];
+    const lt=t-s, dt=lt-LEAD, msize=25, lh=42;
+    let out=[_setter(lt,"01 — REDACT","Strip the direct identifiers",
+      "Every name, organisation and reference code that points to someone outright.",AMBER,a,W/2)];
+    out.push(section_header("01","REDACT","strip the direct identifiers",AMBER,{op:a,lt:dt}));
     const icx=150,icy=232,icw=1180,ich=222;
-    out.push(group(card(icx,icy,icw,ich,"INPUT  ·  raw privileged text",MUTED,{op:a}),{op:smooth(clamp(lt/0.5))}));
-    const inx=icx+34,iny=icy+58, ia=smooth(clamp((lt-0.15)/0.5));
+    out.push(group(card(icx,icy,icw,ich,"INPUT  ·  raw privileged text",MUTED,{op:a}),{op:smooth(clamp(dt/0.5))}));
+    const inx=icx+34,iny=icy+58, ia=smooth(clamp((dt-0.15)/0.5));
     for(let i=0;i<IN1.length;i++) out.push(txt(inx,iny+i*lh,IN1[i],msize,{fill:"#5b5346",family:FT_MONO,op:a*ia}));
-    if(lt>0.5 && lt<2.2){
-      const sp=ease_out(clamp((lt-0.5)/1.6)), sy=icy+18+sp*(ich-36);
+    if(dt>0.5 && dt<2.2){
+      const sp=ease_out(clamp((dt-0.5)/1.6)), sy=icy+18+sp*(ich-36);
       out.push(line(icx+16,sy,icx+icw-16,sy,AMBER,{sw:2.5,op:a*0.8*(1-Math.abs(sp-0.5)*0.6)}));
       out.push(rrect(icx+16,icy+18,icw-32,sy-(icy+18),0,AMBER,{op:a*0.05}));
     }
-    const ocx=150,ocy=510,ocw=1180,och=234, oca=smooth(clamp((lt-1.6)/0.5));
+    const ocx=150,ocy=510,ocw=1180,och=234, oca=smooth(clamp((dt-1.6)/0.5));
     out.push(group(card(ocx,ocy,ocw,och,"OUTPUT  ·  REDACT",AMBER,{op:a}),{op:oca}));
     const onx=ocx+34,ony=ocy+62, base=2.0;
     for(let i=0;i<OUT1.length;i++){
-      const la=smooth(clamp((lt-(base+i*0.32))/0.45));
+      const la=smooth(clamp((dt-(base+i*0.32))/0.45));
       let cx=onx; const ybase=ony+i*lh;
       for(const [seg,kind] of OUT1[i]){
         if(kind==="plain"){ out.push(txt(cx,ybase,seg,msize,{fill:INK,family:FT_MONO,op:a*la})); cx+=mono_w(seg,msize); }
         else{
-          const ct=base+i*0.32+0.18; let pop=ease_out_back(clamp((lt-ct)/0.45)); pop=pop<1?lerp(0.2,1,pop):1;
+          const ct=base+i*0.32+0.18; let pop=ease_out_back(clamp((dt-ct)/0.45)); pop=pop<1?lerp(0.2,1,pop):1;
           const [cs,w]=chip(cx,ybase,seg,msize,kind,a*la,Math.max(pop,0.01)); out.push(cs); cx+=w;
         }
       }
     }
-    const rx=1400, ra=smooth(clamp((lt-2.2)/0.5));
-    let removed=0; for(const i of [1,2,3]) if(lt>=2.0+i*0.32+0.18) removed++;
+    const rx=1400, ra=smooth(clamp((dt-2.2)/0.5));
+    let removed=0; for(const i of [1,2,3]) if(dt>=2.0+i*0.32+0.18) removed++;
     out.push(txt(rx,300,"DIRECT",19,{fill:MUTED,family:FT_MONO,op:a*ra,ls:2}));
     out.push(txt(rx,332,"IDENTIFIERS",19,{fill:MUTED,family:FT_MONO,op:a*ra,ls:2}));
     out.push(txt(rx,470,String(removed),150,{fill:AMBER,family:FT_SEMI,op:a*ra}));
     out.push(txt(rx,520,"removed in one pass",21,{fill:MUTED,family:FT_MONO,op:a*ra}));
     const leg=["PERSON · names","ORG · firms, courts","CODE · case / IBAN"];
     for(let i=0;i<leg.length;i++){
-      const lga=smooth(clamp((lt-(2.6+i*0.25))/0.4));
+      const lga=smooth(clamp((dt-(2.6+i*0.25))/0.4));
       const [cs]=chip(rx,600+i*54,"["+leg[i].split(" ")[0]+"]",20,"amber",a*lga);
       out.push(cs);
       out.push(txt(rx+150,600+i*54,leg[i].split("·")[1].trim(),19,{fill:MUTED,family:FT_MONO,op:a*lga}));
     }
-    const capa=smooth(clamp((lt-3.4)/0.5));
-    out.push(callout(150,778,1620,36,a*capa,
-      [["Anything that names someone outright — ",INK,FT_SEMI],["removed in one pass.",AMBER,FT_SEMI]]));
     return group(out.join(""));
   }
 
@@ -330,32 +344,31 @@
   function scene_anon(t){
     const [s,e]=S2, a=scene_alpha(t,s,e);
     if(a<=0) return "";
-    const lt=t-s, msize=25, lh=42;
-    let out=[section_header("02","ANONYMISE","blur the mosaic fingerprint until it can't be traced",GREEN,{op:a,lt})];
+    const lt=t-s, dt=lt-LEAD, msize=25, lh=42;
+    let out=[_setter(lt,"02 — ANONYMISE","Removing names isn't enough",
+      "Ordinary details still fingerprint a person — so we blur them until the file blends in.",GREEN,a,W/2)];
+    out.push(section_header("02","ANONYMISE","blur the mosaic fingerprint until it can't be traced",GREEN,{op:a,lt:dt}));
     const icx=150,icy=232,icw=980,ich=180;
-    out.push(group(card(icx,icy,icw,ich,"INPUT",MUTED,{op:a}),{op:smooth(clamp(lt/0.5))}));
-    const ia=smooth(clamp((lt-0.15)/0.5));
+    out.push(group(card(icx,icy,icw,ich,"INPUT",MUTED,{op:a}),{op:smooth(clamp(dt/0.5))}));
+    const ia=smooth(clamp((dt-0.15)/0.5));
     for(let i=0;i<IN2.length;i++) out.push(txt(icx+34,icy+54+i*lh,IN2[i],msize,{fill:"#5b5346",family:FT_MONO,op:a*ia}));
-    const ocx=150,ocy=470,ocw=980,och=188, oca=smooth(clamp((lt-1.4)/0.5));
+    const ocx=150,ocy=470,ocw=980,och=188, oca=smooth(clamp((dt-1.4)/0.5));
     out.push(group(card(ocx,ocy,ocw,och,"OUTPUT  ·  ANONYMISE",GREEN,{op:a}),{op:oca}));
     const base=1.8;
     for(let i=0;i<OUT2.length;i++){
-      const la=smooth(clamp((lt-(base+i*0.3))/0.45));
+      const la=smooth(clamp((dt-(base+i*0.3))/0.45));
       let cx=ocx+34; const ybase=ocy+56+i*lh;
       for(const [seg,kind] of OUT2[i]){
         if(kind==="plain"){ out.push(txt(cx,ybase,seg,msize,{fill:INK,family:FT_MONO,op:a*la})); cx+=mono_w(seg,msize); }
-        else{ const ct=base+i*0.3+0.15; let pop=ease_out_back(clamp((lt-ct)/0.45)); pop=pop<1?Math.max(lerp(0.2,1,pop),0.01):1;
+        else{ const ct=base+i*0.3+0.15; let pop=ease_out_back(clamp((dt-ct)/0.45)); pop=pop<1?Math.max(lerp(0.2,1,pop),0.01):1;
           const [cs,w]=chip(cx,ybase,seg,msize,kind,a*la,pop); out.push(cs); cx+=w; }
       }
     }
-    const capa=smooth(clamp((lt-0.8)/0.5));
-    out.push(callout(150,762,1620,36,a*capa,
-      [["Even with the name gone, ",INK,FT_SEMI],["ordinary details still fingerprint one person.",AMBER,FT_SEMI]]));
-    const rx=1210,ry=232,rw=560, pa=smooth(clamp((lt-1.0)/0.5));
+    const rx=1210,ry=232,rw=560, pa=smooth(clamp((dt-1.0)/0.5));
     out.push(group(card(rx,ry,rw,360,"GENERALISATION  LADDER",GREEN,{op:a,fill:CARD2}),{op:pa}));
-    const step_prog=clamp((lt-2.2)/2.4);
+    const step_prog=clamp((dt-2.2)/2.4);
     for(let li=0;li<LADDER.length;li++){
-      const [lab,chain]=LADDER[li], yy=ry+62+li*92, la=smooth(clamp((lt-(1.2+li*0.2))/0.4));
+      const [lab,chain]=LADDER[li], yy=ry+62+li*92, la=smooth(clamp((dt-(1.2+li*0.2))/0.4));
       const [cs]=chip(rx+28,yy,lab,19,"ink",a*la); out.push(cs);
       const active=Math.min(chain.length-1,Math.floor(step_prog*chain.length));
       let cxx=rx+120;
@@ -370,9 +383,9 @@
         cxx+=valw+40;
       }
     }
-    const gy=ry+360+58, ga=smooth(clamp((lt-1.2)/0.5));
+    const gy=ry+360+58, ga=smooth(clamp((dt-1.2)/0.5));
     out.push(txt(rx,gy-34,"RE-IDENTIFICATION RISK",18,{fill:MUTED,family:FT_MONO,op:a*ga,ls:1.5}));
-    const k=lerp(1.0,5.0,ease_out(clamp((lt-2.2)/2.6))), cellw=rw/5-14;
+    const k=lerp(1.0,5.0,ease_out(clamp((dt-2.2)/2.6))), cellw=rw/5-14;
     for(let ci=0;ci<5;ci++){
       const cxc=rx+ci*(rw/5), filled=(ci+1)<=Math.round(k), frac=clamp(k-ci), base_col=lerp_color(ci/4.0);
       out.push(rrect(cxc,gy,cellw,30,7,"#efe9df",{op:a*ga,stroke:BORDER,sw:1.2,sop:a*ga}));
@@ -395,37 +408,39 @@
   function scene_pseudo(t){
     const [s,e]=S3, a=scene_alpha(t,s,e);
     if(a<=0) return "";
-    const lt=t-s, msize=23, lh=40;
-    let out=[section_header("03","PSEUDONYMISE","re-linkable labels — real names never leave the building",AMBER,{op:a,lt})];
+    const lt=t-s, dt=lt-LEAD, msize=23, lh=40;
+    let out=[_setter(lt,"03 — PSEUDONYMISE","Keep it usable: re-linkable labels",
+      "So an external model can still follow who's who — without the real names leaving.",AMBER,a,W/2)];
+    out.push(section_header("03","PSEUDONYMISE","re-linkable labels — real names never leave the building",AMBER,{op:a,lt:dt}));
     const lcx=150,lcy=250,lcw=760,lch=240;
-    out.push(group(card(lcx,lcy,lcw,lch,"SENT OUT  ·  tokens only",AMBER,{op:a}),{op:smooth(clamp(lt/0.5))}));
+    out.push(group(card(lcx,lcy,lcw,lch,"SENT OUT  ·  tokens only",AMBER,{op:a}),{op:smooth(clamp(dt/0.5))}));
     const base=0.5;
     for(let i=0;i<TOK3.length;i++){
-      const la=smooth(clamp((lt-(base+i*0.28))/0.45));
+      const la=smooth(clamp((dt-(base+i*0.28))/0.45));
       let cx=lcx+30; const ybase=lcy+62+i*lh;
       for(const [seg,kind] of TOK3[i]){
         if(kind==="plain"){ out.push(txt(cx,ybase,seg,msize,{fill:INK,family:FT_MONO,op:a*la})); cx+=mono_w(seg,msize); }
-        else{ const ct=base+i*0.28+0.12; let pop=ease_out_back(clamp((lt-ct)/0.4)); pop=pop<1?Math.max(lerp(0.2,1,pop),0.01):1;
+        else{ const ct=base+i*0.28+0.12; let pop=ease_out_back(clamp((dt-ct)/0.4)); pop=pop<1?Math.max(lerp(0.2,1,pop),0.01):1;
           const [cs,w]=chip(cx,ybase,seg,msize,kind,a*la,pop); out.push(cs); cx+=w; }
       }
     }
-    const sa=smooth(clamp((lt-1.6)/0.4));
+    const sa=smooth(clamp((dt-1.6)/0.4));
     out.push(txt(lcx+lcw-44,lcy+lch-22,"↗",30,{fill:AMBER,family:FT_MONO,op:a*sa}));
     const vcx=980,vcy=250,vcw=790,vch=320;
-    out.push(group(card(vcx,vcy,vcw,vch,"LOCAL VAULT  ·  never leaves",GREEN,{op:a,fill:CARD2}),{op:smooth(clamp((lt-0.3)/0.5))}));
-    const la0=smooth(clamp((lt-0.4)/0.4)), lx=vcx+vcw-44, ly=vcy+36;
+    out.push(group(card(vcx,vcy,vcw,vch,"LOCAL VAULT  ·  never leaves",GREEN,{op:a,fill:CARD2}),{op:smooth(clamp((dt-0.3)/0.5))}));
+    const la0=smooth(clamp((dt-0.4)/0.4)), lx=vcx+vcw-44, ly=vcy+36;
     out.push(`<path d="M ${lx-6} ${ly-3} v-4 a6 6 0 0 1 12 0 v4" fill="none" stroke="${GREEN}" stroke-width="2.4" stroke-opacity="${n3(a*la0)}"/>`);
     out.push(rrect(lx-9,ly-3,18,15,3,GREEN,{op:a*la0}));
     for(let i=0;i<VAULT.length;i++){
-      const [tok,name]=VAULT[i], ry=vcy+58+i*60, la=smooth(clamp((lt-(0.9+i*0.25))/0.45));
+      const [tok,name]=VAULT[i], ry=vcy+58+i*60, la=smooth(clamp((dt-(0.9+i*0.25))/0.45));
       const [cs,w]=chip(vcx+28,ry,tok,21,"amber",a*la); out.push(cs);
       out.push(txt(vcx+28+w+22,ry,"→",20,{fill:FAINT,family:FT_MONO,op:a*la}));
       out.push(txt(vcx+28+w+58,ry,name,22,{fill:INK,family:FT_MED,op:a*la}));
     }
-    const ra=smooth(clamp((lt-2.6)/0.5)), ra2=smooth(clamp((lt-2.9)/0.5));
-    out.push(callout(150,650,1620,36,a*ra,
-      [["The reply comes back in tokens — ",INK,FT_SEMI],["names are restored, locally.",AMBER,FT_SEMI]]));
-    out.push(txtspans(150,762,24,{op:a*ra2},
+    const ra=smooth(clamp((dt-2.6)/0.5)), ra2=smooth(clamp((dt-2.9)/0.5));
+    out.push(txtspans(150,704,23,{op:a*ra},
+      [["The model answers in tokens — your machine ",INK,FT_MED],["restores the real names, locally:",AMBER,FT_SEMI]]));
+    out.push(txtspans(150,746,23,{op:a*ra2},
       [["Restored:  ",GREEN,FT_SEMI],["Anya Kowalski",AMBER,FT_SEMI],[" of ",INK,FT_MED],
        ["Meridian Capital Partners",AMBER,FT_SEMI],[" is the acquiring party.",INK,FT_MED]]));
     return group(out.join(""));
@@ -607,7 +622,7 @@
   }
 
   // ---- compose ----
-  function buildInner(t){
+  function buildInner(t, hideBottom){
     let b=[];
     b.push(`<rect width="${W}" height="${H}" fill="${BG}"/>`);
     b.push(`<radialGradient id="vg" cx="22%" cy="0%" r="90%">`
@@ -621,7 +636,7 @@
     b.push(scene_pseudo(t));
     b.push(scene_workflow(t));
     b.push(scene_outro(t));
-    b.push(chrome(t));
+    b.push(chrome(t, hideBottom));
     return b.join("");
   }
   function buildSVG(t){

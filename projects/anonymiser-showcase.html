@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Legal Text Anonymiser — Showcase · William Catt</title>
-<meta name="description" content="A 40-second walkthrough of the Legal Text Anonymiser: redact, anonymise, pseudonymise, and a safe LLM round-trip with Claude." />
+<meta name="description" content="A walkthrough of the Legal Text Anonymiser: redact, anonymise, pseudonymise, and a safe LLM round-trip with Claude." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -23,9 +23,27 @@
     box-shadow:0 18px 50px -28px rgba(40,28,16,.32);cursor:pointer;background:var(--bg)}
   #stage{display:block;width:100%;height:100%}
   .pause-badge{position:absolute;inset:0;display:none;align-items:center;justify-content:center;
-    background:rgba(250,248,244,.35)}
-  .pause-badge svg{width:74px;height:74px;filter:drop-shadow(0 4px 12px rgba(40,28,16,.25))}
+    background:rgba(250,248,244,.30);pointer-events:none}
+  .pause-badge svg{width:72px;height:72px;filter:drop-shadow(0 4px 12px rgba(40,28,16,.25))}
   .stage-frame.paused .pause-badge{display:flex}
+
+  /* interactive control bar */
+  .controls{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;gap:14px;
+    padding:18px 22px 16px;cursor:default;
+    background:linear-gradient(to top, rgba(250,248,244,.97) 30%, rgba(250,248,244,0));}
+  .pbtn{flex:0 0 auto;width:34px;height:34px;display:flex;align-items:center;justify-content:center;
+    border:none;border-radius:50%;background:var(--amber-bg);color:var(--amber);cursor:pointer;
+    transition:transform .12s ease, background .12s ease}
+  .pbtn:hover{transform:scale(1.06);background:#f0ddc6}
+  .track{position:relative;flex:1;height:20px;display:flex;align-items:center;cursor:pointer}
+  .bar{position:relative;width:100%;height:5px;border-radius:3px;background:var(--border)}
+  .fill{position:absolute;left:0;top:0;height:100%;border-radius:3px;background:var(--amber);width:0%}
+  .thumb{position:absolute;top:50%;left:0%;width:14px;height:14px;border-radius:50%;background:var(--amber);
+    transform:translate(-50%,-50%);box-shadow:0 1px 4px rgba(40,28,16,.35);transition:transform .1s ease}
+  .track:hover .thumb{transform:translate(-50%,-50%) scale(1.18)}
+  .tlabel{flex:0 0 auto;font-family:"JetBrains Mono",monospace;font-size:13px;color:var(--muted);
+    letter-spacing:.3px;min-width:96px;text-align:right}
+
   .cta{display:inline-flex;align-items:center;gap:12px;text-decoration:none;
     font-family:"Space Grotesk";font-weight:600;font-size:20px;color:var(--amber);
     background:var(--amber-bg);border:1.6px solid var(--amber-bd);
@@ -34,63 +52,98 @@
   .cta .arrow{font-family:"JetBrains Mono",monospace}
   .meta{font-family:"JetBrains Mono",monospace;font-size:13px;color:var(--muted);
     letter-spacing:.3px;text-align:center}
-  @media (prefers-reduced-motion: reduce){ .stage-frame{cursor:default} }
 </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="stage-frame" id="frame" title="Click to pause / play">
+    <div class="stage-frame" id="frame" title="Click to play / pause">
       <svg id="stage" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet"
            xmlns="http://www.w3.org/2000/svg" aria-label="Legal Text Anonymiser showcase animation"></svg>
       <div class="pause-badge" aria-hidden="true">
         <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="#fffdf9" stroke="#dcab78" stroke-width="2"/>
           <path d="M40 33 L68 50 L40 67 Z" fill="#b86a2e"/></svg>
       </div>
+      <div class="controls" id="controls">
+        <button class="pbtn" id="pbtn" aria-label="Play or pause"></button>
+        <div class="track" id="track"><div class="bar"><div class="fill" id="fill"></div><div class="thumb" id="thumb"></div></div></div>
+        <div class="tlabel" id="tlabel">0:00 / 0:00</div>
+      </div>
     </div>
     <a class="cta" href="anonymiser.html">Read the write-up <span class="arrow">→</span></a>
-    <div class="meta">~40s · silent · loops · vector (crisp at any size)</div>
+    <div class="meta">scrub or click to pause · vector (crisp at any size)</div>
   </div>
 
   <script src="anonymiser-showcase.js"></script>
   <script>
     (function(){
-      var S = window.AnonShowcase;
-      var stage = document.getElementById("stage");
-      var frame = document.getElementById("frame");
+      var S = window.AnonShowcase, TOTAL = S.TOTAL, FRAME_MS = 1000 / S.FPS;
+      var stage = document.getElementById("stage"), frame = document.getElementById("frame");
+      var controls = document.getElementById("controls"), pbtn = document.getElementById("pbtn");
+      var track = document.getElementById("track"), fill = document.getElementById("fill");
+      var thumb = document.getElementById("thumb"), tlabel = document.getElementById("tlabel");
       var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      var paused = false, startMs = null, pauseStart = 0, lastDraw = -1;
-      var FRAME_MS = 1000 / S.FPS;
 
-      function draw(t){ stage.innerHTML = S.buildInner(t); }
+      var currentTime = reduce ? 11.5 : 0;   // 11.5s = the title + keyword bubbles
+      var playing = !reduce, dragging = false, dirty = true;
+      var lastNow = null, lastDraw = -1;
+
+      var PLAY = '<svg viewBox="0 0 24 24" width="18" height="18"><path d="M7 5 L19 12 L7 19 Z" fill="currentColor"/></svg>';
+      var PAUSE = '<svg viewBox="0 0 24 24" width="18" height="18"><rect x="6.5" y="5" width="3.6" height="14" rx="1.2" fill="currentColor"/><rect x="13.9" y="5" width="3.6" height="14" rx="1.2" fill="currentColor"/></svg>';
+
+      function fmt(s){ s=Math.max(0,Math.floor(s)); return Math.floor(s/60)+":"+String(s%60).padStart(2,"0"); }
+      function draw(t){ stage.innerHTML = S.buildInner(t, true); }   // hide drawn progress bar
+      function updateUI(){
+        var f = currentTime / TOTAL;
+        fill.style.width = (f*100).toFixed(2)+"%";
+        thumb.style.left = (f*100).toFixed(2)+"%";
+        tlabel.textContent = fmt(currentTime)+" / "+fmt(TOTAL);
+        pbtn.innerHTML = playing ? PAUSE : PLAY;
+        frame.classList.toggle("paused", !playing);
+      }
 
       function loop(now){
-        if(startMs === null) startMs = now;
-        if(!paused){
-          var t = ((now - startMs) / 1000) % S.TOTAL;
-          if(now - lastDraw >= FRAME_MS - 1){ draw(t); lastDraw = now; }  // ~30fps
+        if(lastNow===null) lastNow=now;
+        var dms = now - lastNow; lastNow = now;
+        if(playing && !dragging){
+          currentTime += dms/1000;
+          if(currentTime >= TOTAL) currentTime -= TOTAL;
+          dirty = true;
         }
+        if(dirty && now - lastDraw >= FRAME_MS - 1){ draw(currentTime); lastDraw = now; dirty = false; }
+        updateUI();
         requestAnimationFrame(loop);
       }
 
-      function begin(){
-        if(reduce){ draw(31.3 + 5.4); return; }  // static key frame (the workflow) for reduced motion
-        requestAnimationFrame(loop);
+      function seekFromClientX(clientX){
+        var r = track.getBoundingClientRect();
+        var frac = Math.max(0, Math.min(1, (clientX - r.left) / r.width));
+        currentTime = frac * TOTAL; dirty = true;
       }
 
-      // start once fonts are ready so text doesn't reflow mid-animation
+      // play/pause
+      function toggle(){ playing = !playing; dirty = true; }
+      pbtn.addEventListener("click", function(e){ e.stopPropagation(); toggle(); });
+      frame.addEventListener("click", function(){ toggle(); });
+      controls.addEventListener("click", function(e){ e.stopPropagation(); });
+
+      // scrubbing (pointer events: mouse + touch)
+      var wasPlaying = false;
+      track.addEventListener("pointerdown", function(e){
+        e.stopPropagation(); e.preventDefault();
+        dragging = true; wasPlaying = playing; playing = false;
+        try{ track.setPointerCapture(e.pointerId); }catch(_){}
+        seekFromClientX(e.clientX);
+      });
+      track.addEventListener("pointermove", function(e){ if(dragging){ seekFromClientX(e.clientX); } });
+      function endDrag(e){ if(dragging){ dragging=false; playing = wasPlaying; dirty = true; } }
+      track.addEventListener("pointerup", endDrag);
+      track.addEventListener("pointercancel", endDrag);
+
+      function begin(){ requestAnimationFrame(loop); }
       if(document.fonts && document.fonts.ready){
-        var started = false;
-        var go = function(){ if(!started){ started = true; begin(); } };
-        document.fonts.ready.then(go);
-        setTimeout(go, 1200); // fallback
+        var started=false, go=function(){ if(!started){ started=true; begin(); } };
+        document.fonts.ready.then(go); setTimeout(go, 1200);
       } else { begin(); }
-
-      if(!reduce){
-        frame.addEventListener("click", function(){
-          if(!paused){ paused = true; pauseStart = performance.now(); frame.classList.add("paused"); }
-          else { paused = false; if(startMs !== null){ startMs += performance.now() - pauseStart; } frame.classList.remove("paused"); }
-        });
-      }
     })();
   </script>
 </body>

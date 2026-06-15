@@ -91,6 +91,7 @@ const PROJECTS = [
     hook: 'How redacted is *"redacted"*? Measuring re-identification risk.',
     chips: ["F1 0.85", "re-ID risk modelled"],
     chart: "assets/overview_reidentification.png",
+    video: "assets/anonymiser-thumb.mp4", poster: "assets/anonymiser-thumb-poster.jpg",
     color: "oklch(52% 0.14 145)", status: "live", priority: 1,
     tags: ["NLP", "NER", "RoBERTa"], year: 2026, q: "Q2" },
   { id: "quoteguard", index: "02", title: "QuoteGuard",
@@ -419,7 +420,7 @@ function renderHook(hook, color) {
 
 function ProjectCard({ p, visible, expanded }) {
   const isLive = p.status === "live";
-  const hasDetail = !!p.chart;
+  const hasDetail = !!(p.video || p.chart);
   const open = hasDetail && expanded;
   return (
     <a href={p.href || `projects/${p.id}.html`}
@@ -470,10 +471,17 @@ function ProjectCard({ p, visible, expanded }) {
           transition: "max-height 0.42s cubic-bezier(.4,0,.2,1), opacity 0.3s ease, margin-top 0.42s ease"
         }}>
           <div style={{ height: 1, background: "var(--border)", marginBottom: 12 }} />
-          <img src={p.chart} alt={`${p.title} — key result`} loading="lazy" style={{
-            width: "100%", height: 150, objectFit: "contain", objectPosition: "center",
-            background: "#fff", padding: 6, borderRadius: 8, border: "1px solid var(--border)", display: "block"
-          }} />
+          {p.video ? (
+            <video src={p.video} poster={p.poster} autoPlay muted loop playsInline preload="metadata" style={{
+              width: "100%", height: 158, objectFit: "cover", objectPosition: "center",
+              background: "var(--bg)", borderRadius: 8, border: "1px solid var(--border)", display: "block"
+            }} />
+          ) : (
+            <img src={p.chart} alt={`${p.title} — key result`} loading="lazy" style={{
+              width: "100%", height: 150, objectFit: "contain", objectPosition: "center",
+              background: "#fff", padding: 6, borderRadius: 8, border: "1px solid var(--border)", display: "block"
+            }} />
+          )}
         </div>
       )}
       <div style={{ marginTop: "auto", paddingTop: 16, display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
