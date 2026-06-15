@@ -5,180 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Penalty Geometry &amp; Game Theory · William Catt</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-  <meta name="description" content="An editorial interactive on World Cup penalty kicks: where shooters aim, where keepers go, whether anyone is playing Nash, and who survives the shootout — built on StatsBomb open data with KDE placement maps, a mixed-strategy equilibrium test, a logistic conversion model and Kaplan-Meier survival. Ends with a playable 'You're the keeper' game. By William Catt." />
-  <link rel="canonical" href="https://williamcatt.dev/projects/penalties.html" />
-  <meta property="og:type" content="article" />
-  <meta property="og:url" content="https://williamcatt.dev/projects/penalties.html" />
-  <meta property="og:title" content="Penalty Geometry &amp; Game Theory — William Catt" />
-  <meta property="og:description" content="Where shooters aim, where keepers go, and whether anyone is playing Nash — a data-driven editorial on penalty kicks, ending in a playable keeper game." />
-  <meta property="og:image" content="https://williamcatt.dev/assets/og-image.png" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Penalty Geometry &amp; Game Theory — William Catt" />
-  <meta name="twitter:description" content="Where shooters aim, where keepers go, and whether anyone is playing Nash — ending in a playable keeper game." />
-  <meta name="twitter:image" content="https://williamcatt.dev/assets/og-image.png" />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../project.css" />
-  <link rel="stylesheet" href="../assets/penalties/penalties.css" />
+  <!-- This standalone deep-dive has been superseded by the reworked piece inside the
+       ML-in-Football explorations hub (now built on World Cup shootout data with the
+       keeper's actual dive on every kick). Redirect there. -->
+  <link rel="canonical" href="https://williamcatt.dev/explorations/pieces/penalties.html" />
+  <meta http-equiv="refresh" content="0; url=/explorations/pieces/penalties.html" />
+  <meta name="robots" content="noindex" />
+  <script>location.replace("/explorations/pieces/penalties.html");</script>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #faf8f4; color: #1a1714;
+           display: grid; place-items: center; min-height: 100vh; margin: 0; }
+    a { color: #b06a16; }
+  </style>
 </head>
 <body>
-<!-- ─── PROJECT META ─────────────────────────────────────────────────────────── -->
-<script>
-  window.PROJECT = {
-    id: "penalties",
-    index: "05",
-    title: "Penalty Geometry & Game Theory",
-    subtitle: "Where shooters aim, where keepers go, and whether anyone is playing Nash",
-    color: "oklch(52% 0.17 15)",
-    status: "live",
-    tags: ["Game Theory","StatsBomb","KDE","D3","Survival"],
-    repo: "github.com/WillCatt/Penalty-Geometry",
-    demo: false,
-  };
-</script>
-
-<div id="root"></div>
-<script src="../project-page.js" defer></script>
-
-<!-- ─── OVERVIEW = the editorial scrolly (cold open + 4 acts + the game) ──────── -->
-<template id="tab-overview">
-  <div id="pen-scrolly" class="pen">
-    <p class="pen-loading">Loading the penalties…</p>
-    <noscript>This piece needs JavaScript: it renders interactive goal-mouth maps and a keeper game in your browser.</noscript>
-  </div>
-</template>
-
-<!-- ─── TECHNICAL ────────────────────────────────────────────────────────────── -->
-<template id="tab-technical">
-  <article class="writeup">
-    <h2>The data, and how small it really is</h2>
-    <p>Everything here is precomputed in Python from <strong>StatsBomb's open data</strong> and shipped to your browser as one static JSON bundle — the page only renders. I pulled every penalty I could find: <strong data-pen="n_total">—</strong> kicks in total across <strong data-pen="n_competitions">—</strong> competitions, of which <strong data-pen="n_shootout">—</strong> were shootout kicks and <strong data-pen="n_world_cup">—</strong> came from a men's or women's World Cup.</p>
-    <p>That is a <em>tiny</em> sample by data-science standards, and pretending otherwise is the quickest way to lose a reader who knows football. So the rule throughout is: <strong>report N next to every cut, show a confidence interval or hedge, and never split a small number three more ways without saying so.</strong> The title says "World Cups"; the honest subtitle is "World Cups, and everywhere else StatsBomb has opened up," because the World-Cup-only sample alone is too thin for most of these tests.</p>
-
-    <h2>The geometric core: mirroring</h2>
-    <p>StatsBomb records where each shot crosses the goal line as a <code>(y, z)</code> point on the goal plane. The goal mouth sits between <code>y = 36</code> and <code>y = 44</code> (8 units = 7.32 m) with the crossbar near <code>z = 2.67</code> (2.44 m). I rescale that to a canonical <strong>7.32 m × 2.44 m</strong> goal in metres, centred on the goal line.</p>
-    <p>Then the important step. A right-footed striker's natural side-foot placement goes to the keeper's right; a left-footer's mirror-images to the keeper's left. If you pool both feet raw, "natural side" and "across the body" cancel into mush. So I <strong>mirror every left-footed kick about the goal centre</strong> onto a canonical right-footer frame: after mirroring, <code>+</code> always means the open-body natural side and <code>−</code> the across-body side. Every aggregate, KDE and strategy test below runs in that mirrored frame.</p>
-    <figure class="fig"><img src="../assets/penalties/mirroring.png" alt="Left- and right-footers mirror each other in the raw frame; after mirroring every kick onto a right-footer frame the natural side lines up." /><figcaption>Raw, the two feet are mirror images. Mirroring collapses them so the natural/cross signal survives aggregation.</figcaption></figure>
-
-    <h2>Keeper dive direction is <em>not</em> in the data — so I inferred it, badly, on purpose</h2>
-    <p>This is the part most penalty write-ups quietly fake. StatsBomb has no "dive direction" column. The only honest signal is contact: when a keeper <em>saves</em> or parries, they reached the ball, so the dive went to the ball's zone. When a keeper is beaten, the event is a clean "No Touch" goal — <strong>indistinguishable from a keeper who guessed wrong</strong>. A keeper who dives the right way and is beaten by a perfect penalty looks identical, in the data, to one who dived the opposite way.</p>
-    <p>So dive direction is recoverable for only about <strong data-pen="dive_coverage">—</strong> of kicks — the ones that produced a save — and that slice is biased toward shots hit near the keeper. I keep the inference, label its coverage everywhere, and treat the rest as an explicit <code>unknown</code> bucket. <strong>The limitation is the finding</strong> (Act 2): anyone quoting a clean keeper-dive frequency from open data is inventing it.</p>
-    <p class="defs"><strong>Inference rules.</strong> R1 — keeper makes contact (save / parry / punch / smother) ⇒ dive = keeper-perspective zone of the shot placement (high confidence). R2 — goal with no touch, or a shot that misses the target ⇒ dive direction <code>unknown</code>. <strong>Failure cases:</strong> central saves made standing read as "centre" even if the keeper committed early; deflections off a trailing wrong-way hand still count as contact; rebound double-saves and goal-line scrambles.</p>
-
-    <h2>Is anyone playing Nash?</h2>
-    <p>The textbook treatment (Chiappori, Groseclose &amp; Levitt 2002; Palacios-Huerta 2003) needs the keeper's dive on <em>every</em> kick to fill a shooter × keeper payoff matrix. Open data doesn't give me that. But it gives me the half that carries the theory's central prediction: <strong>at a mixed-strategy equilibrium, every strategy a player actually uses must return the same expected payoff.</strong> For the taker, the expected payoff of a placement zone — marginalised over whatever keepers do — is simply its observed conversion rate.</p>
-    <p>So I test whether conversion is equal across the placement zones takers actually use (a chi-square on scored × zone), report Wilson 95% CIs per zone, and quantify any gap in percentage points. Equal ⇒ consistent with equilibrium (and I print that null proudly). Unequal ⇒ an under-used, high-converting zone left on the table. For teaching I also solve the classic 2×2 natural/cross game with the literature's canonical payoffs and show its mixed equilibrium — clearly separated from what my data measures.</p>
-
-    <h2>The conversion model (interpretable on purpose)</h2>
-    <p>A single <strong>logistic regression</strong> on scoring, read back as odds ratios in plain English — not an XGBoost moment. Predictors: placement zone (natural / cross vs centre), height (high vs low), and shootout vs open play. With this little data the coefficients carry wide CIs, so I report direction, not decimals.</p>
-    <figure class="fig"><img src="../assets/penalties/logit.png" alt="Odds ratios on scoring with 95% confidence intervals for placement, height and shootout." /><figcaption>Odds ratios on scoring (95% CI). Wide bands — read the direction of each effect, not the third decimal.</figcaption></figure>
-
-    <h2>Survival, and a confound I won't hide</h2>
-    <p>For shootouts I reconstruct each sequence, assign every kick its taker's order number, and compute per-kick conversion with Wilson CIs, plus a Kaplan–Meier curve of "team survival" by kick number. <strong>The confound, stated up front:</strong> kick order is chosen by the manager — best takers often go first, or are held back for the decisive fifth — so any order effect is entangled with taker quality and game state. I report the pattern; I do <em>not</em> claim the fifth kick makes you choke.</p>
-
-    <h2>Honest negatives</h2>
-    <ul class="defs">
-      <li><strong>The keeper-dive distribution is unmeasurable</strong> from open data beyond the saved slice. That's a null I lead with, not one I bury.</li>
-      <li><strong>The equilibrium test may fail to reject</strong> simply because N is small — "consistent with equilibrium" here can mean "too little data to catch the gap," and I say so beside the p-value.</li>
-      <li><strong>The famous-penalty P(goal)</strong> in the cold open is the interpretable model's view of a zone, not a claim about that specific strike's physics.</li>
-    </ul>
-
-    <h2>From prototype to production</h2>
-    <p>A real version of this would ingest the proprietary StatsBomb feed (which <em>does</em> hand-tag keeper movement), pool several thousand kicks, add taker- and keeper-fixed effects to separate skill from strategy, and recompute the equilibrium per footedness and per competition. None of that changes the method on display here — it just buys the sample size to make the CIs narrow enough to coach on.</p>
-
-    <details class="methods">
-      <summary>Methods note — the short version, and the long one</summary>
-      <p><strong>For the fan:</strong> I took every penalty in the open dataset, flipped the lefties so all kicks look right-footed, drew heatmaps of where the ball goes, worked out the few cases where you can tell which way the keeper dived, checked whether shooters are leaving easy goals on the table, and measured whether the fifth kick is really scarier than the first. Where the data can't answer, I say so.</p>
-      <p><strong>For the technical reader:</strong> mirroring convention and goal-plane rescaling in <code>02_geometry.py</code>; Gaussian-KDE placement grids per (foot × phase × outcome) cut; dive inference rules and coverage in <code>03_keeper.py</code>; the equilibrium equal-success chi-square and the cited 2×2 Nash solve in <code>04_game_theory.py</code>; the logit and its odds-ratio glosses in <code>05_models.py</code>; shootout reconstruction, per-kick Wilson CIs and the Kaplan–Meier fit in <code>06_survival.py</code>. Full pipeline and notebook in the <a class="link" href="https://github.com/WillCatt/Penalty-Geometry" target="_blank" rel="noopener">repo</a>.</p>
-    </details>
-  </article>
-</template>
-
-<!-- ─── RESULTS ──────────────────────────────────────────────────────────────── -->
-<template id="tab-results">
-  <article class="writeup">
-    <h2>The numbers, with their error bars</h2>
-    <div class="statrow">
-      <div class="stat"><span class="num" data-pen="n_total">—</span><span class="lbl">penalty kicks</span></div>
-      <div class="stat"><span class="num" data-pen="n_shootout">—</span><span class="lbl">shootout kicks</span></div>
-      <div class="stat"><span class="num" data-pen="overall_conv_pct">—</span><span class="lbl">overall conversion</span></div>
-      <div class="stat"><span class="num" data-pen="dive_coverage">—</span><span class="lbl">dives recoverable</span></div>
-    </div>
-
-    <h3>How it's measured</h3>
-    <p>Conversion rates carry <strong>Wilson 95% confidence intervals</strong> (better than the normal approximation at these sample sizes and near 0/1). The equilibrium test is a chi-square of scored × placement-zone; the survival curve is Kaplan–Meier with manager-chosen order flagged as a confound. Every figure below names its N.</p>
-
-    <h3>Conversion by placement zone (canonical, mirrored frame)</h3>
-    <figure class="fig"><img src="../assets/penalties/nash_zones.png" alt="Conversion by across-body, centre and natural-side placement with 95% CIs and usage shares." /><figcaption>Conversion by zone with 95% CIs and how often each is used. The equilibrium prediction is that used zones convert equally.</figcaption></figure>
-    <table class="metrics">
-      <thead><tr><th>Placement zone</th><th>N</th><th>Conversion</th><th>95% CI</th><th>Usage</th></tr></thead>
-      <tbody>
-        <tr><td>Natural side</td><td data-pen="zn_natural_n">—</td><td data-pen="zn_natural_conv">—</td><td data-pen="zn_natural_ci">—</td><td data-pen="zn_natural_use">—</td></tr>
-        <tr><td>Dead centre</td><td data-pen="zn_centre_n">—</td><td data-pen="zn_centre_conv">—</td><td data-pen="zn_centre_ci">—</td><td data-pen="zn_centre_use">—</td></tr>
-        <tr><td>Across the body</td><td data-pen="zn_cross_n">—</td><td data-pen="zn_cross_conv">—</td><td data-pen="zn_cross_ci">—</td><td data-pen="zn_cross_use">—</td></tr>
-      </tbody>
-    </table>
-    <p><strong>Verdict.</strong> <span data-pen="nash_verdict">—</span></p>
-
-    <h3>Where keepers' dives become invisible</h3>
-    <figure class="fig"><img src="../assets/penalties/dive_mismatch.png" alt="Shot placement distribution for all kicks versus the observable keeper-dive distribution, which only covers saved kicks." /><figcaption>What we can measure (all shot placements) vs what we can only glimpse (dives, recoverable on the saved slice).</figcaption></figure>
-
-    <h3>The pressure cooker</h3>
-    <figure class="fig"><img src="../assets/penalties/survival.png" alt="Per-kick shootout conversion by the taker's kick number, with 95% CIs and the overall mean." /><figcaption>Per-kick shootout conversion with 95% CIs. Order is manager-chosen — read as description, not causation.</figcaption></figure>
-
-    <h3>What moves the odds</h3>
-    <figure class="fig"><img src="../assets/penalties/logit.png" alt="Odds ratios on scoring for placement, height and shootout with 95% CIs." /><figcaption>Logistic-regression odds ratios on scoring (95% CI).</figcaption></figure>
-  </article>
-</template>
-
-<!-- ─── CODE ─────────────────────────────────────────────────────────────────── -->
-<template id="tab-code">
-  <article class="code-tab">
-    <p>Python pipeline (StatsBomb → static JSON) and the D3/SVG front end. Repo:
-      <a class="link" href="https://github.com/WillCatt/Penalty-Geometry" target="_blank" rel="noopener">github.com/WillCatt/Penalty-Geometry</a>.</p>
-    <pre class="tree"><code>Penalty-Geometry/
-├─ pipeline/
-│  ├─ 01_extract.py        # pull every penalty from StatsBomb open data (cached)
-│  ├─ 02_geometry.py       # goal-plane metres + mirroring + KDE grids
-│  ├─ 03_keeper.py         # derive dive direction + its failure cases
-│  ├─ 04_game_theory.py    # equilibrium equal-success test + cited 2×2 Nash
-│  ├─ 05_models.py         # interpretable logit (odds ratios)
-│  ├─ 06_survival.py       # shootout reconstruction + Kaplan–Meier
-│  └─ 07_export.py         # assemble one bundle.json
-├─ figures/build_portfolio_figures.py
-└─ bundle.json             # what the browser renders</code></pre>
-
-    <h3>The mirroring convention</h3>
-    <pre><code class="lang-python">def to_canonical_frame(end_y, body_part):
-    """Centre on goal, convert to metres, mirror left-footers.
-    Returns canonical horizontal position: + natural side, - cross side."""
-    yc_m = (end_y - 40.0) * (7.32 / 8.0)   # + = keeper's right = RF natural side
-    if body_part == "Left Foot":
-        yc_m = -yc_m                        # mirror lefties onto the RF frame
-    return yc_m</code></pre>
-
-    <h3>Dive direction, only where it's honest</h3>
-    <pre><code class="lang-python"># R1: a save means the keeper reached the ball -> dive = ball's zone.
-# R2: a clean goal (No Touch) is indistinguishable from a wrong guess -> unknown.
-if row.gk_contact and not np.isnan(row.end_y):
-    dive_dir, conf = keeper_zone(row.end_y), "inferred"
-else:
-    dive_dir, conf = "unknown", "none"</code></pre>
-
-    <h3>The keeper game resolves on geometry, not a coin flip</h3>
-    <pre><code class="lang-js">// a dive the right way still concedes if the ball finds the corner
-function resolveKick(kick, dive, reach) {
-  if (!kick.on) return { goal: false, reason: "off target" };
-  const correctSide = sideOf(kick.x) === dive;          // guessed the side?
-  const dist = Math.hypot(kick.x - diveTarget(dive).x,  // how far from the dive
-                          kick.z - diveTarget(dive).z);
-  const cover = reach * (kick.z > 1.4 ? 0.55 : 1);      // high balls are harder
-  const saved = correctSide && dist <= cover;
-  return { goal: !saved, reason: saved ? "saved" : correctSide ? "beaten in the corner" : "wrong way" };
-}</code></pre>
-  </article>
-</template>
-
-<script src="https://cdn.jsdelivr.net/npm/d3@7" defer></script>
-<script src="../assets/penalties/penalties.js" defer></script>
+  <p>This piece has moved — <a href="/explorations/pieces/penalties.html">continue to Penalty Geometry &amp; Game Theory →</a></p>
 </body>
 </html>
