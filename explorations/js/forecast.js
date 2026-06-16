@@ -215,22 +215,15 @@
     var def = sim.decay_presets.find(function (p) { return p.key === "default"; });
     var eq = sim.decay_presets.find(function (p) { return p.key === "equal"; }) || def;
     var pre = st.recency ? def : eq;
-    var S = pre.strengths, vz = sim.value_z, sc = sim.meta.value_scale, N = sim.meta.max_goals;
-    var hosts = sim.hosts, ha = pre.home_adv, rho = st.rho ? pre.rho : 0;
-    if (!S[f.home] || !S[f.away]) return null;
-    var wA = st.att ? st.attW : 0, wD = st.def ? st.defW : 0, wH = st.home ? st.homeW : 0, wV = st.value ? st.valueW : 0;
-    function logmu(team, oppo) {
-      var adv = (hosts.indexOf(team) >= 0 && team === f.country) ? wH * ha : 0;
-      return wA * S[team][0] - wD * S[oppo][1] + wV * sc * (vz[team] || 0) + adv;
-    }
-    var muH = Math.exp(logmu(f.home, f.away)), muA = Math.exp(logmu(f.away, f.home));
-    function pois(mu, k) { var p = Math.exp(-mu), t = p; for (var i = 1; i <= k; i++) t *= mu / i; return t; }
-    var ph = [], pa = [], i, j;
-    for (i = 0; i <= N; i++) { ph.push(pois(muH, i)); pa.push(pois(muA, i)); }
-    var g = []; for (i = 0; i <= N; i++) { g.push([]); for (j = 0; j <= N; j++) g[i].push(ph[i] * pa[j]); }
-    g[0][0] *= 1 - muH * muA * rho; g[0][1] *= 1 + muH * rho; g[1][0] *= 1 + muA * rho; g[1][1] *= 1 - rho;
-    var tot = 0, h = 0, d = 0; for (i = 0; i <= N; i++) for (j = 0; j <= N; j++) { tot += g[i][j]; if (i > j) h += g[i][j]; else if (i === j) d += g[i][j]; }
-    return { home: h / tot, draw: d / tot, away: 1 - (h + d) / tot, muH: muH, muA: muA };
+    var r = DC.match({
+      S: pre.strengths, ha: pre.home_adv, rho: st.rho ? pre.rho : 0,
+      vz: sim.value_z, vscale: sim.meta.value_scale, hosts: sim.hosts, country: f.country,
+      home: f.home, away: f.away, N: sim.meta.max_goals,
+      wA: st.att ? st.attW : 0, wD: st.def ? st.defW : 0,
+      wH: st.home ? st.homeW : 0, wV: st.value ? st.valueW : 0
+    });
+    if (!r) return null;
+    return { home: r.home, draw: r.draw, away: r.away, muH: r.muH, muA: r.muA };
   }
   var EVEN_STATE = { att: 0, def: 0, home: 0, recency: 1, rho: 0, value: 0, attW: 0, defW: 0, homeW: 0, valueW: 0 };
 

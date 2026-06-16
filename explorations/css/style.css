@@ -69,6 +69,17 @@ svg { display: block; width: 100%; }
 #robustness { height: 360px; }
 .series-label { font-size: 12px; font-weight: 600; font-family: "JetBrains Mono", monospace; }
 
+/* ── in-page tabs ─────────────────────────────────── */
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin: 4px 0 44px; flex-wrap: wrap; }
+.tab-btn {
+  font-family: "Space Grotesk", sans-serif; font-size: 15px; font-weight: 600;
+  color: var(--muted); background: none; border: none; border-bottom: 2px solid transparent;
+  padding: 12px 18px; margin-bottom: -1px; cursor: pointer; transition: color .15s, border-color .15s;
+}
+.tab-btn:hover { color: var(--ink); }
+.tab-btn.active { color: var(--amber); border-bottom-color: var(--amber); }
+.tab-pane[hidden] { display: none; }
+
 /* ── part dividers ────────────────────────────────── */
 .part { margin: 24px 0 26px; padding-bottom: 12px; border-bottom: 2px solid var(--ink); display: flex; align-items: baseline; gap: 14px; }
 .part-no { font-family: "JetBrains Mono", monospace; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--amber); }
