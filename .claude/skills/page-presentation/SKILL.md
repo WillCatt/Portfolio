@@ -38,7 +38,7 @@ page after this tab, they should still walk away knowing what was built, the hea
 and why it matters.
 
 - **Structure:** The problem (the *tension*, in plain words) → What I built → 1–2 findings,
-  each with one simple chart → a closing `<blockquote>` bottom line.
+  each with one simple chart → a closing `<blockquote>` takeaway.
 - **Register:** no jargon, no acronyms without gloss, analogies over equations ("the 6′3″
   Russian who teaches boxing two doors down" explains re-identification better than k-anonymity
   ever will). Numbers allowed, but only ones a lay reader can feel ("two in five", "98%",
@@ -52,12 +52,12 @@ and why it matters.
 Written for the interviewer who will probe it. Jargon fine; hand-waving not.
 
 - **Structure:** Dataset & evaluation (what's measured, on what, scored how) → method bake-off
-  with charts → the core analysis → pipeline/architecture → **Honest negatives** → caveats →
+  with charts → the core analysis → pipeline/architecture → **What didn't work** → caveats →
   **From prototype to production**.
 - **Decisions, not just descriptions.** Every choice gets its evidence: "docling won *because*
   structure beats raw text for grounded retrieval", "BM25 beat TF-IDF *once the test set was
   big enough to trust*". The reversal stories are the best content on the site — keep them.
-- **Honest negatives is mandatory**, not optional. Kept nulls ("the ensemble backfired",
+- **Reporting what didn't work is mandatory**, not optional. Kept nulls ("the ensemble backfired",
   "coreference added +0.0001") are what separates this portfolio from the median one. Frame
   each null with *why* it's informative, then what follow-up it earned.
 - **From prototype to production** answers the interview question before it's asked: what would
@@ -68,7 +68,7 @@ Real numbers on a held-out / golden standard. Skimmable by a recruiter, checkabl
 interviewer.
 
 - **Structure:** `statrow` stat cards (the four numbers that matter) → "How it's measured"
-  (define the metric in one breath, name the safety-critical one) → definitions table if the
+  (define the metric briefly, name the safety-critical one) → definitions table if the
   labels need it → the `metrics` table → key `figure.fig` charts → **worked runs** with
   verbatim input/output.
 - **Always state the eval set and that it's held out.** "555 documents the model never saw"
@@ -76,7 +76,7 @@ interviewer.
 - **CIs over point estimates** (bootstrap 95% or Wilson). Where N is small, say so next to
   the number, not in a footnote.
 - **Annotate the weak rows.** A table with DEM at 45% F1 and no comment looks like an
-  oversight; the same table with "the weak spots are honest: sparse, fuzzy categories — and
+  oversight; the same table with "the weak spots are where you'd expect: sparse, fuzzy categories — and
   both are handled by Anonymise anyway" looks like judgment.
 - Overlap with Technical is fine *when reframed*: Technical shows a chart to justify a
   decision; Results shows the same chart as the scoreboard. Don't duplicate the prose.
@@ -89,7 +89,7 @@ results explorer (`raw`), etc.
   same ground is worse than two that divide it cleanly.
 - Worked examples must be **real verbatim output** of the actual system, with `io-label` /
   `anon-in` / `anon-out` blocks and a `run-note` that points out both what worked *and* the
-  honest edge ("it clips HR-2021-0847 to HR-[MISC] — the boundary miss the exact-match score
+  rough edge ("it clips HR-2021-0847 to HR-[MISC] — the boundary miss the exact-match score
   reflects").
 - Name the regeneration command at the bottom (`demo/portfolio_examples.py`) — reproducibility
   is part of the presentation.
@@ -118,7 +118,7 @@ The demo converts sceptics: it's the difference between "claims to have built" a
 - Overview links *down* (deeper links into technical/results/examples/app); deeper tabs link
   *out* (repo, full write-up). Don't make deeper tabs link back up — the reader who got there
   doesn't need it.
-- The blockquote bottom line in Overview should end with the single best next click for a
+- The blockquote takeaway in Overview should end with the single best next click for a
   convinced reader — usually the App ("Try it yourself →") if there's a demo, else Technical.
 - Tabs are deep-linkable (`?tab=results` / `#results`) — use that when sharing a page in an
   application email ("results here: …/quoteguard.html?tab=results").
@@ -135,7 +135,7 @@ The demo converts sceptics: it's the difference between "claims to have built" a
 
 ## Voice (applies to every tab)
 
-- **Honest over flattering.** State the weak number with framing, in the same breath as the
+- **Candid over flattering.** State the weak number with framing, in the same breath as the
   strong one. "Retrieval finds the gold page 80%, the 8B model cites it exactly 44%" reads as
   rigour; omitting the 44% reads as spin when the interviewer finds it in the repo.
 - **Claims sized to evidence.** "Risk reduction, not a legal guarantee"; "read the direction,
@@ -144,6 +144,11 @@ The demo converts sceptics: it's the difference between "claims to have built" a
   "state-of-the-art") — let the numbers carry the enthusiasm.
 - **One idea per section, one chart per idea.** If a section needs two charts, it's two
   sections.
+- **Avoid the AI tells.** Don't lean on em-dashes (vary with `;`, `:`, `()`, full stops); don't
+  repeat "honest/honestly" as a verbal tic; skip stock signposts ("Bottom line:", "Net effect:",
+  "The headline is…", "in one breath"); avoid the "it isn't X — it's Y" reframe and rule-of-three
+  triads as a default cadence. Keep the *principle* (surface weak numbers, report nulls) — just
+  not the formula.
 
 ## Anti-patterns (each has burned a real page)
 

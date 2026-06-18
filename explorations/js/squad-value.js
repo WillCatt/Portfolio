@@ -124,7 +124,7 @@
     [{ h: "Money is top-heavy", p: "Just three squads — " + r.slice(0, 3).map(function (x) { return x.nation; }).join(", ") +
         " — clear a billion euros each, while the bottom half of the field shares a fraction of that. Top to bottom spans about <strong>" + gap + "×</strong>." },
      { h: "Value ≠ who starts", p: "Best XI here means most <em>valuable</em>, which rewards youth and potential — so a €30m prospect keeper can edge a veteran starter. It's a market prior, not a team-sheet." },
-     { h: "Honest coverage", p: "<strong>" + Math.round(B.meta.coverage * 100) + "%</strong> of squad players matched a current Transfermarkt value; the rest (mostly home-league names) are shown unvalued rather than guessed." }
+     { h: "What's covered", p: "<strong>" + Math.round(B.meta.coverage * 100) + "%</strong> of squad players matched a current Transfermarkt value; the rest (mostly home-league names) are shown unvalued rather than guessed." }
     ].forEach(function (c) { var a = document.createElement("article"); a.appendChild(el("h3", null, c.h)); a.appendChild(el("p", null, c.p)); f.appendChild(a); });
   }
 

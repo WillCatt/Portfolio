@@ -63,8 +63,8 @@
 <template id="tab-overview">
   <article class="writeup">
     <h2>The problem</h2>
-    <p>Insurers want to put a chatbot in front of customers — to answer "does my policy cover this?" from a 100-page policy document nobody reads. The catch is that insurance is <em>regulated</em>. A chatbot that gives <strong>financial advice</strong>, invents a <strong>premium</strong>, or simply <strong>gets the cover wrong</strong> doesn't just annoy a customer — under Australian financial-services law it creates real legal and licensing risk.</p>
-    <p>So the question isn't "can an LLM chat about insurance?" — obviously it can. It's: <strong>can you make a chatbot that is genuinely useful while being structurally unable to cross the lines an insurer must not cross?</strong> That tension is the whole project.</p>
+    <p>Insurers want to put a chatbot in front of customers — to answer "does my policy cover this?" from a 100-page policy document nobody reads. The catch is that insurance is <em>regulated</em>. A chatbot that gives <strong>financial advice</strong>, invents a <strong>premium</strong>, or simply <strong>gets the cover wrong</strong> isn't just an annoyed customer; under Australian financial-services law it's real legal and licensing risk.</p>
+    <p>The interesting question isn't whether an LLM can chat about insurance (obviously it can). It's whether you can make one <strong>genuinely useful while being structurally unable to cross the lines an insurer must not cross</strong>. That tension is what the project is about.</p>
 
     <h2>What I built</h2>
     <p>QuoteGuard is a chatbot that answers questions about a real insurance <strong>Product Disclosure Statement</strong> (the Allianz Business PDS), with three properties baked in:</p>
@@ -80,13 +80,13 @@
     <a class="deeper" href="#" onclick="document.querySelector('[data-tab=results]')?.click();return false;">See the full results →</a>
 
     <h2>Does it find the right answer?</h2>
-    <p>A grounded chatbot is only as good as its ability to find the right passage. I built a 66-question test set from the policy (each answer checked against the real text) and measured every retrieval method on it. The winning setup — a hybrid keyword search re-ranked by a smarter model — pulls the correct passage into its top 5 about <strong>80% of the time</strong>. A surprising honest result fell out along the way: the method that looked best on a small 20-question test <em>lost</em> once the test set was big enough to trust.</p>
+    <p>A grounded chatbot is only as good as its ability to find the right passage. I built a 66-question test set from the policy (each answer checked against the real text) and measured every retrieval method on it. The winning setup — a hybrid keyword search re-ranked by a smarter model — pulls the correct passage into its top 5 about <strong>80% of the time</strong>. A surprising result fell out along the way: the method that looked best on a small 20-question test <em>lost</em> once the test set was big enough to trust.</p>
     <a class="deeper" href="#" onclick="document.querySelector('[data-tab=technical]')?.click();return false;">How retrieval was chosen on evidence →</a>
 
-    <h2>How it works, in one breath</h2>
+    <h2>How it works, briefly</h2>
     <p>Your question is screened (advice? price? manipulation?) → the system finds the most relevant passages in the policy → it answers <em>only</em> from those passages, citing the page → the draft answer is checked again (is every claim supported? is there a citation? does it stray into advice?) → and you see the whole trail. Pricing and personalised advice are deliberately <em>out of bounds</em> — handed off to the systems and people that are licensed to do them.</p>
 
-    <blockquote>Bottom line: the value isn't the chatbot — it's the <em>guarantees around it</em>. Grounded answers, page citations, and a guardrail layer that makes "give financial advice", "make up a price" and "hallucinate cover" structurally hard to do. <a href="#" onclick="document.querySelector('[data-tab=app]')?.click();return false;">Try it yourself →</a></blockquote>
+    <blockquote>The value here isn't really the chatbot; it's the <em>guarantees around it</em>. Grounded answers, page citations, and a guardrail layer that makes "give financial advice", "make up a price" and "hallucinate cover" structurally hard to do. <a href="#" onclick="document.querySelector('[data-tab=app]')?.click();return false;">Try it yourself →</a></blockquote>
   </article>
 </template>
 
@@ -103,9 +103,9 @@
     <h2>2 · Chunking</h2>
     <p>A section-aware hybrid chunker packs whole sections into ~800-token windows (oversized sections split with overlap), so each chunk carries its <strong>heading path</strong> and <strong>page numbers</strong> — the metadata that makes citations possible. The 100-page PDS becomes 138 chunks.</p>
 
-    <h2>3 · Retrieval — chosen on evidence, with an honest reversal</h2>
+    <h2>3 · Retrieval — chosen on evidence, with a reversal</h2>
     <p>I built a 66-question gold set (61 answerable + 5 deliberately unanswerable), each anchored to a verbatim evidence span <em>validated against the chunk text on its cited page</em> — so the benchmark is grounded by construction, not hand-waved. Then I measured every retriever with bootstrap 95% confidence intervals.</p>
-    <p>The headline lesson is a cautionary one. On an early <strong>20</strong>-question set, plain TF-IDF looked best (recall@5 ≈ 0.90) and beat BM25 — so I'd "frozen" it. On the proper <strong>61</strong>-question set that reverses: <strong>BM25 clearly beats TF-IDF</strong> (recall@5 0.79 vs 0.69). The small set was overfit. Trust a metric only at a credible sample size.</p>
+    <p>The lesson here is cautionary. On an early <strong>20</strong>-question set, plain TF-IDF looked best (recall@5 ≈ 0.90) and beat BM25 — so I'd "frozen" it. On the proper <strong>61</strong>-question set that reverses: <strong>BM25 clearly beats TF-IDF</strong> (recall@5 0.79 vs 0.69). The small set was overfit. Trust a metric only at a credible sample size.</p>
     <p>Adding a <strong>cross-encoder reranker</strong> (re-scoring the top-20 candidates with a model that reads query and passage <em>together</em>) lifts hit@1 and nDCG across <em>every</em> base retriever. Dense embeddings (<code>bge-small</code>) are weakest — as expected on a term-heavy legal document where exact vocabulary carries the signal. The frozen winner is <strong>hybrid (TF-IDF + BM25, reciprocal-rank fused) + rerank</strong>.</p>
     <figure class="fig">
       <img src="../assets/quoteguard/retrieval_bakeoff.png" alt="Retrieval bake-off: hybrid+rerank wins at recall@5 0.80, nDCG 0.63." />
@@ -114,9 +114,9 @@
 
     <h2>4 · The answer engine</h2>
     <p>One <code>LLMClient</code> interface, three interchangeable backends: local <strong>Ollama</strong> (llama-3.1-8b), the <strong>Claude API</strong>, and a deterministic <strong>extractive</strong> fallback (top sentences by query overlap, always cited). The prompt is strict: <em>answer only from these excerpts; if they don't contain the answer, say so; cite the page; no advice; no pricing.</em></p>
-    <p>An 8B local model is a weak grounder — it paraphrases well but mis-cites. That's a feature of the design, not a bug to wish away: the output guardrails catch a fabricated citation and fall back to the extractive answer, so the pipeline degrades to "correct but terse" instead of "fluent but wrong". Designing <em>around</em> the small model — strict prompts, hard output checks, deterministic fallback — is the engineering.</p>
+    <p>An 8B local model is a weak grounder: it paraphrases well but mis-cites. I treated that as a constraint to design around rather than a flaw to wish away. The output guardrails catch a fabricated citation and fall back to the extractive answer, so the pipeline degrades to "correct but terse" instead of "fluent but wrong". Building <em>around</em> the small model — strict prompts, hard output checks, a deterministic fallback — is where most of the engineering went.</p>
 
-    <h2>5 · Guardrails — the differentiator</h2>
+    <h2>5 · Guardrails — where the real work is</h2>
     <p>Every query produces a <code>GuardrailTrace</code>: an ordered record of each check and its decision (<code>pass</code> / <code>warn</code> / <code>block</code>), surfaced to the user. The layers:</p>
     <ul>
       <li><strong>Input</strong> — PII redaction; prompt-injection / jailbreak detection; a law-aware advice/pricing intent check (refuse personal advice and price requests up front).</li>
@@ -124,7 +124,7 @@
       <li><strong>Output</strong> — citation validity (cited pages must exist in the retrieved set, or it's rejected as fabricated); grounding overlap; an advice-leakage scan of the generated text; and a general-advice-warning disclaimer.</li>
       <li><strong>Answerability</strong> — an uncited statement of absence ("there is no email…") becomes a clean refusal, while a <em>cited</em> negative ("does not cover Flood [p.7]") is preserved.</li>
     </ul>
-    <p>I ran 40 adversarial prompts across seven categories plus 30 benign controls (scored deterministically, with bootstrap CIs). The baseline heuristics scored <strong>0.725</strong> overall and wrongly refused 6.7% of legitimate questions. The failures were instructive — regexes missed "ignore <em>the PDS</em>" and "<em>best for my situation</em>", while bare keywords like <em>premium</em> over-blocked legitimate questions. One tightening pass (sharper patterns + the semantic scope gate) took it to a <strong>1.000</strong> safe-rate with <strong>0%</strong> over-refusal.</p>
+    <p>I ran 40 adversarial prompts across seven categories plus 30 benign controls (scored deterministically, with bootstrap CIs). The baseline heuristics scored <strong>0.725</strong> overall and wrongly refused 6.7% of legitimate questions. The failures were telling: regexes missed "ignore <em>the PDS</em>" and "<em>best for my situation</em>", while bare keywords like <em>premium</em> over-blocked legitimate questions. One tightening pass (sharper patterns + the semantic scope gate) took it to a <strong>1.000</strong> safe-rate with <strong>0%</strong> over-refusal.</p>
     <figure class="fig">
       <img src="../assets/quoteguard/adversarial_iteration.png" alt="Per-category adversarial safe-rate: every category reaches 1.0 after one iteration." />
       <figcaption>Adversarial safe-rate by category, before vs after one tighten-and-re-run. Off-topic (0.40 → 1.00) was fixed by the semantic scope gate; advice/injection by sharper intent patterns.</figcaption>
@@ -134,7 +134,7 @@
     <h2>The Australian-law framing</h2>
     <p>Each guard maps to a real boundary: the <strong>general-vs-personal advice</strong> line (Corporations Act 2001 s766B — personalised recommendations need a licence) is why advice is refused and the bot stays in the <em>factual-information</em> safe zone; <strong>misleading-or-deceptive conduct</strong> (ASIC Act s12DA) is why grounding + mandatory citations + "I don't have that" matter; and pricing is handed off because premiums are underwriting, not chat. <em>(This is design rationale, not legal advice — the demo is not a licensed financial service. The point is compliance-</em>aware<em> engineering.)</em>
 
-    <h2>Honest caveats</h2>
+    <h2>Caveats</h2>
     <ul>
       <li>n = 61 → confidence intervals are wide; hybrid+rerank and bm25+rerank are a statistical tie, chosen on point estimates with recall prioritised.</li>
       <li>The adversarial suite is small (40 prompts) and the heuristics were tuned partly in response to it — the ML detector and the (model-based) scope gate are the generalising parts; expanding the suite is future work.</li>
@@ -173,7 +173,7 @@
         <tr class="overall"><td>Hybrid + rerank</td><td>0.492</td><td>0.803</td><td>0.596</td><td class="f1">0.632</td></tr>
       </tbody>
     </table>
-    <p class="run-note">Two honest findings. <strong>(1)</strong> On an earlier 20-question set TF-IDF topped the table; on this 61-question set BM25 clearly beats it — the small set was overfit. <strong>(2)</strong> The cross-encoder reranker lifts hit@1 and nDCG for <em>every</em> base retriever; dense embeddings are weakest on this term-heavy legal text.</p>
+    <p class="run-note">Two findings worth flagging. <strong>(1)</strong> On an earlier 20-question set TF-IDF topped the table; on this 61-question set BM25 clearly beats it — the small set was overfit. <strong>(2)</strong> The cross-encoder reranker lifts hit@1 and nDCG for <em>every</em> base retriever; dense embeddings are weakest on this term-heavy legal text.</p>
     <figure class="fig">
       <img src="../assets/quoteguard/retrieval_bakeoff.png" alt="Retrieval bake-off bar chart — hybrid+rerank wins recall@5 0.80 and nDCG 0.63." />
       <figcaption>recall@5 and nDCG@5 by retriever. The frozen production choice — hybrid + cross-encoder rerank — is highlighted.</figcaption>
@@ -231,10 +231,10 @@
 <template id="tab-raw">
   <article class="writeup">
     <p>The full, unedited output of the <strong>real</strong> system — hybrid + cross-encoder rerank retrieval and the actual LLM (<code>llama-3.1-8b</code>, run locally) — on <strong>every one of the 66 golden questions</strong>, each shown beside its gold answer and the deterministic extractive fallback. The badges are objective (did retrieval surface the gold page; did the answer cite it), and every per-question record is available as raw JSON. This is the evidence behind the headline numbers in <a href="#" onclick="document.querySelector('[data-tab=results]')?.click();return false;">Results</a>; the <a href="#" onclick="document.querySelector('[data-tab=app]')?.click();return false;">App tab</a> is a lighter in-browser version you can play with.</p>
-    <p style="font-size:14px;color:var(--text-muted)">Read it honestly: retrieval surfaces the gold page ~80% of the time, but the local 8B model cites that exact page in only ~44% of answers — citation precision is its weak spot (the guardrails block <em>fabricated</em> cites, and the extractive fallback or a stronger model close the gap). The gold answer sits beside the system's so you can judge the content yourself.</p>
+    <p style="font-size:14px;color:var(--text-muted)">The plain reading: retrieval surfaces the gold page ~80% of the time, but the local 8B model cites that exact page in only ~44% of answers — citation precision is its weak spot (the guardrails block <em>fabricated</em> cites, and the extractive fallback or a stronger model close the gap). The gold answer sits beside the system's so you can judge the content yourself.</p>
     <p><a class="gr-dl" href="../assets/quoteguard/gold_results.json" download>⤓ Download the full raw results (JSON)</a></p>
     <div id="qg-gold" class="gr"><p class="qg-loading">Loading the full golden-set results…</p></div>
-    <p style="color:var(--text-muted);font-size:13px;margin-top:14px">Generated locally with <code>scripts/build_gold_results.py</code> (Ollama), shipped as static JSON — no API at view time. Honest by construction: the gold answer sits beside the system's, the per-question retrieval/citation badges come straight from the gold supporting pages, and each record can be expanded to its raw JSON.</p>
+    <p style="color:var(--text-muted);font-size:13px;margin-top:14px">Generated locally with <code>scripts/build_gold_results.py</code> (Ollama), shipped as static JSON — no API at view time. Transparent by construction: the gold answer sits beside the system's, the per-question retrieval/citation badges come straight from the gold supporting pages, and each record can be expanded to its raw JSON.</p>
   </article>
 </template>
 

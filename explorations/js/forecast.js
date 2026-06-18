@@ -191,9 +191,9 @@
 
   function findings(B) {
     var f = d3.select("#findings"), sc = B.scorecard;
-    [{ h: "Frozen, so it's honest", p: "The model is fit only on matches before <strong>" + B.meta.asof + "</strong>, then never touched — so every call is a true out-of-sample prediction, not hindsight." },
+    [{ h: "Frozen, so it's a real test", p: "The model is fit only on matches before <strong>" + B.meta.asof + "</strong>, then never touched — so every call is a true out-of-sample prediction, not hindsight." },
      { h: "Probabilities, not prophecies", p: "A 60% favourite is meant to lose 40% of the time. The piece scores the model on calibration and Brier, not just whether the headline pick came in." },
-     { h: "No verdict without N", p: "After <strong>" + sc.n_played + "</strong> games the scoreboard is mostly noise. The honest read comes near the end of the group stage, and the page updates as it gets there." }
+     { h: "No verdict without N", p: "After <strong>" + sc.n_played + "</strong> games the scoreboard is mostly noise. The real read comes near the end of the group stage, and the page updates as it gets there." }
     ].forEach(function (c) { var a = f.append("article"); a.append("h3").text(c.h); a.append("p").html(c.p); });
   }
 

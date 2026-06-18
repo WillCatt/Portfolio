@@ -53,11 +53,10 @@
 
     <h2>Overview</h2>
     <p class="punch">
-      The headline is uncomfortable: bet-sizing systems mostly rearrange losing.
-      They make the ride smoother, spikier, longer or more theatrical — they do
-      not erase a negative edge. The one genuine exception is counting, and it
-      wins for a reason that has nothing to do with bet patterns: it adds
-      <em>information</em>.
+      The uncomfortable part: bet-sizing systems mostly rearrange losing. They
+      make the ride smoother, or spikier, or longer, but they don't erase a
+      negative edge. The one real exception is counting, and it wins for a reason
+      that has nothing to do with bet patterns: it adds <em>information</em>.
     </p>
 
     <figure class="fig">
@@ -73,12 +72,12 @@
     </figure>
 
     <div class="takeaway">
-      <strong>The useful question isn't "which system wins?"</strong>
+      <strong>The question worth asking isn't "which system wins?"</strong>
       <p>
-        It's "what <em>kind</em> of loss does this system manufacture, and how much
-        bankroll does it need before that loss becomes visible?" That single
-        reframing makes martingale, flat betting, counting and team play
-        comparable — without pretending they're solving the same problem.
+        It's "what <em>kind</em> of loss does each one produce, and how much
+        bankroll does it need before that loss shows up?" Asking it that way makes
+        martingale, flat betting, counting and team play comparable, without
+        pretending they're solving the same problem.
       </p>
     </div>
 
@@ -86,7 +85,7 @@
       <div class="finding-card">
         <strong>Flat betting loses slowly.</strong>
         <p>−0.09% per dollar wagered — within noise of the textbook house edge.
-        Boring, which is exactly what makes it the honest control group.</p>
+        Boring, which is exactly what makes it the control group to measure against.</p>
         <div class="mini-rule">low variance · negative edge</div>
       </div>
       <div class="finding-card">
@@ -132,7 +131,7 @@
     </div>
 
     <p>
-      The deep dive splits into two halves: <a class="deeper" href="#" onclick="document.querySelector('[data-tab=technical]')?.click();return false;">how the engine works and where it's honest about its limits</a>,
+      The deep dive splits into two halves: <a class="deeper" href="#" onclick="document.querySelector('[data-tab=technical]')?.click();return false;">how the engine works and where its limits are</a>,
       and <a class="deeper" href="#" onclick="document.querySelector('[data-tab=results]')?.click();return false;">the full sweep analysis</a> —
       decks, penetration, bankroll and bet limits, each one moved across its whole
       range while everything else is held fixed.
@@ -157,8 +156,8 @@
       late-surrender decisions — the strategies differ only in how they
       <em>size their bets</em>. The single exception is the counters, who also
       apply selected high-value Hi-Lo index deviations (the "Illustrious 18") and
-      take insurance at true count ≥ +3. That separation of <em>play</em> from
-      <em>bet</em> is the whole point: it isolates what bet-sizing can and cannot do.
+      take insurance at true count ≥ +3. Separating <em>play</em> from
+      <em>bet</em> is deliberate: it isolates what bet-sizing can and cannot do.
     </p>
 
     <h3>Simulation design</h3>
@@ -216,7 +215,7 @@
       is the Big Player's.
     </p>
 
-    <h3 class="neg-head">Honest negatives — where the model bites back</h3>
+    <h3 class="neg-head">Where the model bites back</h3>
     <div class="takeaway neg">
       <strong>A positive edge can still lose you money.</strong>
       <p>
@@ -331,7 +330,7 @@
     <section class="result-section">
       <h3>3. Bankroll and the MIT team — capital buys survival, not edge</h3>
       <p>
-        This is the sweep that reframes everything. As the team's shared bankroll
+        This is the sweep that changes the picture. As the team's shared bankroll
         grows from $5k to $200k, its <strong>return on risk holds essentially flat
         between +1.1% and +1.5%</strong> — the edge is a property of the game and
         the strategy, and money cannot buy more of it. What money buys is
@@ -405,17 +404,16 @@
     </section>
 
     <section class="result-section">
-      <h3>What the whole picture says</h3>
+      <h3>What it all adds up to</h3>
       <p>
         Read across the five sweeps and one pattern dominates: <strong>strategies
         that add no information only ever reshape the loss</strong> — earlier or
         later, smoother or spikier — they never remove the house edge. The only
         thing that creates a real edge is information (counting), and even that edge
         is small, fragile to deck count and penetration, and useless without the
-        bankroll to survive its own variance. Or, put the way the data keeps
-        insisting: the recreational player's single most profitable move isn't a
-        better system. It's a bigger bankroll relative to the bet, and a shorter
-        time at the table.
+        bankroll to survive its own variance. Put another way: the recreational
+        player's most profitable move isn't a better system. It's a bigger bankroll
+        relative to the bet, and a shorter time at the table.
       </p>
     </section>
   </article>
@@ -454,7 +452,7 @@ ev_per_hand   = total_profit / (num_sims * intended_hands)
 profit_chance = sims_finished_above_start / num_sims
 ruin_rate     = sims_ruined / num_sims</code></pre>
 
-    <h2>Sweeps with honest error bars</h2>
+    <h2>Sweeps with real error bars</h2>
     <p>
       Each figure runs the engine across a parameter grid and bootstraps a 95%
       interval — essential when the signal (a ~0.5–1% edge) is dwarfed by blackjack's

@@ -5,7 +5,7 @@ description: >-
   (~/Documents/Projects/Portfolio, live at williamcatt.dev) or producing
   portfolio-style writeups/figures/demos in the same house style — the
   Overview/Technical/Results/Code/App tab layout, palette-matched matplotlib
-  figures, a zero-cost interactive demo, and honest, evidence-driven copy.
+  figures, a zero-cost interactive demo, and plain, evidence-driven copy.
   Trigger on "add this to my portfolio", "make a project page", "portfolio
   writeup", "results/figures/demo in my portfolio style".
 ---
@@ -15,7 +15,7 @@ description: >-
 This skill encodes how the **QuoteGuard** and **Legal Text Anonymiser** pages were built so new
 pieces come out with the same vibe: a stakeholder-readable Overview, a data-science-heavy Technical
 deep dive, a Results section with real numbers on a golden standard, a Code tab, and an interactive
-App — all honest and evidence-driven.
+App — all plain-spoken and evidence-driven.
 
 ## The repo
 
@@ -62,13 +62,13 @@ After creating the page, add a matching entry to the `PROJECTS` array in **both*
 ## The five tabs — what goes in each (the vibe)
 
 - **OVERVIEW** — *stakeholder, plain language, no jargon, punchy.* Structure: **The problem** →
-  **What I built** → 1–2 **findings with a simple chart** → a closing **`<blockquote>` bottom line**.
+  **What I built** → 1–2 **findings with a simple chart** → a closing **`<blockquote>` takeaway**.
   Use `<a class="deeper" onclick="document.querySelector('[data-tab=technical]')?.click();...">` to
   link down into deeper tabs. Analogies over equations. Lead with the *tension the project resolves*.
 - **TECHNICAL** — *DS deep dive, jargon fine.* Dataset & eval → method bake-off (with charts) → the
-  core analysis → pipeline → **Honest negatives** (kept null results — "the null *is* the finding") →
-  caveats → **From prototype to production** (what a real deployment would need). This honesty is the
-  differentiator.
+  core analysis → pipeline → **What didn't work** (kept null results — "the null *is* the finding") →
+  caveats → **From prototype to production** (what a real deployment would need). This candour is what
+  sets the pages apart.
 - **RESULTS** — *real numbers on a held-out / golden standard.* `statrow` stat cards → "How it's
   measured" → a `metrics` table → `figure.fig` charts → **worked runs** (`.run` blocks with real
   verbatim outputs, `io-label` + `anon-out`). Report **bootstrap 95% CIs**, not point estimates.
@@ -126,12 +126,17 @@ Keep them legible and titled (`loc="left"`, `fontweight="bold"`), value labels o
 
 ## The voice (what makes it land)
 
-- **Honest over flattering.** Surface weak numbers with framing, never hide them — e.g. "retrieval
+- **Candid over flattering.** Surface weak numbers with framing, never hide them — e.g. "retrieval
   finds the gold page 80%, the 8B model cites it exactly 44% — citation precision is the weak spot."
-  Honest negatives and a prototype↔production gap section read as rigour, not weakness.
+  Negative results and a prototype↔production gap section read as rigour, not weakness.
 - **Stakeholder Overview, DS Technical.** Same project, two registers.
 - **Evidence-driven.** Real numbers on a golden standard, CIs, reproducible scripts named on the page.
 - **Show, don't tell.** Worked runs with verbatim output; an interactive demo to play with.
+- **Avoid the AI tells.** Don't lean on em-dashes (vary with `;`, `:`, `()`, full stops); don't
+  repeat "honest/honestly" as a verbal tic; skip stock signposts ("Bottom line:", "Net effect:",
+  "The headline is…", "in one breath"); avoid the "it isn't X — it's Y" reframe and rule-of-three
+  triads as a default cadence. Keep the *principle* (surface weak numbers, report nulls) — just not
+  the formula.
 
 ## Process for a new piece
 
