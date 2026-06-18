@@ -66,11 +66,41 @@
       <li><strong>Redact</strong> — quickly removes the obvious identifiers (names, organisations, case numbers). Right when the worry is "the AI provider might store our text."</li>
       <li><strong>Anonymise</strong> — also blurs the everyday details (<em>Plovdiv → Bulgaria</em>, <em>47-year-old → in their 40s</em>) until a document can no longer be traced to one person. Right when the worry is a determined attacker piecing clues together.</li>
     </ul>
+    <div style="margin:10px 0 4px">
+      <div class="io-label">Original — never leaves the firm</div>
+      <div class="anon-in">Maria Petrova, 47, from Plovdiv, filed a complaint in 2018.</div>
+      <div class="io-label">Redact — names and IDs gone, the rest left readable</div>
+      <div class="anon-out"><span class="tok">[PERSON]</span>, 47, from Plovdiv, filed a complaint in 2018.</div>
+      <div class="io-label">Anonymise — the give-away details blurred too</div>
+      <div class="anon-out"><span class="tok">[PERSON]</span>, <strong>in their 40s</strong>, from <strong>Bulgaria</strong>, filed a complaint in the <strong>2010s</strong>.</div>
+    </div>
     <a class="deeper" href="#" onclick="document.querySelector('[data-tab=examples]')?.click();return false;">Watch each mode run on a real document</a>
     <h2>Keeping it usable: re-linkable labels</h2>
     <p>Stripping names protects privacy but can wreck usefulness: if everyone becomes a flat <strong>[name]</strong>, the AI can no longer tell who did what to whom. So the tool can instead swap each party for a stable label — <strong>Person A</strong>, <strong>Person B</strong>, <strong>Company A</strong> — and keep it consistent across the whole document.</p>
     <p>The piece that makes this work is <strong>co-reference</strong>: spotting when different wordings refer to the same person. Take a memo that reads <em>“Anya Kowalski … Ms Kowalski … she”</em> — all three are one individual. Co-reference links them so they all become the same <strong>Person A</strong>, every time it appears. The AI can then still reason that <em>“Person A negotiated with Person B and reported to the board”</em> — a faithful picture of the matter, with not a single real name in it.</p>
     <p>Without that step you get the worst of both worlds: either the same person picks up several different labels (the AI loses the thread), or you fall back to flat redaction (the AI can’t follow the parties at all).</p>
+    <div style="display:flex;flex-wrap:wrap;align-items:stretch;gap:8px;margin:16px 0 6px">
+      <div style="flex:1 1 140px;border:1px solid var(--border);border-left:3px solid var(--live);border-radius:8px;padding:11px 13px;background:var(--card)">
+        <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;color:var(--live);text-transform:uppercase">1 · In the firm</div>
+        <div style="font-size:13px;margin-top:5px">The document, with real client names.</div>
+      </div>
+      <div style="align-self:center;color:var(--text-dim);font-family:var(--font-mono);font-size:16px">→</div>
+      <div style="flex:1 1 140px;border:1px solid var(--border);border-left:3px solid var(--live);border-radius:8px;padding:11px 13px;background:var(--card)">
+        <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;color:var(--live);text-transform:uppercase">2 · In the firm</div>
+        <div style="font-size:13px;margin-top:5px">Names swapped for <span class="tok">Person A</span>; the key kept in a local vault.</div>
+      </div>
+      <div style="align-self:center;color:var(--text-dim);font-family:var(--font-mono);font-size:16px">→</div>
+      <div style="flex:1 1 140px;border:1px solid var(--border);border-left:3px solid var(--wip);border-radius:8px;padding:11px 13px;background:var(--card)">
+        <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;color:var(--wip);text-transform:uppercase">3 · Outside · untrusted</div>
+        <div style="font-size:13px;margin-top:5px">The AI sees only the labelled text — never a real name.</div>
+      </div>
+      <div style="align-self:center;color:var(--text-dim);font-family:var(--font-mono);font-size:16px">→</div>
+      <div style="flex:1 1 140px;border:1px solid var(--border);border-left:3px solid var(--live);border-radius:8px;padding:11px 13px;background:var(--card)">
+        <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;color:var(--live);text-transform:uppercase">4 · Back in the firm</div>
+        <div style="font-size:13px;margin-top:5px">The answer is translated back to real names, locally.</div>
+      </div>
+    </div>
+    <p class="run-note">The vault — the mapping from <span class="tok">Person A</span> back to real names — never leaves the firm's machines, so privilege is never put on the wire.</p>
     <p><strong>Why a law firm should care:</strong></p>
     <ul>
       <li><strong>The AI’s answer stays useful.</strong> Because the relationships survive the swap, summaries, chronologies and “who agreed to what” still come back correct — you’re not trading away the reason you wanted AI in the first place.</li>
@@ -122,6 +152,11 @@
       <li>Every decision is recorded in a per-span <strong>audit log</strong> (source, confidence, role, generalisation level) for human review.</li>
     </ul>
     <img src="../assets/pipeline_architecture.svg" alt="Redact + Anonymise + pseudonymisation pipeline architecture diagram." />
+
+    <figure class="fig">
+      <img src="../assets/round_trip_threat_model.svg" alt="Round-trip threat model — real names stay inside the firm's trust boundary; only tokenised text crosses to the LLM, and the answer is restored locally from the vault." />
+      <figcaption>The pseudonymisation round-trip as a threat model. Real names never cross the trust boundary to the LLM provider: tokenised text goes out, the vault stays local, and <code>restore()</code> re-identifies the answer in-house.</figcaption>
+    </figure>
 
     <h2>Training &amp; caveats</h2>
     <ul>
