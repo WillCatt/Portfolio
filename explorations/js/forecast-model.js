@@ -286,6 +286,11 @@
 
   function buildPicker() {
     var sel = d3.select("#mdl-pipe-select");
+    // list fixtures in date order (sort in place — indexed by #mdl-pipe-select value elsewhere)
+    SIM.fixtures.sort(function (a, b) {
+      return a.date < b.date ? -1 : a.date > b.date ? 1
+        : ((a.group || "") + a.home).localeCompare((b.group || "") + b.home);
+    });
     SIM.fixtures.forEach(function (f, k) {
       var date = new Date(f.date + "T00:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
       sel.append("option").attr("value", k).text(date + " · " + f.home + " v " + f.away);
