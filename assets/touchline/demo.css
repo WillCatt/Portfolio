@@ -1,0 +1,70 @@
+/* Touchline demo — scoped styles (kept out of the shared project.css). */
+#tl-demo { font-size: 0.95rem; }
+.tl-loading, .tl-dim { color: var(--text-muted); }
+.tl-dim { font-size: 0.82em; }
+.tl-note {
+  background: #fff; border: 1px solid var(--border); border-left: 3px solid #2a8f8f;
+  border-radius: 8px; padding: 0.7rem 0.9rem; color: var(--text-muted); margin: 0 0 1rem;
+}
+.tl-note b { color: var(--text); font-weight: 600; }
+
+.tl-controls { margin-bottom: 0.8rem; }
+.tl-brains { display: inline-flex; gap: 4px; background: #efe9df; padding: 4px; border-radius: 10px; }
+.tl-brain {
+  border: 0; background: transparent; padding: 0.4rem 0.9rem; border-radius: 7px;
+  font: inherit; cursor: pointer; color: var(--text-muted);
+}
+.tl-brain.on { background: #fff; color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,.08); font-weight: 600; }
+
+.tl-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1rem; }
+.tl-chip {
+  border: 1px solid var(--border); background: #fff; border-radius: 999px;
+  padding: 0.32rem 0.75rem; font: inherit; font-size: 0.82rem; cursor: pointer;
+  color: var(--text-muted); text-align: left; line-height: 1.2; max-width: 100%;
+}
+.tl-chip:hover { border-color: #b06a16; color: var(--text); }
+.tl-chip.on { background: #b06a16; border-color: #b06a16; color: #fff; }
+
+.tl-run { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+@media (max-width: 720px) { .tl-run { grid-template-columns: 1fr; } }
+.tl-col h4 { margin: 0 0 0.5rem; font-size: 0.78rem; text-transform: uppercase; letter-spacing: .04em; color: var(--text-muted); }
+.tl-col h4 .tl-dim { text-transform: none; letter-spacing: 0; }
+
+.tl-thought {
+  background: #faf7f1; border: 1px solid var(--border); border-radius: 8px;
+  padding: 0.55rem 0.7rem; margin-bottom: 0.5rem; color: var(--text); font-size: 0.86rem;
+}
+.tl-sql { margin-bottom: 0.5rem; }
+.tl-tag {
+  display: inline-block; font-family: "JetBrains Mono", monospace; font-size: 0.68rem;
+  color: var(--text-muted); background: #efe9df; padding: 2px 7px; border-radius: 5px; margin-bottom: 3px;
+}
+.tl-tag.live { background: #e3f1e8; color: #2f6f47; }
+.tl-sql.bad .tl-tag { background: #f6e3df; color: #a23a2a; }
+.tl-sql pre, .tl-play textarea {
+  font-family: "JetBrains Mono", monospace; font-size: 0.78rem; background: #1a1714; color: #f4efe7;
+  padding: 0.6rem 0.75rem; border-radius: 8px; overflow-x: auto; margin: 0; white-space: pre-wrap;
+}
+.tl-live { margin-bottom: 0.6rem; }
+.tl-table { border-collapse: collapse; width: 100%; font-size: 0.8rem; margin-top: 4px; }
+.tl-table th, .tl-table td { border: 1px solid var(--border); padding: 3px 8px; text-align: left; }
+.tl-table th { background: #f3ede3; font-weight: 600; }
+.tl-svg { width: 100%; height: auto; margin-top: 0.4rem; }
+
+.tl-answer {
+  margin-top: 0.7rem; padding: 0.7rem 0.8rem; background: #fff; border: 1px solid var(--border);
+  border-radius: 8px; line-height: 1.5;
+}
+.tl-badge { display: inline-block; font-size: 0.72rem; padding: 1px 8px; border-radius: 999px; margin-left: 4px; white-space: nowrap; }
+.tl-badge.ok { background: #e3f1e8; color: #2f6f47; }
+.tl-badge.no { background: #f6e3df; color: #a23a2a; }
+.tl-err { color: #a23a2a; font-family: "JetBrains Mono", monospace; font-size: 0.8rem; }
+
+.tl-play { margin-top: 1.2rem; border-top: 1px dashed var(--border); padding-top: 0.8rem; }
+.tl-play summary { cursor: pointer; color: var(--text-muted); font-size: 0.85rem; }
+.tl-play textarea { width: 100%; min-height: 64px; margin: 0.6rem 0; box-sizing: border-box; border: 0; }
+.tl-play button, #tl-run {
+  border: 0; background: #b06a16; color: #fff; padding: 0.4rem 1rem; border-radius: 7px;
+  font: inherit; cursor: pointer;
+}
+#tl-play-out { margin-top: 0.7rem; }

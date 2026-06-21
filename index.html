@@ -102,20 +102,28 @@ const PROJECTS = [
     chart: "assets/quoteguard/overview_guardrails.png",
     color: "oklch(52% 0.14 200)", status: "live", priority: 2,
     tags: ["RAG", "Guardrails", "Retrieval"], year: 2026, q: "Q2" },
+  { id: "touchline", index: "07", title: "Touchline",
+    href: "projects/touchline.html",
+    subtitle: "An agent that answers football questions by writing its own SQL",
+    hook: "Ask in English; it writes the SQL and runs it *live in your browser*.",
+    chips: ["code vs general: a tie", "SQL runs in-browser"],
+    chart: "assets/touchline/accuracy_by_category.png",
+    color: "oklch(54% 0.12 160)", status: "wip", priority: 3,
+    tags: ["Agents", "Tool Use", "Text-to-SQL", "Evals"], year: 2026, q: "Q2" },
   { id: "explorations", index: "06", title: "ML in Football — Explorations",
     href: "explorations/index.html",
     subtitle: "A grid of self-contained football data explorations",
     hook: "Football questions, each *taken as far as the data will go*.",
     chips: ["5 pieces", "D3 · no build"],
     chart: "assets/explorations-thumb.svg",
-    color: "oklch(54% 0.10 190)", status: "live", priority: 3,
+    color: "oklch(54% 0.10 190)", status: "live", priority: 4,
     tags: ["D3", "Football", "Game Theory"], year: 2026, q: "Q2" },
   { id: "blackjack", index: "03", title: "Blackjack Simulator",
     subtitle: "Monte Carlo strategy analysis",
     hook: "Does card counting *actually* beat the house?",
     chips: ["1.6M hands", "+1.02% ROR"],
     chart: "assets/blackjack/fig_ranking.png",
-    color: "oklch(52% 0.14 25)", status: "live", priority: 4,
+    color: "oklch(52% 0.14 25)", status: "live", priority: 5,
     tags: ["Simulation", "Python", "Monte Carlo"], year: 2026, q: "Q2" },
   { id: "kaggle", index: "04", title: "Kaggle Competitions",
     subtitle: "Competitive ML — tabular, NLP, vision",
@@ -127,7 +135,7 @@ const PROJECTS = [
 const FEATURED_ALL = PROJECTS
   .filter(p => p.status !== "planned")
   .sort((a, b) => (a.priority ?? 99) - (b.priority ?? 99));
-const DEFAULT_LIMIT = 4;
+const DEFAULT_LIMIT = 6;
 
 // Skills cell — grouped stack, evidenced by the projects above.
 const SKILLS = [
