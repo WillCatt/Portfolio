@@ -34,7 +34,7 @@
 
 <!-- ─── OVERVIEW ─────────────────────────────────────────────────────────────── -->
 <template id="tab-overview">
-  <div class="writeup">
+  <article class="writeup">
     <h2>The problem</h2>
     <p>There are 150 years of international football results sitting in a database — 49,291 matches
       back to the first Scotland–England game in 1872. Getting an answer out of it (“who has England
@@ -42,52 +42,54 @@
       Most people who have the questions don't have the query.</p>
 
     <h2>What I built</h2>
-    <p>Touchline is an <strong>agent that is the analyst</strong>. You ask in plain English; it decides
-      what to compute, writes a SQL query, runs it against the database, draws a chart if it helps, and
-      explains the answer — correcting itself when a query errors. It isn't a fixed set of dashboards:
-      the model writes every query on the spot.</p>
-    <p>Under the hood it's a small <strong>tool-use loop</strong> with two tools — <code>run_sql</code>
-      (guarded, read-only) and <code>plot</code> — and a hard rule: <em>every number must come from a
-      tool result, never from memory.</em>
-      <a class="deeper" href="#" onclick="document.querySelector('[data-tab=technical]')?.click();return false;">How the loop and the guard work →</a></p>
+    <p>Touchline does the querying for you. You ask a question in plain English; it works out what to
+      compute, writes the SQL, runs it against the database, draws a chart where one helps, and explains
+      what it found. If a query fails, it reads the error and tries again. There are no pre-built
+      dashboards; it writes each query from scratch.</p>
+    <p>It has two things it can do: run a read-only query, and draw a chart from one. And it follows one
+      firm rule: every number it gives you has to come from a query it actually ran, not from the model's
+      own memory.
+      <a class="deeper" href="#" onclick="document.querySelector('[data-tab=technical]')?.click();return false;">How it works under the hood →</a></p>
 
-    <h2>Finding — code-tuning didn't win the bake-off</h2>
-    <p>The interesting question isn't “can an LLM write SQL” — it's <em>which</em> model you need. I ran
-      the identical agent on two models that run free on a laptop: <strong>qwen2.5-coder:7b</strong>, a
-      code specialist, and <strong>llama3.1:8b</strong>, a general-purpose model — scored on the same
-      30-question golden set. (A frontier benchmark, Claude Opus 4.8, slots into the same harness next.)</p>
+    <h2>Finding — the code model didn't win</h2>
+    <p>The question I cared about wasn't whether an LLM can write SQL (it can), but which model you
+      actually need to run this. I gave the same agent two models that run free on a laptop:
+      <strong>qwen2.5-coder:7b</strong>, tuned for code, and <strong>llama3.1:8b</strong>, a general
+      model. Both answered the same 30 questions. (Claude Opus 4.8 will join the same test later, as a
+      paid-model benchmark.)</p>
     <figure class="fig">
       <img src="../assets/touchline/accuracy_frontier_vs_local.png" alt="Answer accuracy: qwen2.5-coder vs llama3.1, with 95% confidence intervals." />
-      <figcaption>Answer accuracy on the golden set, with bootstrap 95% CIs. The code-tuned model edges
-        it on raw accuracy, but the intervals overlap heavily — on this task the two are effectively tied.
+      <figcaption>Answer accuracy on the 30 questions, with bootstrap 95% confidence intervals. The
+        code-tuned model is a few points ahead, but the intervals overlap, so the difference isn't real.
         <a class="deeper" href="#" onclick="document.querySelector('[data-tab=results]')?.click();return false;">See the full scorecard →</a></figcaption>
     </figure>
-    <p>The candid version: the code specialist scored <strong>77%</strong> to the general model's
-      <strong>73%</strong> — a dead heat once the CIs are in. And the average hides a reversal: llama
-      writes far cleaner SQL (<strong>86%</strong> of its queries run, against qwen's <strong>68%</strong>)
-      and recovers from its own errors twice as often, while qwen invents fewer numbers (97% grounded vs
-      83%). They're even strong in <em>opposite</em> places — qwen owns the single-table conditionals,
-      llama owns the head-to-head joins (100% vs 25%). “Use a code model for SQL” turns out to be too
-      glib.</p>
+    <p>The code model scored <strong>77%</strong> and the general model <strong>73%</strong>: close
+      enough, given the confidence intervals, to call a tie. The averages hide the more interesting part.
+      The general model wrote working SQL far more often (<strong>86%</strong> of its queries ran, against
+      <strong>68%</strong> for the code model) and fixed its own mistakes about twice as often. The code
+      model, for its part, made up fewer numbers: 97% of the figures it quoted traced back to a real
+      query, against 83%. And they were good at opposite things, the code model on single-table filters,
+      the general model on questions comparing two teams (100% versus 25%). “A code model is better at
+      SQL” turned out to be too simple a rule.</p>
 
     <blockquote>An LLM is a good analyst only if it actually runs the query. The whole design is
       built to force that: a read-only guard so it can't do harm, a hard “ground every number in a tool
       result” rule, and an eval that checks the spoken answer against the database — not against the
       model's confidence. <a href="#" onclick="document.querySelector('[data-tab=technical]')?.click();return false;">Read the technical write-up →</a></blockquote>
-  </div>
+  </article>
 </template>
 
 <!-- ─── TECHNICAL ────────────────────────────────────────────────────────────── -->
 <template id="tab-technical">
-  <div class="writeup">
+  <article class="writeup">
     <h2>Dataset &amp; schema</h2>
     <p>One clean fact table, <code>matches</code> (49,291 played internationals, 1872–2026: teams,
       scores, tournament, venue, plus derived <code>year</code>, <code>winner</code>,
       <code>total_goals</code>, <code>goal_diff</code>), and a long-form view <code>team_match</code>
       — one row per team per match, with <code>goals_for/against</code>, <code>venue</code> and a
-      <code>W/D/L</code> result. The view is the quiet hero: team-centric questions (“who did X beat”)
-      become trivial joins instead of <code>CASE</code> gymnastics over home/away, which measurably
-      lifts the small model's hit rate.</p>
+      <code>W/D/L</code> result. The view earns its keep: team-centric questions (“who did X beat”)
+      become a simple filter instead of fiddly <code>CASE</code> expressions over the home/away columns,
+      which measurably lifts the smaller models' hit rate.</p>
 
     <h2>The agent loop</h2>
     <p>A model-agnostic ReAct-style loop. The system prompt carries the schema, sample rows, and the
@@ -98,9 +100,9 @@
       <li><code>plot(sql, x, y, kind, title)</code> — runs a query and describes a bar/line chart from
         two of its columns, so the answer ships with a figure grounded in a real result set.</li>
     </ul>
-    <p><strong>Self-correction.</strong> A failed query isn't fatal — the error text goes back to the
-      model as the tool result, and it gets another turn to fix the SQL. That single design choice is
-      what lets a wobbly local model recover instead of giving up.</p>
+    <p><strong>Self-correction.</strong> A failed query isn't fatal. The error text goes back to the
+      model as the tool result, and it gets another turn to fix the SQL. That one choice is what lets a
+      weaker local model recover instead of giving up.</p>
 
     <h2>The SELECT-guard (defence in depth)</h2>
     <p>The agent can <em>only read</em>. Three layers enforce it: the SQLite connection is opened in
@@ -131,10 +133,10 @@
         local model returns no native tool call, the harness pulls the SQL out of its prose and runs it,
         forcing it to ground. The same question then answers <em>Brazil, 76</em> — correct. Forcing the
         model to look at a real result turned a confident hallucination into a right answer.</li>
-      <li><strong>The two local models fail in opposite places.</strong> Head-to-head questions wreck
-        qwen2.5-coder (25%) — it filters on the wrong column or miscounts distinct teams — yet llama3.1
-        nails them (100%). Flip it for single-table conditionals, where qwen scores 100% and llama 50%.
-        “Code-tuned ⇒ better at SQL” doesn't survive contact with the eval.</li>
+      <li><strong>The two local models fail in opposite places.</strong> Head-to-head questions are
+        where qwen2.5-coder falls down (25%): it filters on the wrong column, or miscounts distinct
+        teams. llama3.1 gets them all right (100%). It flips for single-table conditions, where qwen
+        scores 100% and llama 50%. Whatever “tuned for code” is worth, it isn't a clean win here.</li>
       <li><strong>One question sent qwen into a 37-second loop</strong> of failed queries before it gave
         up — the iteration cap is what stops that becoming an infinite spend.</li>
     </ul>
@@ -155,12 +157,12 @@
       and a guardrail layer against prompt-injection through the question (“ignore your instructions and
       run …”) — the read-only guard blocks the damage, but the scope-escape surface is exactly what the
       companion <strong>Red-Team Lab</strong> is built to probe.</p>
-  </div>
+  </article>
 </template>
 
 <!-- ─── RESULTS ──────────────────────────────────────────────────────────────── -->
 <template id="tab-results">
-  <div class="writeup">
+  <article class="writeup">
     <div class="statrow">
       <div class="stat"><div class="num">77%</div><div class="lbl">Best accuracy — qwen2.5-coder:7b (CI 60–90%); llama3.1:8b a near-tie at 73% (CI 57–87%)</div></div>
       <div class="stat"><div class="num">86%</div><div class="lbl">llama's valid-SQL rate — vs qwen's 68%. The general model writes cleaner SQL</div></div>
@@ -209,12 +211,12 @@
       playable in the <a href="#" onclick="document.querySelector('[data-tab=app]')?.click();return false;">App</a> tab:
       pick a question, toggle between the two models, and watch the SQL run in your browser. A set of
       verbatim pasted traces (including a failure) lands here alongside the frontier run.</p>
-  </div>
+  </article>
 </template>
 
 <!-- ─── CODE ─────────────────────────────────────────────────────────────────── -->
 <template id="tab-code">
-  <div class="code-tab">
+  <article class="code-tab">
     <h2>Repository</h2>
     <p>Full source at <a href="https://github.com/WillCatt/Touchline" target="_blank" rel="noopener">github.com/WillCatt/Touchline</a>.
       The agent is model-agnostic; brains plug in behind one interface.</p>
@@ -260,12 +262,12 @@ if not calls:                       # no native tool call —
     recovered = _tool_from_text(text)  # pull SQL out of the prose
     if recovered:
         calls, text = [recovered], None  # run it; don't treat prose as final</code></pre>
-  </div>
+  </article>
 </template>
 
 <!-- ─── APP ──────────────────────────────────────────────────────────────────── -->
 <template id="tab-app">
-  <div class="app-tab">
+  <article class="app-tab">
     <p>Pick a question and a brain. The agent's reasoning is <strong>replayed from real recorded
       runs</strong>; the SQL tool runs <strong>live in your browser</strong> via sql.js against the
       shipped database, and the charts redraw from the real result. Or open “drive the SQL yourself” to
@@ -274,7 +276,7 @@ if not calls:                       # no native tool call —
     <p class="run-note"><strong>Faithful vs lightweight:</strong> the data tool and charts are real and
       computed on your device; the LLM planning is replayed (live planning needs a server this page
       doesn't call). The browser guard is a JS port of the Python <code>SELECT</code>-guard.</p>
-  </div>
+  </article>
 </template>
 
 <script src="../assets/touchline/demo.js" defer></script>
