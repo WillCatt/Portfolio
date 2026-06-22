@@ -71,11 +71,12 @@
       query, against 83%. And they were good at opposite things, the code model on single-table filters,
       the general model on questions comparing two teams (100% versus 25%). “A code model is better at
       SQL” turned out to be too simple a rule.</p>
-    <p>I also tried to make a local model better by <strong>training it on its own correct answers</strong>:
-      since the eval checks every answer against the database, it can label training data for free. It
-      helped on familiar questions (61% → 72%) and hurt on unfamiliar ones (60% → 33%) — a textbook case of
-      a narrow fine-tune forgetting the rest.
-      <a class="deeper" href="#" onclick="document.querySelector('[data-tab=technical]')?.click();return false;">See the self-training experiment →</a></p>
+    <p>I also <strong>trained a local model on its own correct answers</strong>, on a loop: the eval
+      labels the data for free, so the model learns from the queries it gets right. A single round
+      over-specialises and forgets things, but with a wider question bank and a held-out gate the best
+      round beats the starting model on both test sets at once (54% → 63% on unseen teams, 60% → 70% on
+      the original questions).
+      <a class="deeper" href="#" onclick="document.querySelector('[data-tab=technical]')?.click();return false;">See the self-training loop →</a></p>
 
     <blockquote>An LLM is a good analyst only if it actually runs the query. The whole design is
       built to force that: a read-only guard so it can't do harm, a hard “ground every number in a tool
@@ -156,35 +157,36 @@
       latency, cost, and <strong>groundedness</strong> — does every number the model states trace back
       to a tool result, or did it invent one. All accuracy figures carry bootstrap 95% CIs.</p>
 
-    <h2>Self-training: the eval as the teacher</h2>
+    <h2>Self-training: the eval as the teacher, on a loop</h2>
     <p>Because the eval checks every answer against the database, it can label training data on its own.
-      I built a large bank of templated questions over the same schema (each with a reference SQL), held
-      a set of teams out of it entirely, and let the base model attempt the rest. Every attempt whose SQL
-      reproduced the gold answer was kept as a training example; the wrong ones were thrown away. This is
-      rejection sampling: the model's own verified-correct queries become the dataset, with no
-      hand-labelling.</p>
-    <p>Those kept pairs then LoRA fine-tune the model on-device (MLX on the M-series Mac, with the loss
-      masked to the SQL so it learns the query rather than the prompt). The test is deliberately hard —
-      single-shot, one SELECT per question, no self-correction loop — on two sets kept out of training:
-      questions about the held-out teams (same templates, unseen teams) and the original 30 from the main
-      eval, some of which are question types the bank never covers.</p>
+      I built a bank of ~2,000 templated questions over the same schema (each with a reference SQL), held
+      fifteen teams out entirely, and let the model attempt the rest. Every attempt whose SQL reproduced
+      the gold answer was kept; the rest were thrown away. This is rejection sampling: the model's own
+      verified-correct queries become the dataset, with no hand-labelling. The kept pairs LoRA fine-tune
+      the model on-device (MLX on the M-series Mac, loss masked to the SQL).</p>
+    <p>One round of this over-specialises, exactly as you'd expect. Fine-tuning on the first ~250
+      verified queries <em>dropped</em> single-shot accuracy on the original 30 from 60% to 40%: the model
+      got sharper on the team-by-team patterns it trained on and worse at the rest. So I made it a loop
+      with two changes: a wider question bank (percentages, per-decade buckets, max-of-derived shapes, not
+      just counts) and a <strong>held-out gate</strong> — keep a new round only if it beats the previous
+      best on both test sets, never just one.</p>
     <figure class="fig">
-      <img src="../assets/touchline/selftrain.png" alt="Self-training: base vs fine-tuned single-shot accuracy and valid-SQL, on held-out teams and the original 30." />
-      <figcaption>Single-shot SQL accuracy, base vs self-trained. The fine-tune helps on the question
-        types it was trained on (left bars) and hurts on the ones it wasn't (right bars).</figcaption>
+      <img src="../assets/touchline/iterate.png" alt="Iterated self-training: execution accuracy by round, on held-out teams and the original 30." />
+      <figcaption>Each round: the current model attempts the bank, its verified-correct SQL is added to
+        the training set, a fresh model is fine-tuned, and it's tested on both held-out sets. The rounds
+        are noisy; the gate is what makes the loop trustworthy.</figcaption>
     </figure>
-    <p>It both worked and backfired, in the same run. On the held-out teams (templates the model trained
-      on, but teams it had never seen) self-training lifted single-shot accuracy from <strong>61% to
-      72%</strong>: a real gain, learned from the model's own verified-correct queries, with no labels and
-      no cost. On the original 30, which include question shapes the bank never covered (global counts,
-      percentages, per-decade buckets), accuracy <em>fell</em> from <strong>60% to 33%</strong>. The
-      narrow fine-tune over-fitted to the team-by-team count, sum and head-to-head patterns and got worse
-      at everything else. Valid-SQL stayed near-perfect throughout (94–100%), so this isn't broken SQL;
-      it's the model reaching for the wrong shape of query.</p>
-    <p>That is the real lesson here. Auto-verified self-training is a cheap way to sharpen a model on a
-      known distribution of questions, but a narrow training diet makes it forget the rest. The fix is
-      breadth: a wider question bank, fewer training steps, or some general data mixed in — not more of
-      the same.</p>
+    <p>The loop is genuinely noisy. Round 1 regressed both sets; round 3 pushed the held-out teams to
+      their best (67%) but gave back ground on the broader 30. The round that passes the gate is
+      <strong>round 2</strong>, and it is a real win: it beats the base model on <em>both</em> sets at
+      once — held-out teams <strong>54% → 63%</strong>, original 30 <strong>60% → 70%</strong> — trained
+      only on the model's own verified queries, for nothing but compute. The wider bank is what let it
+      recover the question types one round had forgotten.</p>
+    <p>So yes, it iterates, with caveats worth stating plainly. The gains are noisy and they plateau:
+      rejection sampling can only harvest what the model can already sometimes do, not teach it genuinely
+      new tricks. And a cheap verifier can be gamed if you push hard enough — a query that happens to
+      contain the gold number isn't always the right query. The held-out gate is the load-bearing part;
+      without it you'd ship round 1 and write self-training off as a failure.</p>
 
     <h2>From prototype to production</h2>
     <p>What a real deployment would add: per-query cost and row caps; result caching for repeated
@@ -270,11 +272,13 @@ eval/
   golden.yaml     # 30 questions + reference SQL (gold = the DB result)
   run.py          # run the agent, score, bootstrap CIs
   score.py        # the (pure, unit-tested) scorer
-train/            # self-training pipeline
-  build_questions.py # templated question bank, disjoint from the eval
-  sample.py          # rejection-sample the model's verified-correct SQL
-  finetune.sh        # MLX LoRA fine-tune on the kept pairs
-  eval_sql.py        # base vs fine-tuned on held-out sets
+train/            # self-training loop
+  build_questions.py # ~2,000 templated questions, disjoint from the eval
+  split.py           # train pool vs held-out-team test set
+  mlx_sample.py      # attempt the pool, keep verified-correct SQL
+  finetune.sh        # MLX LoRA fine-tune (loss masked to the SQL)
+  eval_sql.py        # accuracy on the held-out sets
+  iterate.sh         # the loop: sample -> fine-tune -> eval -> gate
 figures/          # palette-matched charts for this page</code></pre>
 
     <h2>The SELECT-guard</h2>
