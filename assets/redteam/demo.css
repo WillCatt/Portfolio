@@ -1,0 +1,52 @@
+/* Red-Team Lab demo — scoped styles. */
+#rt-demo { font-size: 0.95rem; }
+.rt-loading { color: var(--text-muted); }
+.rt-note {
+  background: #fff; border: 1px solid var(--border); border-left: 3px solid #c0533b;
+  border-radius: 8px; padding: 0.7rem 0.9rem; color: var(--text-muted); margin: 0 0 1rem;
+}
+.rt-note b { color: var(--text); font-weight: 600; }
+
+.rt-controls { margin-bottom: 0.8rem; }
+.rt-toggle {
+  border: 1px solid var(--border); border-radius: 8px; padding: 0.45rem 1rem;
+  font: inherit; font-weight: 600; cursor: pointer;
+}
+.rt-toggle.on  { background: #e3f1e8; color: #2f6f47; border-color: #bcdcc8; }
+.rt-toggle.off { background: #f6e3df; color: #a23a2a; border-color: #e6c5bd; }
+
+.rt-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1rem; }
+.rt-chip {
+  border: 1px solid var(--border); background: #fff; border-radius: 999px;
+  padding: 0.32rem 0.75rem; font: inherit; font-size: 0.8rem; cursor: pointer;
+  color: var(--text-muted); text-align: left; line-height: 1.2;
+}
+.rt-chip:hover { border-color: #c0533b; color: var(--text); }
+.rt-chip.on { background: #c0533b; border-color: #c0533b; color: #fff; }
+
+.rt-fam {
+  display: inline-block; font-size: 0.7rem; text-transform: uppercase; letter-spacing: .05em;
+  color: #a23a2a; background: #f6e3df; padding: 2px 8px; border-radius: 5px; margin-bottom: 0.6rem;
+}
+.rt-block { margin-bottom: 0.6rem; }
+.rt-tag {
+  display: block; font-family: "JetBrains Mono", monospace; font-size: 0.68rem;
+  color: var(--text-muted); margin-bottom: 3px;
+}
+.rt-block pre {
+  font-family: "JetBrains Mono", monospace; font-size: 0.78rem; background: #1a1714; color: #f4efe7;
+  padding: 0.6rem 0.75rem; border-radius: 8px; overflow-x: auto; margin: 0; white-space: pre-wrap;
+}
+.rt-guard {
+  font-family: "JetBrains Mono", monospace; font-size: 0.78rem; padding: 0.5rem 0.75rem;
+  border-radius: 8px; margin: 0.6rem 0;
+}
+.rt-guard.ref  { background: #f6e3df; color: #a23a2a; }
+.rt-guard.pass { background: #f3ede3; color: var(--text-muted); }
+.rt-guard.off  { background: #efe9df; color: var(--text-muted); }
+.rt-outcome {
+  padding: 0.6rem 0.8rem; border-radius: 8px; line-height: 1.5;
+}
+.rt-outcome.breach { background: #f6e3df; color: #7a2a1e; }
+.rt-outcome.held   { background: #e3f1e8; color: #2f6f47; }
+.rt-outcome strong { letter-spacing: 0.03em; }
