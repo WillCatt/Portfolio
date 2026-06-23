@@ -1,0 +1,755 @@
+{
+ "model": "llama3.1:8b",
+ "max_revisions": 1,
+ "runs": [
+  {
+   "id": "m1",
+   "type": "multi",
+   "question": "Does the policy cover flood, and if a single event also causes storm damage, how many excesses apply?",
+   "gold_pages": [
+    7,
+    24
+   ],
+   "subquestions": [
+    "Does the policy cover flood?",
+    "If a single event triggers claims under both flood and storm sections, how many excesses apply?"
+   ],
+   "evidence": {
+    "Does the policy cover flood?": [
+     {
+      "pages": [
+       7
+      ],
+      "heading": "Document > Summary of the available covers",
+      "text": "Document > Summary of the available covers\nNot everything is covered by the Policy. The following is a limited summary only and as such does not form part of the terms of Your insurance. All cover is subject to the applicable Sum Insured, Limit of Indemnity, other limits and sub-limits and terms, conditions, exclusions and limitations\u2026"
+     },
+     {
+      "pages": [
+       30
+      ],
+      "heading": "Document > Provided that:",
+      "text": "Document > Provided that:\n- a. this temporary cover is limited to a period of 90 consecutive days from the day that You first use new premises; - b. this temporary cover is only available to property of a type or class of Property Insured shown in the Schedule; - c. for each of the Property Insured shown in the Schedule this temporary\u2026"
+     },
+     {
+      "pages": [
+       30
+      ],
+      "heading": "Document > Specific exclusions applicable to this Section",
+      "text": "Document > Specific exclusions applicable to this Section\n1. We will not cover You for Damage insurable under any other Section or Sections of the Policy. This exclusion does not apply to any Damage which would only be insurable under any other Section or Sections because it fell within an extra cover or additional benefits in that\u2026"
+     }
+    ],
+    "If a single event triggers claims under both flood and storm sections, how many excesses apply?": [
+     {
+      "pages": [
+       24
+      ],
+      "heading": "Document > 15.  Payment of Excess",
+      "text": "Document > 15.  Payment of Excess\nYou must pay the Excess amount as a contribution to Your claim and in accordance with the terms and conditions applicable to the Section of Your Policy under which You are making a claim. If We settle a claim by cash settlement We will deduct the Excess from the amount We pay You. Should a single event\u2026"
+     },
+     {
+      "pages": [
+       95,
+       96
+      ],
+      "heading": "Document > b.  Additional Excesses",
+      "text": "Document > b.  Additional Excesses\nIf You make a claim for an Accident when Your Vehicle was being driven by or was in the charge of a driver: - i. up to the age of 21 years, - ii. aged between 21 and 25 years, - iii. greater than 25 years but have held their Australian driver licence for less than 2 years, You must pay the additional\u2026"
+     },
+     {
+      "pages": [
+       11
+      ],
+      "heading": "Document > Your obligation to comply with the Policy terms and conditions",
+      "text": "Document > Your obligation to comply with the Policy terms and conditions\nYou are required to comply with the terms and conditions of the Policy. Please remember that if You do not comply with any term or condition, We may, to the extent We are prejudiced by Your non-compliance, decline or reduce any claim payment and/or cancel Your\u2026"
+     }
+    ]
+   },
+   "initial_drafts": {
+    "Does the policy cover flood?": "The policy does not automatically provide cover for loss or damage caused by Flood (p. 7). However, there is an option to apply for cover for Flood under the Commercial Property Section, and if agreed, it will be shown on the Schedule (p. 7). When 'Flood' cover is shown in the current Schedule as covered, We will cover loss of or Damage to Property Insured caused by Flood (p. 30).",
+    "If a single event triggers claims under both flood and storm sections, how many excesses apply?": "According to Document > 15. Payment of Excess (p. 24), if a single event results in claiming under more than one Section of the Policy, then only the single highest Excess will apply to all claims that arise out of the one event."
+   },
+   "final_drafts": {
+    "Does the policy cover flood?": "The policy does not automatically provide cover for loss or damage caused by Flood (p. 7). However, there is an option to apply for cover for Flood under the Commercial Property Section, and if agreed, it will be shown on the Schedule (p. 7). When 'Flood' cover is shown in the current Schedule as covered, We will cover loss of or Damage to Property Insured caused by Flood (p. 30).",
+    "If a single event triggers claims under both flood and storm sections, how many excesses apply?": "According to Document > 15. Payment of Excess (p. 24), if a single event results in claiming under more than one Section of the Policy, then only the single highest Excess will apply to all claims that arise out of the one event. However, it does not specify how many excesses apply in this scenario.\n\nA separate excerpt Document > 15. Payment of Excess (p. 24) states: \"Only one Excess will apply to all Damage resulting from Flood, earthquake, subterranean fire, volcanic eruption, bushfire, storm, hail or rainwater that is continuous, is due to the same general conditions, and occurs within a 72-hour period from the first happening of Damage.\" This excerpt implies that in the case of flood and storm sections, only one excess applies."
+   },
+   "final_brief": "**Policy Coverage Brief**\n\nThe policy does not automatically provide cover for loss or damage caused by Flood (p. 7), but there is an option to apply for cover under the Commercial Property Section, which would be shown on the Schedule (p. 7). If 'Flood' cover is shown as covered in the current Schedule, We will cover loss of or Damage to Property Insured caused by Flood (p. 30).\n\nIf a single event triggers claims under both flood and storm sections, only one excess applies (Document > 15. Payment of Excess, p. 24). This is because the policy states that \"Only one Excess will apply to all Damage resulting from...storm...\" (Document > 15. Payment of Excess, p. 24), implying that in the case of flood and storm sections, only one excess applies.\n\n**Sources:**\n\np. 7\np. 30\nDocument > 15. Payment of Excess, p. 24\n\nThis is general information about the PDS, not personal financial advice.",
+   "status": "grounded",
+   "revision_count": 1,
+   "usage": {
+    "llm_calls": 7,
+    "tokens": 11621
+   },
+   "latency_s": 87.6,
+   "trace": [
+    {
+     "node": "guard_in",
+     "label": "input passed"
+    },
+    {
+     "node": "planner",
+     "label": "decomposed",
+     "subquestions": [
+      "Does the policy cover flood?",
+      "If a single event triggers claims under both flood and storm sections, how many excesses apply?"
+     ],
+     "n": 2,
+     "latency_s": 2.68
+    },
+    {
+     "node": "research",
+     "label": "retrieved + drafted",
+     "subquestion": "Does the policy cover flood?",
+     "retrieved_pages": [
+      7,
+      30
+     ],
+     "latency_s": 14.66
+    },
+    {
+     "node": "research",
+     "label": "retrieved + drafted",
+     "subquestion": "If a single event triggers claims under both flood and storm sections, how many excesses apply?",
+     "retrieved_pages": [
+      11,
+      24,
+      95,
+      96
+     ],
+     "latency_s": 29.36
+    },
+    {
+     "node": "critic",
+     "label": "reviewed drafts",
+     "verdicts": [
+      "pass",
+      "revise"
+     ],
+     "flagged": 1,
+     "round": 0,
+     "critiques": [
+      {
+       "subquestion": "Does the policy cover flood?",
+       "verdict": "pass",
+       "reason": "Supported by cited evidence."
+      },
+      {
+       "subquestion": "If a single event triggers claims under both flood and storm sections, how many excesses apply?",
+       "verdict": "revise",
+       "reason": "The answer does not address the specific scenario of a single event triggering claims under both flood and storm sections. The cited excerpt (p. 24) only mentions that if a single event results in claiming under more than one Section, then only the single highest Excess will apply to all claims. However, it does not specify how many excesses apply in this scenario."
+      }
+     ],
+     "latency_s": 10.6
+    },
+    {
+     "node": "revise",
+     "label": "re-drafted",
+     "subquestion": "If a single event triggers claims under both flood and storm sections, how many excesses apply?",
+     "latency_s": 21.58
+    },
+    {
+     "node": "critic",
+     "label": "reviewed drafts",
+     "verdicts": [
+      "pass",
+      "revise"
+     ],
+     "flagged": 1,
+     "round": 1,
+     "critiques": [
+      {
+       "subquestion": "Does the policy cover flood?",
+       "verdict": "pass",
+       "reason": "Supported by cited evidence."
+      },
+      {
+       "subquestion": "If a single event triggers claims under both flood and storm sections, how many excesses apply?",
+       "verdict": "revise",
+       "reason": "The draft answer states that the excerpt implies only one excess applies, but it does not directly address the question of how many excesses apply in this scenario. The relevant excerpt (p. 24) mentions that 'only one Excess will apply to all Damage resulting from' a list of events, but flood and storm are not explicitly mentioned. Therefore, the answer is incomplete and requires further clarification."
+      }
+     ],
+     "latency_s": 12.26
+    },
+    {
+     "node": "synthesizer",
+     "label": "composed brief",
+     "latency_s": 10.98
+    },
+    {
+     "node": "guard_out",
+     "label": "grounding check",
+     "grounded": true,
+     "cited_pages": [
+      7,
+      24,
+      30
+     ],
+     "unsupported": []
+    }
+   ],
+   "baseline": {
+    "answer": "Yes, the policy covers flood (p. 24).\n\nIf a single event causes both flood and storm damage, only one Excess will apply to all Damage resulting from Flood, earthquake, subterranean fire, volcanic eruption, bushfire, storm, hail or rainwater that is continuous, is due to the same general conditions, and occurs within a 72-hour period from the first happening of Damage (p. 24).\n\nSources:\n(p. 24)",
+    "grounded": true,
+    "gold_coverage": 0.5,
+    "cited_pages": []
+   }
+  },
+  {
+   "id": "m2",
+   "type": "multi",
+   "question": "What does 'Excess' mean, and which excess applies when one event triggers claims under more than one section?",
+   "gold_pages": [
+    16,
+    24
+   ],
+   "subquestions": [
+    "What does Excess mean?",
+    "Which excess applies when one event triggers claims under more than one section?"
+   ],
+   "evidence": {
+    "What does Excess mean?": [
+     {
+      "pages": [
+       9,
+       10
+      ],
+      "heading": "Document > Our contract with You",
+      "text": "Document > Our contract with You\nWhere We agree to enter into a Policy with the Insured it is a contract of insurance between Us and the Insured. The Policy consists of: - this document which sets out the standard terms of Your cover and its limitations; - Your current Schedule issued by Us. The Schedule is a separate document, which\u2026"
+     },
+     {
+      "pages": [
+       11,
+       12
+      ],
+      "heading": "Document > Premium payment by direct debit",
+      "text": "Document > Premium payment by direct debit\nYou may have chosen to pay the Premium for this insurance by direct debit from a financial institution holding Your account. If You choose this option, the financial institution may dishonour the direct debit payment due to lack of funds in Your account. If this occurs, We will charge You for\u2026"
+     },
+     {
+      "pages": [
+       16
+      ],
+      "heading": "Document",
+      "text": "Document\nContents means all contents at the Situation, including property (other than Buildings and Stock) of others and shipping containers not owned by You but temporarily in Your possession for the delivery, unloading, loading and/or dispatch of goods and merchandise to or from the Situation, but only to the extent that You are not\u2026"
+     }
+    ],
+    "Which excess applies when one event triggers claims under more than one section?": [
+     {
+      "pages": [
+       66,
+       67
+      ],
+      "heading": "Document > 6.  Turnover elsewhere after Damage",
+      "text": "Document > 6.  Turnover elsewhere after Damage\nIf during the Indemnity Period You or others on Your behalf operate the Business from a situation other than those specifi ed in the Schedule then the Turnover so earned will be brought into account when calculating the Turnover.\n\nDocument > 7.  Under-insurance\nIf the Business Turnover at\u2026"
+     },
+     {
+      "pages": [
+       24
+      ],
+      "heading": "Document > 15.  Payment of Excess",
+      "text": "Document > 15.  Payment of Excess\nYou must pay the Excess amount as a contribution to Your claim and in accordance with the terms and conditions applicable to the Section of Your Policy under which You are making a claim. If We settle a claim by cash settlement We will deduct the Excess from the amount We pay You. Should a single event\u2026"
+     },
+     {
+      "pages": [
+       34,
+       35
+      ],
+      "heading": "Document > 10.  Tenanted Situation",
+      "text": "Document > 10.  Tenanted Situation\nWe will also pay in addition to the Sum Insured for Property Insured, the cost of repairing or replacing Your landlords premises or property (other than Glass) for which You are liable under the terms of Your lease or rental agreement arising from Theft at the Situation. Provided that the maximum amount\u2026"
+     }
+    ]
+   },
+   "initial_drafts": {
+    "What does Excess mean?": "Excess means either the amount of money specified in the Schedule or otherwise stated in the Policy for each applicable Section that You must contribute for all claims arising out of one event, or the period of time specified in the Schedule or otherwise stated in the Policy for which no payment will be made by Us. (p. 16)",
+    "Which excess applies when one event triggers claims under more than one section?": "According to Document > 15. Payment of Excess (p. 24), if a single event results in You claiming under more than one Section of Your Policy, then only the single highest Excess will apply to all claims that arise out of the one event."
+   },
+   "final_drafts": {
+    "What does Excess mean?": "Excess means either the amount of money specified in the Schedule or otherwise stated in the Policy for each applicable Section that You must contribute for all claims arising out of one event, or the period of time specified in the Schedule or otherwise stated in the Policy for which no payment will be made by Us. (p. 16)",
+    "Which excess applies when one event triggers claims under more than one section?": "According to Document > 15. Payment of Excess (p. 16), if a single event results in You claiming under more than one Section of Your Policy, then only the single highest Excess will apply to all claims that arise out of the one event."
+   },
+   "final_brief": "Here is the combined brief:\n\nExcess refers to either the amount of money specified in the Schedule or otherwise stated in the Policy for each applicable Section that You must contribute for all claims arising out of one event, or the period of time specified in the Schedule or otherwise stated in the Policy for which no payment will be made by Us (p. 16).\n\nWhen one event triggers claims under more than one section, only the single highest Excess applies to all claims that arise out of the one event (Document > 15. Payment of Excess, p. 16).\n\nSources:\n(p. 16)\n\nThis is general information about the PDS, not personal financial advice.",
+   "status": "grounded",
+   "revision_count": 1,
+   "usage": {
+    "llm_calls": 7,
+    "tokens": 11064
+   },
+   "latency_s": 69.6,
+   "trace": [
+    {
+     "node": "guard_in",
+     "label": "input passed"
+    },
+    {
+     "node": "planner",
+     "label": "decomposed",
+     "subquestions": [
+      "What does Excess mean?",
+      "Which excess applies when one event triggers claims under more than one section?"
+     ],
+     "n": 2,
+     "latency_s": 2.37
+    },
+    {
+     "node": "research",
+     "label": "retrieved + drafted",
+     "subquestion": "What does Excess mean?",
+     "retrieved_pages": [
+      9,
+      10,
+      11,
+      12,
+      16
+     ],
+     "latency_s": 29.03
+    },
+    {
+     "node": "research",
+     "label": "retrieved + drafted",
+     "subquestion": "Which excess applies when one event triggers claims under more than one section?",
+     "retrieved_pages": [
+      24,
+      34,
+      35,
+      66,
+      67
+     ],
+     "latency_s": 13.92
+    },
+    {
+     "node": "critic",
+     "label": "reviewed drafts",
+     "verdicts": [
+      "pass",
+      "revise"
+     ],
+     "flagged": 1,
+     "round": 0,
+     "critiques": [
+      {
+       "subquestion": "What does Excess mean?",
+       "verdict": "pass",
+       "reason": "Supported by cited evidence."
+      },
+      {
+       "subquestion": "Which excess applies when one event triggers claims under more than one section?",
+       "verdict": "revise",
+       "reason": "The draft answer cites page 24, but the relevant snippet is actually about payment of excess in general, not specifically about multiple sections. The correct citation for this sub-question would be p. 16."
+      }
+     ],
+     "latency_s": 8.88
+    },
+    {
+     "node": "revise",
+     "label": "re-drafted",
+     "subquestion": "Which excess applies when one event triggers claims under more than one section?",
+     "latency_s": 14.24
+    },
+    {
+     "node": "critic",
+     "label": "reviewed drafts",
+     "verdicts": [
+      "pass",
+      "revise"
+     ],
+     "flagged": 1,
+     "round": 1,
+     "critiques": [
+      {
+       "subquestion": "What does Excess mean?",
+       "verdict": "pass",
+       "reason": "Supported by cited evidence."
+      },
+      {
+       "subquestion": "Which excess applies when one event triggers claims under more than one section?",
+       "verdict": "revise",
+       "reason": "Cites page(s) not in evidence ([16]). The answer drifts off-topic by mentioning Turnover elsewhere after Damage and Under-insurance, which are unrelated to the question about excess when one event triggers claims under more than one section."
+      }
+     ],
+     "latency_s": 8.5
+    },
+    {
+     "node": "synthesizer",
+     "label": "composed brief",
+     "latency_s": 6.5
+    },
+    {
+     "node": "guard_out",
+     "label": "grounding check",
+     "grounded": true,
+     "cited_pages": [
+      16
+     ],
+     "unsupported": []
+    }
+   ],
+   "baseline": {
+    "answer": "The Excess is not defined in the provided excerpts. However, it is mentioned that \"You can ask Us for more details if You wish\" regarding how Excesses are applied (p. 11).\n\nWhen one event triggers claims under more than one section, the document does not cover this scenario.\n\nSources:\n(p. 11)",
+    "grounded": true,
+    "gold_coverage": 0.0,
+    "cited_pages": []
+   }
+  },
+  {
+   "id": "s2",
+   "type": "simple",
+   "question": "Which sections are insured under the policy?",
+   "gold_pages": [
+    9
+   ],
+   "subquestions": [
+    "What sections are covered by this insurance policy?",
+    "Are there any exclusions or limitations to these sections?"
+   ],
+   "evidence": {
+    "What sections are covered by this insurance policy?": [
+     {
+      "pages": [
+       9,
+       10
+      ],
+      "heading": "Document > Our contract with You",
+      "text": "Document > Our contract with You\nWhere We agree to enter into a Policy with the Insured it is a contract of insurance between Us and the Insured. The Policy consists of: - this document which sets out the standard terms of Your cover and its limitations; - Your current Schedule issued by Us. The Schedule is a separate document, which\u2026"
+     },
+     {
+      "pages": [
+       11,
+       12
+      ],
+      "heading": "Document > Premium payment by direct debit",
+      "text": "Document > Premium payment by direct debit\nYou may have chosen to pay the Premium for this insurance by direct debit from a financial institution holding Your account. If You choose this option, the financial institution may dishonour the direct debit payment due to lack of funds in Your account. If this occurs, We will charge You for\u2026"
+     },
+     {
+      "pages": [
+       11
+      ],
+      "heading": "Document > Your obligation to comply with the Policy terms and conditions",
+      "text": "Document > Your obligation to comply with the Policy terms and conditions\nYou are required to comply with the terms and conditions of the Policy. Please remember that if You do not comply with any term or condition, We may, to the extent We are prejudiced by Your non-compliance, decline or reduce any claim payment and/or cancel Your\u2026"
+     }
+    ],
+    "Are there any exclusions or limitations to these sections?": [
+     {
+      "pages": [
+       8,
+       9
+      ],
+      "heading": "Document",
+      "text": "Document\n| Sections | Summary of covers (This table is not to be relied on as an accurate description of cover. See relevant Section for details, relevant limits, and specific conditions and exclusions that apply) |\u2026"
+     },
+     {
+      "pages": [
+       7
+      ],
+      "heading": "Document > Summary of the available covers",
+      "text": "Document > Summary of the available covers\nNot everything is covered by the Policy. The following is a limited summary only and as such does not form part of the terms of Your insurance. All cover is subject to the applicable Sum Insured, Limit of Indemnity, other limits and sub-limits and terms, conditions, exclusions and limitations\u2026"
+     },
+     {
+      "pages": [
+       19
+      ],
+      "heading": "Document",
+      "text": "Document\n- I. These Sections do not cover any loss or Damage of whatsoever kind directly or indirectly caused by, contributed to by or arising from: - i. Damage, loss, destruction, distortion, erasure, corruption, alteration, theft or other dishonest, criminal, fraudulent or unauthorised manipulation of Electronic Data from any cause\u2026"
+     }
+    ]
+   },
+   "initial_drafts": {
+    "What sections are covered by this insurance policy?": "The Policy consists of: \n- this document which sets out the standard terms of Your cover and its limitations; \n- Your current Schedule issued by Us; \n- any other change to the terms of the Policy otherwise advised by Us in writing (such as an Endorsement or Supplementary PDS) before You enter into the Policy or where required or permitted by law. (pp. 9, 10)\n\nEach Section may also contain definitions relevant to that Section of the Policy. (p. 11)",
+    "Are there any exclusions or limitations to these sections?": "Yes, there are several exclusions and limitations mentioned in the excerpts:\n\n* Exclusion of loss or damage caused by Flood is mentioned on p. 7.\n* Electronic Data exclusion is applicable to Machinery Breakdown Section and Electronic Equipment Section (p. 19).\n* The Policy does not cover loss, destruction, liability or Damage directly or indirectly, caused by, contributed to by or arising from the acquisition of companies (p. 6).\n* The Policy does not provide any cover at an Unoccupied Building after it has been left vacant for more than 60 consecutive days, except in certain circumstances (p. 7)."
+   },
+   "final_drafts": {
+    "What sections are covered by this insurance policy?": "The Policy consists of: \n- this document which sets out the standard terms of Your cover and its limitations; \n- Your current Schedule issued by Us; \n- any other change to the terms of the Policy otherwise advised by Us in writing (such as an Endorsement or Supplementary PDS) before You enter into the Policy or where required or permitted by law. (pp. 9, 10)\n\nEach Section may also contain definitions relevant to that Section of the Policy. (p. 11)",
+    "Are there any exclusions or limitations to these sections?": "Yes, there are several exclusions and limitations mentioned:\n\n* The Policy does not cover loss or damage caused by Flood (p. 7).\n* Electronic Data exclusion is applicable to Machinery Breakdown Section and Electronic Equipment Section (pp. 19).\n* The Policy does not provide any cover at an Unoccupied Building after it has been left vacant for more than 60 consecutive days, except in certain circumstances (p. 7)."
+   },
+   "final_brief": "The sections insured under this policy include:\n\n* This document, which sets out the standard terms of Your cover and its limitations\n* Your current Schedule issued by Us\n* Any other change to the terms of the Policy otherwise advised by Us in writing (such as an Endorsement or Supplementary PDS) before You enter into the Policy or where required or permitted by law\n\nEach Section may also contain definitions relevant to that Section of the Policy.\n\nHowever, there are several exclusions and limitations to these sections, including:\n\n* Loss or damage caused by Flood\n* Electronic Data exclusion applicable to Machinery Breakdown Section and Electronic Equipment Section\n* No cover at an Unoccupied Building after it has been left vacant for more than 60 consecutive days, except in certain circumstances.\n\nSources:\npp. 7, 9, 10, 11, 19\n\nThis is general information about the PDS, not personal financial advice.",
+   "status": "grounded",
+   "revision_count": 1,
+   "usage": {
+    "llm_calls": 7,
+    "tokens": 11285
+   },
+   "latency_s": 155.2,
+   "trace": [
+    {
+     "node": "guard_in",
+     "label": "input passed"
+    },
+    {
+     "node": "planner",
+     "label": "decomposed",
+     "subquestions": [
+      "What sections are covered by this insurance policy?",
+      "Are there any exclusions or limitations to these sections?"
+     ],
+     "n": 2,
+     "latency_s": 4.9
+    },
+    {
+     "node": "research",
+     "label": "retrieved + drafted",
+     "subquestion": "What sections are covered by this insurance policy?",
+     "retrieved_pages": [
+      9,
+      10,
+      11,
+      12
+     ],
+     "latency_s": 34.68
+    },
+    {
+     "node": "research",
+     "label": "retrieved + drafted",
+     "subquestion": "Are there any exclusions or limitations to these sections?",
+     "retrieved_pages": [
+      7,
+      8,
+      9,
+      19
+     ],
+     "latency_s": 66.98
+    },
+    {
+     "node": "critic",
+     "label": "reviewed drafts",
+     "verdicts": [
+      "pass",
+      "revise"
+     ],
+     "flagged": 1,
+     "round": 0,
+     "critiques": [
+      {
+       "subquestion": "What sections are covered by this insurance policy?",
+       "verdict": "pass",
+       "reason": "Supported by cited evidence."
+      },
+      {
+       "subquestion": "Are there any exclusions or limitations to these sections?",
+       "verdict": "revise",
+       "reason": "Cites page(s) not in evidence ([6]). The answer drifts off-topic by mentioning p. 7 and p. 6, which are not relevant to the sub-question about exclusions or limitations in the sections covered by the policy."
+      }
+     ],
+     "latency_s": 17.53
+    },
+    {
+     "node": "revise",
+     "label": "re-drafted",
+     "subquestion": "Are there any exclusions or limitations to these sections?",
+     "latency_s": 31.26
+    },
+    {
+     "node": "critic",
+     "label": "reviewed drafts",
+     "verdicts": [
+      "pass",
+      "revise"
+     ],
+     "flagged": 1,
+     "round": 1,
+     "critiques": [
+      {
+       "subquestion": "What sections are covered by this insurance policy?",
+       "verdict": "pass",
+       "reason": "Supported by cited evidence."
+      },
+      {
+       "subquestion": "Are there any exclusions or limitations to these sections?",
+       "verdict": "revise",
+       "reason": "The answer drifts off-topic by mentioning a table that is not relevant to the sub-question. The correct answer should only mention exclusions and limitations mentioned in the policy document."
+      }
+     ],
+     "latency_s": 16.76
+    },
+    {
+     "node": "synthesizer",
+     "label": "composed brief",
+     "latency_s": 17.64
+    },
+    {
+     "node": "guard_out",
+     "label": "grounding check",
+     "grounded": true,
+     "cited_pages": [
+      7,
+      9,
+      10,
+      11,
+      19
+     ],
+     "unsupported": []
+    }
+   ],
+   "baseline": {
+    "answer": "The following Sections are mentioned as being covered under the Policy:\n\n* Commercial Property Section (p. 24)\n* Business Interruption Section (p. 24)\n* Theft Section (p. 24)\n* Money Section (p. 24)\n* Glass Section (p. 24)\n* General Property Section (p. 24)\n* Goods In Transit Section (p. 24)\n* Management Liability Section - Part A - Directors and Officers Liability (p. 25)\n* Management Liability Section - Part C - Crime (p. 25)\n\nSources:\n(p. 24), (p. 25)",
+    "grounded": true,
+    "gold_coverage": 0.0,
+    "cited_pages": []
+   }
+  },
+  {
+   "id": "s3",
+   "type": "simple",
+   "question": "How long is the cooling off period for this insurance?",
+   "gold_pages": [
+    10
+   ],
+   "subquestions": [
+    "How long is the cooling off period?"
+   ],
+   "evidence": {
+    "How long is the cooling off period?": [
+     {
+      "pages": [
+       10
+      ],
+      "heading": "Document",
+      "text": "Document\nWhere We agree to issue a Policy, cover is provided on the basis: - that You have paid or agreed to pay Us the Premium for the cover provided; - of the verbal and/or written information provided by You which must have been given in accordance with Your duty of disclosure. If You fail to comply with Your duty of disclosure, We\u2026"
+     },
+     {
+      "pages": [
+       9,
+       10
+      ],
+      "heading": "Document > Our contract with You",
+      "text": "Document > Our contract with You\nWhere We agree to enter into a Policy with the Insured it is a contract of insurance between Us and the Insured. The Policy consists of: - this document which sets out the standard terms of Your cover and its limitations; - Your current Schedule issued by Us. The Schedule is a separate document, which\u2026"
+     },
+     {
+      "pages": [
+       13,
+       14
+      ],
+      "heading": "Document > Disclosure overseas",
+      "text": "Document > Disclosure overseas\nYour personal information may be disclosed to other companies in the Allianz Group, business partners, reinsurers and service providers that may be located in Australia or overseas. The countries this information may be disclosed to will vary from time to time, but may include Canada, Germany, New Zealand,\u2026"
+     }
+    ]
+   },
+   "initial_drafts": {
+    "How long is the cooling off period?": "A 14 day cooling off period applies to this insurance (p. 10)."
+   },
+   "final_drafts": {
+    "How long is the cooling off period?": "The document does not cover a cooling off period."
+   },
+   "final_brief": "There is no specified cooling off period for this insurance, as it is not mentioned in the provided information. \n\nSources: \nNone cited.\n\nThis is general information about the PDS, not personal financial advice.",
+   "status": "ungrounded",
+   "revision_count": 1,
+   "usage": {
+    "llm_calls": 6,
+    "tokens": 7176
+   },
+   "latency_s": 77.5,
+   "trace": [
+    {
+     "node": "guard_in",
+     "label": "input passed"
+    },
+    {
+     "node": "planner",
+     "label": "decomposed",
+     "subquestions": [
+      "How long is the cooling off period?"
+     ],
+     "n": 1,
+     "latency_s": 3.43
+    },
+    {
+     "node": "research",
+     "label": "retrieved + drafted",
+     "subquestion": "How long is the cooling off period?",
+     "retrieved_pages": [
+      9,
+      10,
+      13,
+      14
+     ],
+     "latency_s": 25.71
+    },
+    {
+     "node": "critic",
+     "label": "reviewed drafts",
+     "verdicts": [
+      "revise"
+     ],
+     "flagged": 1,
+     "round": 0,
+     "critiques": [
+      {
+       "subquestion": "How long is the cooling off period?",
+       "verdict": "revise",
+       "reason": "The draft answer claims a 14 day cooling off period applies, but the provided evidence snippets do not mention any cooling off period. The relevant snippet (p. 10) discusses the basis of cover provision and duty of disclosure."
+      }
+     ],
+     "latency_s": 10.46
+    },
+    {
+     "node": "revise",
+     "label": "re-drafted",
+     "subquestion": "How long is the cooling off period?",
+     "latency_s": 26.19
+    },
+    {
+     "node": "critic",
+     "label": "reviewed drafts",
+     "verdicts": [
+      "revise"
+     ],
+     "flagged": 1,
+     "round": 1,
+     "critiques": [
+      {
+       "subquestion": "How long is the cooling off period?",
+       "verdict": "revise",
+       "reason": "No page citation. The draft answer claims that the document does not cover a cooling off period. However, there is no mention of a cooling off period in any of the provided evidence snippets."
+      }
+     ],
+     "latency_s": 9.22
+    },
+    {
+     "node": "synthesizer",
+     "label": "composed brief",
+     "latency_s": 2.4
+    },
+    {
+     "node": "guard_out",
+     "label": "grounding check",
+     "grounded": false,
+     "cited_pages": [],
+     "unsupported": []
+    }
+   ],
+   "baseline": {
+    "answer": "A 14 day cooling off period applies to this insurance (p. 10).",
+    "grounded": true,
+    "gold_coverage": 1.0,
+    "cited_pages": []
+   }
+  },
+  {
+   "id": "blocked",
+   "type": "blocked",
+   "question": "Which policy should I buy for my cafe?",
+   "gold_pages": [],
+   "subquestions": [],
+   "evidence": {},
+   "initial_drafts": {},
+   "final_drafts": {},
+   "final_brief": "I can't give personal financial advice or tell you which cover to choose. I answer factual questions about what the Product Disclosure Statement says.",
+   "status": "blocked_personal_advice",
+   "revision_count": 0,
+   "usage": {
+    "llm_calls": 0,
+    "tokens": 0
+   },
+   "latency_s": 0.0,
+   "trace": [
+    {
+     "node": "guard_in",
+     "label": "input blocked",
+     "kind": "personal_advice",
+     "detail": "I can't give personal financial advice or tell you which cover to choose. I answer factual questions about what the Product Disclosure Statement says."
+    }
+   ],
+   "baseline": {
+    "answer": "I can't give personal financial advice or tell you which cover to choose. I answer factual questions about what the Product Disclosure Statement says.",
+    "grounded": true,
+    "gold_coverage": 0.0,
+    "cited_pages": []
+   }
+  }
+ ]
+}

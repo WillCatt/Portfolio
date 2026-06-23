@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PolicyDesk · William Catt</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <meta name="description" content="PolicyDesk: a LangGraph multi-agent research desk over an insurance Product Disclosure Statement. A supervisor decomposes a question, researchers retrieve per sub-question, a critic checks grounding and loops revisions, an editor synthesises a cited brief. Measured head-to-head against single-shot RAG. By William Catt." />
+  <link rel="canonical" href="https://williamcatt.dev/projects/policydesk.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="PolicyDesk — a LangGraph multi-agent research desk" />
+  <meta property="og:description" content="Multi-agent (planner / researcher / critic / editor) grounded Q&A over an insurance PDS, built on LangGraph and measured against single-shot RAG. When does multi-agent actually beat one pass?" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../project.css" />
+  <link rel="stylesheet" href="../assets/policydesk/demo.css" />
+</head>
+<body>
+<!-- ─── PROJECT META ────────────────────────────────────────────────────────── -->
+<script>
+  window.PROJECT = {
+    id: "policydesk",
+    index: "09",
+    title: "PolicyDesk",
+    subtitle: "A LangGraph multi-agent research desk over an insurance policy document",
+    color: "oklch(52% 0.14 295)",
+    status: "wip", // "live" | "wip" | "archived"
+    tags: ["LangGraph","Multi-agent","Agents","RAG"],
+    repo: "github.com/WillCatt/PolicyDesk",
+    demo: true,
+  };
+</script>
+
+<div id="root"></div>
+<script src="../project-page.js" defer></script>
+
+<!-- ─── TAB CONTENT ──────────────────────────────────────────────────────────── -->
+
+<!-- OVERVIEW: stakeholder-facing. Plain language, simple charts. -->
+<template id="tab-overview">
+  <article class="writeup">
+    <h2>The problem</h2>
+    <p>A single-shot Q&amp;A bot (like its sibling <a href="quoteguard.html">QuoteGuard</a>) does one retrieval and writes one answer. That works for one fact. Real policy questions are rarely one fact: <em>"Is flood covered, and if a storm hits in the same event, how many excesses apply?"</em> is three questions wearing a trench coat. Ask a single pass and it tends to answer the loudest part, gloss the rest, and occasionally assert something the document doesn't actually say.</p>
+    <p>The interesting question isn't whether an LLM can answer insurance questions. It's whether handing the job to a small <strong>team of specialised agents</strong> — one to plan, several to research, one to check the work — produces a better, better-grounded answer than one model doing it all at once, or whether it's just more moving parts and more cost for the same result.</p>
+
+    <h2>What I built</h2>
+    <p>PolicyDesk is a research desk built on <strong>LangGraph</strong>. Given a question about the Allianz Business PDS, it runs a small org chart:</p>
+    <ul>
+      <li>A <strong>planner</strong> splits the question into the minimal set of sub-questions.</li>
+      <li>A <strong>researcher</strong> is spun up for each sub-question (in parallel) to retrieve evidence and draft a page-cited answer.</li>
+      <li>A <strong>critic</strong> reads every draft against its cited evidence and sends weak ones back for revision — a loop, capped so it can't spin forever.</li>
+      <li>An <strong>editor</strong> merges the verified findings into one cited brief; guardrails sit on the way in and out.</li>
+    </ul>
+    <p>It deliberately reuses QuoteGuard's corpus and BM25 retrieval, which let me do the thing that makes this a study rather than a demo: <strong>measure the multi-agent desk head-to-head against plain single-shot RAG</strong>, same model, same retriever, only the orchestration changes.</p>
+
+    <h2>Does multi-agent actually win?</h2>
+    <p>Sometimes — and the "when" is the whole point. On <strong>multi-part</strong> questions the desk covers more of the source material than a single pass (gold-page coverage 57% vs 31%). On <strong>simple</strong> lookups it does a little <em>worse</em> (38% vs 62%): the planner tends to over-split a one-fact question, and the extra machinery adds ways to go wrong. Both approaches cite their sources equally reliably; the difference is purely how completely they answer.</p>
+    <img src="../assets/policydesk/gain_by_type.png" alt="Multi-agent improves gold-page coverage on multi-part questions but loses on simple ones." />
+    <a class="deeper" href="#" onclick="document.querySelector('[data-tab=results]')?.click();return false;">See the full comparison →</a>
+
+    <h2>Does the critic earn its keep?</h2>
+    <p>Less than I expected, and that's worth saying plainly. The critic does catch drafts that cite nothing or cite a page they never read, and bounces them back. But across the eval the revision loop didn't actually raise grounding (it went 0.84 → 0.83). The reason is instructive: a cheap, deterministic check already blocks fabricated citations before the loop runs, so the extra LLM revision mostly re-words, and occasionally talks a good draft into a worse one. The deterministic guard does the heavy lifting; the LLM critic loop, with a small model, is close to a no-op here.</p>
+    <a class="deeper" href="#" onclick="document.querySelector('[data-tab=technical]')?.click();return false;">How the graph and the critic loop work →</a>
+
+    <blockquote>The headline isn't "multi-agent is better". It's that orchestration is a <em>tool with a cost</em>: it buys grounding and completeness on hard, multi-part questions, and wastes money on easy ones. A sensible system routes by complexity. <a href="#" onclick="document.querySelector('[data-tab=app]')?.click();return false;">Watch the desk run →</a></blockquote>
+  </article>
+</template>
+
+<!-- TECHNICAL: deep dive. Jargon OK. -->
+<template id="tab-technical">
+  <article class="writeup">
+    <h2>The task &amp; corpus</h2>
+    <p>Same document as QuoteGuard: the <strong>Allianz Business Insurance Pack PDS</strong>, 100 pages, parsed (with docling) into 138 section-aware chunks that each carry a heading path and page numbers. The new problem is shape, not source: questions that genuinely have several parts, where a single retrieval-then-answer pass under-serves at least one part.</p>
+
+    <h2>Why LangGraph (and why a framework at all)</h2>
+    <p>I've hand-rolled agent loops before — <a href="touchline.html">Touchline</a> is a from-scratch tool-use loop. Doing it by hand teaches you the internals; it also teaches you which parts are genuinely fiddly. Three of them are exactly what a graph framework makes declarative:</p>
+    <ul>
+      <li><strong>Typed shared state with reducers.</strong> When several researchers write back at once, you need a defined merge. LangGraph's annotated state channels do this; I'd otherwise be hand-managing concurrent dict updates.</li>
+      <li><strong>Map-reduce fan-out.</strong> The planner emits N sub-questions and the graph spawns one researcher each via LangGraph's <code>Send</code> API, fanning back into a single critic. No manual task pool.</li>
+      <li><strong>A cyclic, capped loop.</strong> critic ⇄ revise is a real cycle with an iteration limit and a conditional exit — a few lines of edges instead of a hand-written while-loop with its own bookkeeping.</li>
+    </ul>
+    <p>State is checkpointed with a <code>MemorySaver</code>, so every step is inspectable and the run is resumable. That's the case <em>for</em> a framework: the orchestration becomes the readable part, and the agent prompts become the thing you actually iterate on.</p>
+
+    <h2>The graph</h2>
+    <pre class="tree"><code>guard_in → planner ─┬─(Send)→ research(sub-q₁) ─┐
+                    ├──────→ research(sub-q₂) ─┼→ critic ⇄ revise → synthesiser → guard_out
+                    └──────→ research(sub-q₃) ─┘   └── capped revision loop ──┘</code></pre>
+    <ul>
+      <li><strong>guard_in</strong> — refuses personal advice, pricing and prompt-injection up front (a thin port of QuoteGuard's input guards); a block short-circuits straight to the end.</li>
+      <li><strong>planner</strong> — a supervisor that returns JSON sub-questions, tuned to prefer <em>one</em> sub-question unless the question clearly has several parts.</li>
+      <li><strong>research</strong> — fan-out worker: BM25-retrieve the top few chunks for its sub-question, draft a short answer that cites pages and uses the excerpts only.</li>
+      <li><strong>critic</strong> — a deterministic grounding check (are the cited pages real and present?) <em>and</em> one LLM faithfulness pass over all drafts; the deterministic verdict overrides the LLM's.</li>
+      <li><strong>revise</strong> — re-drafts only the flagged sub-questions, given the critic's reason; loops back to the critic until clean or the cap (1–2) is hit.</li>
+      <li><strong>synthesiser → guard_out</strong> — merge into one cited brief; a final grounding check + disclaimer.</li>
+    </ul>
+
+    <h2>The evaluation</h2>
+    <p>The point of reusing QuoteGuard's retrieval is a clean control. The <strong>baseline</strong> is single-shot RAG: retrieve once for the whole question, answer once — same model (<code>llama-3.1-8b</code> on Ollama), same BM25, same corpus. The only variable is orchestration. 15 questions, tagged <strong>simple</strong> (single-fact lookups drawn from QuoteGuard's gold set) or <strong>multi-part</strong> (authored to combine two or three facts, with gold pages = the union). All rates carry <strong>bootstrap 95% CIs</strong>.</p>
+    <p>Metrics are deliberately objective: <strong>grounded</strong> (the answer cites at least one page and every cited page was actually retrieved — i.e. no invented citations); <strong>gold-page coverage</strong> (the fraction of the question's gold supporting pages the answer cites); and <strong>cost</strong> (LLM calls, tokens, wall-clock). The critic's effect is measured within each run by comparing the grounding of the first-pass drafts to the post-loop drafts.</p>
+
+    <h2>What didn't work (kept, because the null is the finding)</h2>
+    <ul>
+      <li><strong>The planner over-decomposes.</strong> An early version split a flat yes/no ("is flood covered?") into four sub-questions, which both inflated cost and <em>lost</em> the gold page a single pass nailed. A firmer prompt with worked examples curbed it, but the tendency remains on borderline questions — and it's the main reason multi-agent is a bad deal on simple lookups.</li>
+      <li><strong>The critic doesn't always converge.</strong> On some questions it keeps flagging the same draft through every allowed revision and then synthesises anyway. The cap isn't a formality; it's load-bearing. A cheap grounding proxy is also game-able — it rewards a citation that's present and real, not necessarily one that supports the specific claim.</li>
+      <li><strong>An 8B model is a shaky grounder.</strong> This is inherited from QuoteGuard: the local model paraphrases well but mis-cites. The deterministic citation check catches fabricated pages; it can't make a weak model into a strong one.</li>
+    </ul>
+
+    <h2>Caveats</h2>
+    <ul>
+      <li>15 questions is a small set; CIs are wide and the headline is a direction, not a precise effect size.</li>
+      <li>Single document, single product line, single local model. The architecture generalises; the numbers are specific to this PDS and this 8B model.</li>
+      <li>Grounding here means "cited, real, present", a necessary-not-sufficient proxy for faithfulness. A proper NLI/judge faithfulness score is future work.</li>
+    </ul>
+
+    <h2>From prototype to production</h2>
+    <ul>
+      <li><strong>Route by complexity.</strong> The eval says it plainly: send simple questions to single-shot, reserve the desk for multi-part ones. A cheap classifier (or the planner's own sub-question count) is the switch.</li>
+      <li><strong>Stronger reasoning + retrieval.</strong> Swap in a frontier model (a one-flag <code>ChatAnthropic</code> change) and QuoteGuard's hybrid+rerank retriever; the 8B grounding ceiling is the current bottleneck.</li>
+      <li><strong>Real guardrails + a human in the loop.</strong> Wire QuoteGuard's full guardrail pipeline into <code>guard_in</code>/<code>guard_out</code>, and use LangGraph's <code>interrupt</code> to pause for human approval before a brief is released in a regulated setting.</li>
+      <li><strong>Observability.</strong> A persistent checkpointer + tracing (LangSmith) so every run's state, cost and revisions are auditable.</li>
+    </ul>
+    <p><a href="https://github.com/WillCatt/PolicyDesk" target="_blank" rel="noreferrer">Full code, the graph, and the eval harness →</a></p>
+  </article>
+</template>
+
+<!-- RESULTS: numbers on the eval set. -->
+<template id="tab-results">
+  <article class="writeup">
+    <p>Every number is measured on 15 questions (8 simple, 7 multi-part) over the Allianz Business PDS, comparing the LangGraph desk against single-shot RAG with the <strong>same model and retriever</strong>. Rates carry <strong>bootstrap 95% CIs</strong>. Reproduce with <code>eval/run.py</code>.</p>
+
+    <div class="statrow">
+      <div class="stat"><div class="num">+26 pts</div><div class="lbl">multi-agent's gold-page coverage gain over single-shot on multi-part questions (CI excludes zero)</div></div>
+      <div class="stat"><div class="num">−25 pts</div><div class="lbl">its coverage change on simple questions — orchestration overshoots one-fact lookups</div></div>
+      <div class="stat"><div class="num">7×</div><div class="lbl">the LLM calls of single-shot, per answer — the price of the desk</div></div>
+      <div class="stat"><div class="num">15</div><div class="lbl">questions, single-shot vs multi-agent, head-to-head (bootstrap CIs)</div></div>
+    </div>
+
+    <h2>How it's measured</h2>
+    <p><strong>Grounded</strong> = the answer cites ≥1 page and every cited page was actually retrieved (no fabricated citations). <strong>Gold-page coverage</strong> = fraction of the question's gold supporting pages the answer cites; on multi-part questions, where the gold is the union of two or three pages, this doubles as a completeness measure. <strong>Critic lift</strong> compares the grounding of the first-pass drafts to the post-loop drafts within each run. Cost is LLM calls / tokens / wall-clock.</p>
+
+    <h2>Multi-agent vs single-shot</h2>
+    <table class="metrics">
+      <thead><tr><th>Question type</th><th>System</th><th>Grounded</th><th>Gold coverage</th><th>LLM calls</th><th>Latency</th></tr></thead>
+      <tbody>
+        <tr><td rowspan="2">Simple</td><td>Single-shot</td><td>88%</td><td>62%</td><td>1.0</td><td>19s</td></tr>
+        <tr><td>Multi-agent</td><td>88%</td><td>38%</td><td>6.9</td><td>92s</td></tr>
+        <tr><td rowspan="2">Multi-part</td><td>Single-shot</td><td>86%</td><td>31%</td><td>1.0</td><td>19s</td></tr>
+        <tr class="overall"><td>Multi-agent</td><td>86%</td><td class="f1">57%</td><td>7.1</td><td>84s</td></tr>
+      </tbody>
+    </table>
+    <p class="run-note">The shape of the result: <strong>grounding</strong> (no fabricated citations) is identical for both systems everywhere. The difference is <strong>gold-page coverage</strong> — on multi-part questions the desk covers more of the answer than a single pass (57% vs 31%), because each part gets its own retrieval; on simple ones it covers <em>less</em> (38% vs 62%), because the planner tends to over-split a one-fact question. Orchestration is worth paying for only when the question is genuinely compound.</p>
+    <figure class="fig">
+      <img src="../assets/policydesk/quality_by_type.png" alt="Grounded rate and gold coverage, single-shot vs multi-agent, split by question type." />
+      <figcaption>Quality by question type. Multi-agent's advantage concentrates on multi-part questions; on simple ones the two are level.</figcaption>
+    </figure>
+
+    <h2>Does the critic loop help? (a null result)</h2>
+    <p>I expected the critic ⇄ revise loop to be the star. It wasn't. The share of grounded sub-answers barely moved across the loop (0.84 → 0.83, overlapping CIs). The deterministic grounding check — cited pages must be real and retrieved — already blocks fabrications before the loop runs, so the LLM revision mostly paraphrases, and on a few questions it over-edits a sound draft into a weaker one. The loop earns its keep as a <em>safety net</em> (it forces a citation where one is missing) rather than a grounding booster. A stronger model, or a real faithfulness judge instead of a citation-presence proxy, is where a genuine lift would come from.</p>
+    <figure class="fig">
+      <img src="../assets/policydesk/critic_lift.png" alt="Grounded sub-answer rate before vs after the critic loop — essentially flat." />
+      <figcaption>Grounding of sub-answers, first draft vs after the critic ⇄ revise loop — essentially flat (0.84 → 0.83).</figcaption>
+    </figure>
+
+    <h2>The price of orchestration</h2>
+    <p>Multi-agent is not free. A single-shot answer is one LLM call; a desk run is a planner call, one per researcher, a critic call per round, a revise call per flagged sub-question, and an editor call.</p>
+    <figure class="fig">
+      <img src="../assets/policydesk/cost.png" alt="Latency and LLM calls per answer, single-shot vs multi-agent." />
+      <figcaption>Cost per answer. The multiple is the case for routing simple questions away from the desk.</figcaption>
+    </figure>
+
+    <h2>A worked run</h2>
+    <div class="run">
+      <h3>Multi-part question, the desk's brief</h3>
+      <div class="io-label">Q — "Does the policy cover flood, and if a single event also causes storm damage, how many excesses apply?"</div>
+      <div class="anon-out">The policy does not automatically provide cover for loss or damage caused by flood (p. 7); flood is an optional benefit under the Commercial Property Section. Where a single event causes damage under more than one section, only one excess applies to all damage from that event within a 72-hour period (p. 24).</div>
+      <p class="run-note">Two parts, each grounded on its own page. The single-shot baseline tends to answer the flood half and drop the excess half. Watch the planner split it and the critic check both drafts in the <a href="#" onclick="document.querySelector('[data-tab=app]')?.click();return false;">App tab</a>.</p>
+    </div>
+    <p style="color:var(--text-muted);font-size:13px">Reproduce: <code>python eval/run.py</code> (multi-agent vs baseline + critic ablation, bootstrap CIs) · <code>python figures/build_portfolio_figures.py</code>.</p>
+  </article>
+</template>
+
+<!-- CODE: repo structure + key snippets. -->
+<template id="tab-code">
+  <article class="code-tab">
+    <h2>Repository</h2>
+    <p><a href="https://github.com/WillCatt/PolicyDesk" target="_blank" rel="noreferrer">⌥ github.com/WillCatt/PolicyDesk ↗</a></p>
+    <p style="color:var(--text-muted);font-size:14px">Python · LangGraph · langchain-ollama · rank-bm25 · Ollama (llama-3.1-8b) · pytest. Reuses the <a href="quoteguard.html">QuoteGuard</a> PDS corpus + retrieval approach; the new layer is the orchestration.</p>
+
+    <h2>Structure</h2>
+    <pre class="tree"><code>src/policydesk/
+├── graph.py        StateGraph wiring: fan-out + critic⇄revise loop + checkpointer
+├── state.py        DeskState (typed) + reducers for the fan-out merge
+├── nodes/          guarding · planner · research · critic (+revise) · synthesizer
+├── retrieval.py    BM25 over the 138 PDS chunks
+├── models.py       ChatOllama / ChatAnthropic factory + usage capture
+├── guards.py       input refusals + output grounding/citation checks
+└── baseline.py     single-shot RAG (the control)
+eval/    run.py (multi vs baseline + ablation, bootstrap CIs) · export_demo.py
+figures/ build_portfolio_figures.py   ·   tests/ (graph runs without Ollama)</code></pre>
+
+    <h2>The graph, in one function</h2>
+    <p>The whole orchestration is declarative: nodes, a <code>Send</code> fan-out from the planner, and a conditional edge that forms the critic ⇄ revise cycle.</p>
+    <pre><code class="lang-python">def build_graph(checkpointer=None):
+    g = StateGraph(DeskState)
+    for name, fn in [("guard_in", guard_in), ("planner", planner), ("research", research),
+                     ("critic", critic), ("revise", revise),
+                     ("synthesizer", synthesizer), ("guard_out", guard_out)]:
+        g.add_node(name, fn)
+    g.add_edge(START, "guard_in")
+    g.add_conditional_edges("guard_in", _after_guard_in, {"blocked": END, "ok": "planner"})
+    g.add_conditional_edges("planner", _fan_out_research, ["research"])   # Send map-reduce
+    g.add_edge("research", "critic")                                       # fan back in
+    g.add_conditional_edges("critic", _after_critic, {"revise": "revise", "synthesize": "synthesizer"})
+    g.add_edge("revise", "critic")                                         # the cycle
+    g.add_edge("synthesizer", "guard_out")
+    g.add_edge("guard_out", END)
+    return g.compile(checkpointer=checkpointer or MemorySaver())</code></pre>
+
+    <h2>Fan-out + the capped loop</h2>
+    <pre><code class="lang-python">def _fan_out_research(state):                 # one researcher per sub-question
+    return [Send("research", {"question": state["question"], "subquestion": sq})
+            for sq in state["subquestions"]]
+
+def _after_critic(state):                     # loop until clean or the cap is hit
+    cap = state.get("max_revisions", settings.max_revisions)
+    flagged = any(c["verdict"] == "revise" for c in state.get("critiques", []))
+    return "revise" if flagged and state.get("revision_count", 0) < cap else "synthesize"</code></pre>
+
+    <h2>The critic: deterministic check overrides the LLM</h2>
+    <p>A cheap, exact grounding check runs first; the LLM faithfulness verdict can't rescue a draft that cites a page it never retrieved.</p>
+    <pre><code class="lang-python">g = check_grounding(draft, evidence_pages)        # cited ⊆ retrieved, and ≥1 citation
+if not g.grounded:
+    verdict = "revise"                             # deterministic override
+    reason = "No page citation." if not g.has_citation else f"Cites pages not in evidence {g.unsupported_pages}."
+else:
+    verdict = "revise" if llm_verdict == "revise" else "pass"</code></pre>
+  </article>
+</template>
+
+<!-- APP: in-browser demo. -->
+<template id="tab-app">
+  <article class="app-tab">
+    <p>Watch the real multi-agent graph run. Pick a question, then <strong>play</strong> or step through it: the planner splits the question, a researcher lights up per sub-question, the critic flags weak drafts and the reviser fixes them, and the editor produces the final cited brief — shown beside what single-shot RAG returned for the same question. Below it, a <strong>live BM25 retriever</strong> you can type into.</p>
+    <p style="font-size:14px;color:var(--text-muted)"><strong>This runs entirely in your browser — no server, no API.</strong> The graph topology, the sub-question split, the retrieved evidence, the recorded agent outputs and the live retriever are all real; the LLM reasoning is pre-recorded from a local <code>llama-3.1-8b</code> run. The <a href="#" onclick="document.querySelector('[data-tab=results]')?.click();return false;">Results</a> tab has the measured numbers.</p>
+    <div id="pd-demo"><p class="pd-loading">Loading the in-browser demo…</p></div>
+  </article>
+</template>
+<script src="../assets/policydesk/demo.js" defer></script>
+
+</body>
+</html>

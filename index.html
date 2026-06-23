@@ -110,6 +110,14 @@ const PROJECTS = [
     chart: "assets/touchline/accuracy_by_category.png",
     color: "oklch(54% 0.12 160)", status: "wip", priority: 3,
     tags: ["Agents", "Tool Use", "Text-to-SQL", "Evals"], year: 2026, q: "Q2" },
+  { id: "policydesk", index: "09", title: "PolicyDesk",
+    href: "projects/policydesk.html",
+    subtitle: "A LangGraph multi-agent research desk over an insurance policy",
+    hook: "A planner, researchers and a critic. *Does multi-agent actually win?*",
+    chips: ["+26pts on multi-part", "7× the LLM calls"],
+    chart: "assets/policydesk/gain_by_type.png",
+    color: "oklch(52% 0.14 295)", status: "wip", priority: 3.2,
+    tags: ["LangGraph", "Multi-agent", "Agents", "RAG"], year: 2026, q: "Q2" },
   { id: "redteam", index: "08", title: "Red-Team Lab",
     href: "projects/redteam.html",
     subtitle: "Attacking an LLM SQL agent — what a guardrail actually stops",
@@ -143,7 +151,7 @@ const PROJECTS = [
 const FEATURED_ALL = PROJECTS
   .filter(p => p.status !== "planned")
   .sort((a, b) => (a.priority ?? 99) - (b.priority ?? 99));
-const DEFAULT_LIMIT = 6;
+const DEFAULT_LIMIT = 7;
 
 // Skills cell — grouped stack, evidenced by the projects above.
 const SKILLS = [
