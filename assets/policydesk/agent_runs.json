@@ -78,7 +78,7 @@
     "llm_calls": 7,
     "tokens": 11621
    },
-   "latency_s": 87.6,
+   "latency_s": 83.9,
    "trace": [
     {
      "node": "guard_in",
@@ -92,7 +92,7 @@
       "If a single event triggers claims under both flood and storm sections, how many excesses apply?"
      ],
      "n": 2,
-     "latency_s": 2.68
+     "latency_s": 2.59
     },
     {
      "node": "research",
@@ -102,7 +102,7 @@
       7,
       30
      ],
-     "latency_s": 14.66
+     "latency_s": 14.18
     },
     {
      "node": "research",
@@ -114,7 +114,7 @@
       95,
       96
      ],
-     "latency_s": 29.36
+     "latency_s": 28.6
     },
     {
      "node": "critic",
@@ -137,13 +137,13 @@
        "reason": "The answer does not address the specific scenario of a single event triggering claims under both flood and storm sections. The cited excerpt (p. 24) only mentions that if a single event results in claiming under more than one Section, then only the single highest Excess will apply to all claims. However, it does not specify how many excesses apply in this scenario."
       }
      ],
-     "latency_s": 10.6
+     "latency_s": 10.55
     },
     {
      "node": "revise",
      "label": "re-drafted",
      "subquestion": "If a single event triggers claims under both flood and storm sections, how many excesses apply?",
-     "latency_s": 21.58
+     "latency_s": 20.57
     },
     {
      "node": "critic",
@@ -166,12 +166,12 @@
        "reason": "The draft answer states that the excerpt implies only one excess applies, but it does not directly address the question of how many excesses apply in this scenario. The relevant excerpt (p. 24) mentions that 'only one Excess will apply to all Damage resulting from' a list of events, but flood and storm are not explicitly mentioned. Therefore, the answer is incomplete and requires further clarification."
       }
      ],
-     "latency_s": 12.26
+     "latency_s": 11.29
     },
     {
      "node": "synthesizer",
      "label": "composed brief",
-     "latency_s": 10.98
+     "latency_s": 10.18
     },
     {
      "node": "guard_out",
@@ -271,7 +271,7 @@
     "llm_calls": 7,
     "tokens": 11064
    },
-   "latency_s": 69.6,
+   "latency_s": 69.2,
    "trace": [
     {
      "node": "guard_in",
@@ -285,7 +285,7 @@
       "Which excess applies when one event triggers claims under more than one section?"
      ],
      "n": 2,
-     "latency_s": 2.37
+     "latency_s": 2.32
     },
     {
      "node": "research",
@@ -298,7 +298,7 @@
       12,
       16
      ],
-     "latency_s": 29.03
+     "latency_s": 15.59
     },
     {
      "node": "research",
@@ -311,7 +311,7 @@
       66,
       67
      ],
-     "latency_s": 13.92
+     "latency_s": 28.88
     },
     {
      "node": "critic",
@@ -334,13 +334,13 @@
        "reason": "The draft answer cites page 24, but the relevant snippet is actually about payment of excess in general, not specifically about multiple sections. The correct citation for this sub-question would be p. 16."
       }
      ],
-     "latency_s": 8.88
+     "latency_s": 8.72
     },
     {
      "node": "revise",
      "label": "re-drafted",
      "subquestion": "Which excess applies when one event triggers claims under more than one section?",
-     "latency_s": 14.24
+     "latency_s": 14.31
     },
     {
      "node": "critic",
@@ -363,12 +363,12 @@
        "reason": "Cites page(s) not in evidence ([16]). The answer drifts off-topic by mentioning Turnover elsewhere after Damage and Under-insurance, which are unrelated to the question about excess when one event triggers claims under more than one section."
       }
      ],
-     "latency_s": 8.5
+     "latency_s": 8.52
     },
     {
      "node": "synthesizer",
      "label": "composed brief",
-     "latency_s": 6.5
+     "latency_s": 6.29
     },
     {
      "node": "guard_out",
@@ -464,7 +464,7 @@
     "llm_calls": 7,
     "tokens": 11285
    },
-   "latency_s": 155.2,
+   "latency_s": 149.8,
    "trace": [
     {
      "node": "guard_in",
@@ -478,7 +478,7 @@
       "Are there any exclusions or limitations to these sections?"
      ],
      "n": 2,
-     "latency_s": 4.9
+     "latency_s": 6.12
     },
     {
      "node": "research",
@@ -490,7 +490,7 @@
       11,
       12
      ],
-     "latency_s": 34.68
+     "latency_s": 69.43
     },
     {
      "node": "research",
@@ -502,7 +502,7 @@
       9,
       19
      ],
-     "latency_s": 66.98
+     "latency_s": 39.85
     },
     {
      "node": "critic",
@@ -525,13 +525,13 @@
        "reason": "Cites page(s) not in evidence ([6]). The answer drifts off-topic by mentioning p. 7 and p. 6, which are not relevant to the sub-question about exclusions or limitations in the sections covered by the policy."
       }
      ],
-     "latency_s": 17.53
+     "latency_s": 15.16
     },
     {
      "node": "revise",
      "label": "re-drafted",
      "subquestion": "Are there any exclusions or limitations to these sections?",
-     "latency_s": 31.26
+     "latency_s": 29.08
     },
     {
      "node": "critic",
@@ -554,12 +554,12 @@
        "reason": "The answer drifts off-topic by mentioning a table that is not relevant to the sub-question. The correct answer should only mention exclusions and limitations mentioned in the policy document."
       }
      ],
-     "latency_s": 16.76
+     "latency_s": 15.06
     },
     {
      "node": "synthesizer",
      "label": "composed brief",
-     "latency_s": 17.64
+     "latency_s": 14.86
     },
     {
      "node": "guard_out",
@@ -632,7 +632,7 @@
     "llm_calls": 6,
     "tokens": 7176
    },
-   "latency_s": 77.5,
+   "latency_s": 49.5,
    "trace": [
     {
      "node": "guard_in",
@@ -645,7 +645,7 @@
       "How long is the cooling off period?"
      ],
      "n": 1,
-     "latency_s": 3.43
+     "latency_s": 3.08
     },
     {
      "node": "research",
@@ -657,7 +657,7 @@
       13,
       14
      ],
-     "latency_s": 25.71
+     "latency_s": 20.62
     },
     {
      "node": "critic",
@@ -674,13 +674,13 @@
        "reason": "The draft answer claims a 14 day cooling off period applies, but the provided evidence snippets do not mention any cooling off period. The relevant snippet (p. 10) discusses the basis of cover provision and duty of disclosure."
       }
      ],
-     "latency_s": 10.46
+     "latency_s": 5.52
     },
     {
      "node": "revise",
      "label": "re-drafted",
      "subquestion": "How long is the cooling off period?",
-     "latency_s": 26.19
+     "latency_s": 13.43
     },
     {
      "node": "critic",
@@ -697,12 +697,12 @@
        "reason": "No page citation. The draft answer claims that the document does not cover a cooling off period. However, there is no mention of a cooling off period in any of the provided evidence snippets."
       }
      ],
-     "latency_s": 9.22
+     "latency_s": 4.9
     },
     {
      "node": "synthesizer",
      "label": "composed brief",
-     "latency_s": 2.4
+     "latency_s": 1.83
     },
     {
      "node": "guard_out",
