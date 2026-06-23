@@ -39,8 +39,8 @@
 <template id="tab-overview">
   <article class="writeup">
     <h2>The problem</h2>
-    <p>A single-shot Q&amp;A bot (like its sibling <a href="quoteguard.html">QuoteGuard</a>) does one retrieval and writes one answer. That works for one fact. Real policy questions are rarely one fact: <em>"Is flood covered, and if a storm hits in the same event, how many excesses apply?"</em> is three questions wearing a trench coat. Ask a single pass and it tends to answer the loudest part, gloss the rest, and occasionally assert something the document doesn't actually say.</p>
-    <p>The interesting question isn't whether an LLM can answer insurance questions. It's whether handing the job to a small <strong>team of specialised agents</strong> — one to plan, several to research, one to check the work — produces a better, better-grounded answer than one model doing it all at once, or whether it's just more moving parts and more cost for the same result.</p>
+    <p>A single-shot Q&amp;A bot (like its sibling <a href="quoteguard.html">QuoteGuard</a>) does one retrieval and writes one answer. That works for one fact. Real policy questions are rarely one fact: <em>"Is flood covered, and if a storm hits in the same event, how many excesses apply?"</em> is three questions wearing a trench coat. Ask a single pass and it usually answers the loudest part and skims the rest, sometimes asserting something the document never says.</p>
+    <p>The interesting question is whether handing the job to a small <strong>team of specialised agents</strong> (one to plan, several to research, one to check the work) produces a better-grounded answer than one model doing it all at once, or whether it just adds moving parts and cost for the same result.</p>
 
     <h2>What I built</h2>
     <p>PolicyDesk is a research desk built on <strong>LangGraph</strong>. Given a question about the Allianz Business PDS, it runs a small org chart:</p>
@@ -50,18 +50,18 @@
       <li>A <strong>critic</strong> reads every draft against its cited evidence and sends weak ones back for revision — a loop, capped so it can't spin forever.</li>
       <li>An <strong>editor</strong> merges the verified findings into one cited brief; guardrails sit on the way in and out.</li>
     </ul>
-    <p>It deliberately reuses QuoteGuard's corpus and BM25 retrieval, which let me do the thing that makes this a study rather than a demo: <strong>measure the multi-agent desk head-to-head against plain single-shot RAG</strong>, same model, same retriever, only the orchestration changes.</p>
+    <p>It reuses QuoteGuard's corpus and BM25 retrieval on purpose, so I could <strong>measure the multi-agent desk head-to-head against plain single-shot RAG</strong>: same model, same retriever, with only the orchestration changing.</p>
 
     <h2>Does multi-agent actually win?</h2>
-    <p>Sometimes — and the "when" is the whole point. On <strong>multi-part</strong> questions the desk covers more of the source material than a single pass (gold-page coverage 57% vs 31%). On <strong>simple</strong> lookups it does a little <em>worse</em> (38% vs 62%): the planner tends to over-split a one-fact question, and the extra machinery adds ways to go wrong. Both approaches cite their sources equally reliably; the difference is purely how completely they answer.</p>
+    <p>Sometimes, and which times matters. On <strong>multi-part</strong> questions the desk covers more of the source material than a single pass (gold-page coverage 57% vs 31%). On <strong>simple</strong> lookups it does a little <em>worse</em> (38% vs 62%): the planner over-splits a one-fact question, and the extra machinery adds ways to go wrong. Both approaches cite their sources equally reliably; the difference is how completely they answer.</p>
     <img src="../assets/policydesk/gain_by_type.png" alt="Multi-agent improves gold-page coverage on multi-part questions but loses on simple ones." />
     <a class="deeper" href="#" onclick="document.querySelector('[data-tab=results]')?.click();return false;">See the full comparison →</a>
 
     <h2>Does the critic earn its keep?</h2>
-    <p>Less than I expected, and that's worth saying plainly. The critic does catch drafts that cite nothing or cite a page they never read, and bounces them back. But across the eval the revision loop didn't actually raise grounding (it went 0.84 → 0.83). The reason is instructive: a cheap, deterministic check already blocks fabricated citations before the loop runs, so the extra LLM revision mostly re-words, and occasionally talks a good draft into a worse one. The deterministic guard does the heavy lifting; the LLM critic loop, with a small model, is close to a no-op here.</p>
+    <p>Less than I expected. The critic does catch drafts that cite nothing or cite a page they never read, and bounces them back. But across the eval the revision loop didn't raise grounding (it went 0.84 → 0.83). A cheap deterministic check already blocks fabricated citations before the loop runs, so the extra LLM revision mostly re-words, and now and then talks a good draft into a worse one. The deterministic guard does the heavy lifting; with a small model the LLM critic loop is close to a no-op.</p>
     <a class="deeper" href="#" onclick="document.querySelector('[data-tab=technical]')?.click();return false;">How the graph and the critic loop work →</a>
 
-    <blockquote>The headline isn't "multi-agent is better". It's that orchestration is a <em>tool with a cost</em>: it buys grounding and completeness on hard, multi-part questions, and wastes money on easy ones. A sensible system routes by complexity. <a href="#" onclick="document.querySelector('[data-tab=app]')?.click();return false;">Watch the desk run →</a></blockquote>
+    <blockquote>Multi-agent orchestration buys completeness on hard, multi-part questions and burns calls on easy ones. The design lesson is to route by complexity: send the easy questions to a single pass, and keep the desk for the compound ones. <a href="#" onclick="document.querySelector('[data-tab=app]')?.click();return false;">Watch the desk run →</a></blockquote>
   </article>
 </template>
 
@@ -69,16 +69,16 @@
 <template id="tab-technical">
   <article class="writeup">
     <h2>The task &amp; corpus</h2>
-    <p>Same document as QuoteGuard: the <strong>Allianz Business Insurance Pack PDS</strong>, 100 pages, parsed (with docling) into 138 section-aware chunks that each carry a heading path and page numbers. The new problem is shape, not source: questions that genuinely have several parts, where a single retrieval-then-answer pass under-serves at least one part.</p>
+    <p>Same document as QuoteGuard: the <strong>Allianz Business Insurance Pack PDS</strong>, 100 pages, parsed (with docling) into 138 section-aware chunks that each carry a heading path and page numbers. What changes is the question shape: compound questions with several parts, where a single retrieval-then-answer pass under-serves at least one of them.</p>
 
     <h2>Why LangGraph (and why a framework at all)</h2>
-    <p>I've hand-rolled agent loops before — <a href="touchline.html">Touchline</a> is a from-scratch tool-use loop. Doing it by hand teaches you the internals; it also teaches you which parts are genuinely fiddly. Three of them are exactly what a graph framework makes declarative:</p>
+    <p>I've hand-rolled agent loops before; <a href="touchline.html">Touchline</a> is a from-scratch tool-use loop. Doing it by hand teaches you the internals, and which parts are most fiddly. Three of those are what a graph framework makes declarative:</p>
     <ul>
       <li><strong>Typed shared state with reducers.</strong> When several researchers write back at once, you need a defined merge. LangGraph's annotated state channels do this; I'd otherwise be hand-managing concurrent dict updates.</li>
       <li><strong>Map-reduce fan-out.</strong> The planner emits N sub-questions and the graph spawns one researcher each via LangGraph's <code>Send</code> API, fanning back into a single critic. No manual task pool.</li>
       <li><strong>A cyclic, capped loop.</strong> critic ⇄ revise is a real cycle with an iteration limit and a conditional exit — a few lines of edges instead of a hand-written while-loop with its own bookkeeping.</li>
     </ul>
-    <p>State is checkpointed with a <code>MemorySaver</code>, so every step is inspectable and the run is resumable. That's the case <em>for</em> a framework: the orchestration becomes the readable part, and the agent prompts become the thing you actually iterate on.</p>
+    <p>State is checkpointed with a <code>MemorySaver</code>, so every step is inspectable and the run is resumable. That's the case <em>for</em> a framework: the orchestration becomes the readable part, and the agent prompts become what you iterate on.</p>
 
     <h2>The graph</h2>
     <pre class="tree"><code>guard_in → planner ─┬─(Send)→ research(sub-q₁) ─┐
@@ -94,8 +94,8 @@
     </ul>
 
     <h2>The evaluation</h2>
-    <p>The point of reusing QuoteGuard's retrieval is a clean control. The <strong>baseline</strong> is single-shot RAG: retrieve once for the whole question, answer once — same model (<code>llama-3.1-8b</code> on Ollama), same BM25, same corpus. The only variable is orchestration. 15 questions, tagged <strong>simple</strong> (single-fact lookups drawn from QuoteGuard's gold set) or <strong>multi-part</strong> (authored to combine two or three facts, with gold pages = the union). All rates carry <strong>bootstrap 95% CIs</strong>.</p>
-    <p>Metrics are deliberately objective: <strong>grounded</strong> (the answer cites at least one page and every cited page was actually retrieved — i.e. no invented citations); <strong>gold-page coverage</strong> (the fraction of the question's gold supporting pages the answer cites); and <strong>cost</strong> (LLM calls, tokens, wall-clock). The critic's effect is measured within each run by comparing the grounding of the first-pass drafts to the post-loop drafts.</p>
+    <p>The point of reusing QuoteGuard's retrieval is a clean control. The <strong>baseline</strong> is single-shot RAG: retrieve once for the whole question, answer once, on the same model (<code>llama-3.1-8b</code> on Ollama), same BM25, same corpus. The only variable is orchestration. 15 questions, tagged <strong>simple</strong> (single-fact lookups drawn from QuoteGuard's gold set) or <strong>multi-part</strong> (authored to combine two or three facts, with gold pages = the union). All rates carry <strong>bootstrap 95% CIs</strong>.</p>
+    <p>The metrics are objective: <strong>grounded</strong> (the answer cites at least one page and every cited page was in the retrieved set, so no invented citations); <strong>gold-page coverage</strong> (the fraction of the question's gold supporting pages the answer cites); and <strong>cost</strong> (LLM calls, tokens, wall-clock). The critic's effect is measured within each run by comparing the grounding of the first-pass drafts to the post-loop drafts.</p>
 
     <h2>What didn't work (kept, because the null is the finding)</h2>
     <ul>
@@ -113,7 +113,7 @@
 
     <h2>From prototype to production</h2>
     <ul>
-      <li><strong>Route by complexity.</strong> The eval says it plainly: send simple questions to single-shot, reserve the desk for multi-part ones. A cheap classifier (or the planner's own sub-question count) is the switch.</li>
+      <li><strong>Route by complexity.</strong> Send simple questions to single-shot and reserve the desk for multi-part ones. A cheap classifier, or the planner's own sub-question count, can be the switch.</li>
       <li><strong>Stronger reasoning + retrieval.</strong> Swap in a frontier model (a one-flag <code>ChatAnthropic</code> change) and QuoteGuard's hybrid+rerank retriever; the 8B grounding ceiling is the current bottleneck.</li>
       <li><strong>Real guardrails + a human in the loop.</strong> Wire QuoteGuard's full guardrail pipeline into <code>guard_in</code>/<code>guard_out</code>, and use LangGraph's <code>interrupt</code> to pause for human approval before a brief is released in a regulated setting.</li>
       <li><strong>Observability.</strong> A persistent checkpointer + tracing (LangSmith) so every run's state, cost and revisions are auditable.</li>
@@ -147,7 +147,7 @@
         <tr class="overall"><td>Multi-agent</td><td>86%</td><td class="f1">57%</td><td>7.1</td><td>84s</td></tr>
       </tbody>
     </table>
-    <p class="run-note">The shape of the result: <strong>grounding</strong> (no fabricated citations) is identical for both systems everywhere. The difference is <strong>gold-page coverage</strong> — on multi-part questions the desk covers more of the answer than a single pass (57% vs 31%), because each part gets its own retrieval; on simple ones it covers <em>less</em> (38% vs 62%), because the planner tends to over-split a one-fact question. Orchestration is worth paying for only when the question is genuinely compound.</p>
+    <p class="run-note">The shape of the result: <strong>grounding</strong> (no fabricated citations) is identical for both systems everywhere. The difference is <strong>gold-page coverage</strong> — on multi-part questions the desk covers more of the answer than a single pass (57% vs 31%), because each part gets its own retrieval; on simple ones it covers <em>less</em> (38% vs 62%), because the planner over-splits a one-fact question. Orchestration earns its cost only when the question really has several parts.</p>
     <figure class="fig">
       <img src="../assets/policydesk/quality_by_type.png" alt="Grounded rate and gold coverage, single-shot vs multi-agent, split by question type." />
       <figcaption>Quality by question type. Multi-agent's advantage concentrates on multi-part questions; on simple ones the two are level.</figcaption>
@@ -172,7 +172,7 @@
       <h3>Multi-part question, the desk's brief</h3>
       <div class="io-label">Q — "Does the policy cover flood, and if a single event also causes storm damage, how many excesses apply?"</div>
       <div class="anon-out">The policy does not automatically provide cover for loss or damage caused by flood (p. 7); flood is an optional benefit under the Commercial Property Section. Where a single event causes damage under more than one section, only one excess applies to all damage from that event within a 72-hour period (p. 24).</div>
-      <p class="run-note">Two parts, each grounded on its own page. The single-shot baseline tends to answer the flood half and drop the excess half. Watch the planner split it and the critic check both drafts in the <a href="#" onclick="document.querySelector('[data-tab=app]')?.click();return false;">App tab</a>.</p>
+      <p class="run-note">Two parts, each grounded on its own page. The single-shot baseline usually answers the flood half and drops the excess half. Watch the planner split it and the critic check both drafts in the <a href="#" onclick="document.querySelector('[data-tab=app]')?.click();return false;">App tab</a>.</p>
     </div>
     <p style="color:var(--text-muted);font-size:13px">Reproduce: <code>python eval/run.py</code> (multi-agent vs baseline + critic ablation, bootstrap CIs) · <code>python figures/build_portfolio_figures.py</code>.</p>
   </article>
