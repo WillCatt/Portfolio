@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Touchline · William Catt</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-  <meta name="description" content="Touchline: a tool-using agent that answers natural-language questions about 150 years of international football by writing its own SQL, running it, and charting the result. An open-model bake-off (qwen2.5-coder vs llama3.1, frontier benchmark next) scored on a golden question set, with a zero-cost in-browser demo. By William Catt." />
+  <meta name="description" content="Touchline: a tool-using agent that answers natural-language questions about 150 years of international football by writing its own SQL, running it, and charting the result. An open-model bake-off (qwen2.5-coder vs llama3.1) against a Claude Opus 4.8 frontier benchmark, scored on a golden question set, with a zero-cost in-browser demo. By William Catt." />
   <link rel="canonical" href="https://williamcatt.dev/projects/touchline.html" />
   <meta property="og:type" content="article" />
   <meta property="og:title" content="Touchline — an agentic football analyst" />
@@ -22,7 +22,7 @@
     title: "Touchline",
     subtitle: "An agent that answers football questions by writing its own SQL",
     color: "oklch(54% 0.12 160)",
-    status: "wip", // "live" | "wip" | "archived"
+    status: "live", // "live" | "wip" | "archived"
     tags: ["Agents","Tool Use","Text-to-SQL","Evals","Fine-tuning"],
     repo: "github.com/WillCatt/Touchline",
     demo: true,
@@ -51,18 +51,25 @@
       own memory.
       <a class="deeper" href="#" onclick="document.querySelector('[data-tab=technical]')?.click();return false;">How it works under the hood →</a></p>
 
-    <h2>Finding — the code model didn't win</h2>
+    <h2>Finding — the code model didn't win; the frontier model swept</h2>
     <p>The question I cared about wasn't whether an LLM can write SQL (it can), but which model you
       actually need to run this. I gave the same agent two models that run free on a laptop:
       <strong>qwen2.5-coder:7b</strong>, tuned for code, and <strong>llama3.1:8b</strong>, a general
-      model. Both answered the same 30 questions. (Claude Opus 4.8 will join the same test later, as a
-      paid-model benchmark.)</p>
+      model — then ran <strong>Claude Opus 4.8</strong> through the identical harness as a paid frontier
+      benchmark. All three answered the same 30 questions.</p>
     <figure class="fig">
-      <img src="../assets/touchline/accuracy_frontier_vs_local.png" alt="Answer accuracy: qwen2.5-coder vs llama3.1, with 95% confidence intervals." />
-      <figcaption>Answer accuracy on the 30 questions, with bootstrap 95% confidence intervals. The
-        code-tuned model is a few points ahead, but the intervals overlap, so the difference isn't real.
+      <img src="../assets/touchline/accuracy_frontier_vs_local.png" alt="Answer accuracy: Claude Opus 4.8 vs qwen2.5-coder vs llama3.1, with 95% confidence intervals." />
+      <figcaption>Answer accuracy on the 30 questions, with bootstrap 95% confidence intervals. The two
+        local models are a statistical tie; Opus 4.8 answers every question correctly.
         <a class="deeper" href="#" onclick="document.querySelector('[data-tab=results]')?.click();return false;">See the full scorecard →</a></figcaption>
     </figure>
+    <p><strong>Opus 4.8 scored 100%</strong> — every question, every category, and every query it wrote
+      was valid SQL. It did it at <strong>0.8¢ per question</strong> (24 cents for the whole run) and, to
+      my surprise, <em>faster</em> than either local model (4.9s vs 8.1s and 5.4s) despite being a network
+      round-trip. The frontier model removes accuracy from the decision entirely: the choice between local
+      and frontier here isn't "which is right" but "free, on-device, private" against "perfect, paid, and
+      networked." That's exactly why the zero-cost on-device demo below is the interesting artefact — the
+      frontier ceiling is known, the open question is how close free gets you.</p>
     <p>The code model scored <strong>77%</strong> and the general model <strong>73%</strong>: close
       enough, given the confidence intervals, to call a tie. The averages hide the more interesting part.
       The general model wrote working SQL far more often (<strong>86%</strong> of its queries ran, against
@@ -123,11 +130,11 @@
     <p>The same loop, the same tools, the same prompt — only the “brain” swaps behind one interface, so
       every model is a like-for-like comparison:</p>
     <ul>
-      <li><strong>Local (now):</strong> two models via Ollama — qwen2.5-coder:7b (code-tuned) and
+      <li><strong>Local:</strong> two models via Ollama — qwen2.5-coder:7b (code-tuned) and
         llama3.1:8b (general) — both free, on-device, no network.</li>
-      <li><strong>Frontier (next):</strong> Claude Opus 4.8 via the Anthropic API, native tool use,
+      <li><strong>Frontier:</strong> Claude Opus 4.8 via the Anthropic API, native tool use,
         adaptive thinking, with the system+tools prefix marked for prompt caching — the ceiling the
-        local models get measured against.</li>
+        local models get measured against. Cost is computed from real token usage per call.</li>
     </ul>
 
     <h2>What didn't work (kept in)</h2>
@@ -201,10 +208,10 @@
 <template id="tab-results">
   <article class="writeup">
     <div class="statrow">
-      <div class="stat"><div class="num">77%</div><div class="lbl">Best accuracy — qwen2.5-coder:7b (CI 60–90%); llama3.1:8b a near-tie at 73% (CI 57–87%)</div></div>
-      <div class="stat"><div class="num">86%</div><div class="lbl">llama's valid-SQL rate — vs qwen's 68%. The general model writes cleaner SQL</div></div>
-      <div class="stat"><div class="num">2×</div><div class="lbl">llama recovers from its own SQL errors twice as often (67% vs 33%)</div></div>
-      <div class="stat"><div class="num">$0</div><div class="lbl">both models run on-device; a frontier benchmark (Opus 4.8) lands next</div></div>
+      <div class="stat"><div class="num">100%</div><div class="lbl">Claude Opus 4.8 — every question, every category, 100% valid SQL (CI 100–100%)</div></div>
+      <div class="stat"><div class="num">77% ≈ 73%</div><div class="lbl">the local tie — qwen2.5-coder:7b vs llama3.1:8b, CIs overlap; code-tuning no clean win</div></div>
+      <div class="stat"><div class="num">0.8¢</div><div class="lbl">Opus per question (24¢ for the whole run) — and faster than local: 4.9s vs 8.1 / 5.4s</div></div>
+      <div class="stat"><div class="num">$0</div><div class="lbl">both local models run on-device, no network — the differentiator the frontier ceiling can't match</div></div>
     </div>
 
     <h2>How it's measured</h2>
@@ -213,24 +220,26 @@
       carries a bootstrap 95% CI. Full method is in the <a href="#" onclick="document.querySelector('[data-tab=technical]')?.click();return false;">Technical</a> tab.</p>
 
     <h2>Accuracy by question type</h2>
-    <p>Where the local model holds up, and where it doesn't:</p>
+    <p>The frontier sweep, and where the local models hold up or fall down:</p>
     <table class="metrics">
-      <thead><tr><th>Category</th><th>qwen2.5-coder:7b</th><th>llama3.1:8b</th></tr></thead>
+      <thead><tr><th>Category</th><th>Claude Opus 4.8</th><th>qwen2.5-coder:7b</th><th>llama3.1:8b</th></tr></thead>
       <tbody>
-        <tr><td>head_to_head</td><td>25%</td><td class="f1">100%</td></tr>
-        <tr><td>conditional</td><td class="f1">100%</td><td>50%</td></tr>
-        <tr><td>aggregation</td><td class="f1">80%</td><td>60%</td></tr>
-        <tr><td>superlative</td><td class="f1">100%</td><td>75%</td></tr>
-        <tr><td>lookup</td><td>80%</td><td>80%</td></tr>
-        <tr><td>multi_step</td><td>50%</td><td>50%</td></tr>
-        <tr><td>trend</td><td>100%</td><td>100%</td></tr>
-        <tr class="overall"><td>Overall</td><td class="f1">77%</td><td>73%</td></tr>
+        <tr><td>head_to_head</td><td class="f1">100%</td><td>25%</td><td class="f1">100%</td></tr>
+        <tr><td>conditional</td><td class="f1">100%</td><td class="f1">100%</td><td>50%</td></tr>
+        <tr><td>aggregation</td><td class="f1">100%</td><td>80%</td><td>60%</td></tr>
+        <tr><td>superlative</td><td class="f1">100%</td><td class="f1">100%</td><td>75%</td></tr>
+        <tr><td>lookup</td><td class="f1">100%</td><td>80%</td><td>80%</td></tr>
+        <tr><td>multi_step</td><td class="f1">100%</td><td>50%</td><td>50%</td></tr>
+        <tr><td>trend</td><td class="f1">100%</td><td class="f1">100%</td><td class="f1">100%</td></tr>
+        <tr class="overall"><td>Overall</td><td class="f1">100%</td><td>77%</td><td>73%</td></tr>
       </tbody>
     </table>
-    <p class="run-note">Both columns are real (full 30-question runs). The bold cell is the per-category
-      winner — and the wins split: qwen takes the single-table conditionals and superlatives, llama
-      takes head-to-head joins by a mile (100% vs 25%) and writes more valid SQL overall. The two tie on
-      lookups, multi-step and trends. A frontier benchmark (Opus 4.8) joins as a third column next.</p>
+    <p class="run-note">All three columns are real, full 30-question runs; bold marks the best (or tied-best)
+      in each row. Opus 4.8 is a clean sweep — 100% in every category. Among the local models the wins
+      split: qwen takes the single-table conditionals and superlatives, llama takes head-to-head joins by a
+      mile (100% vs 25%) and writes more valid SQL overall (86% vs 68%). The categories that need the
+      <code>team_match</code> view and a precise filter (head-to-head, multi-step) are where the local gap
+      opens up — and where the frontier model's reliability shows most.</p>
 
     <figure class="fig">
       <img src="../assets/touchline/accuracy_by_category.png" alt="Accuracy by question category, frontier vs local." />
@@ -238,16 +247,17 @@
         precise filter (head-to-head, multi-step) are where the gap opens up.</figcaption>
     </figure>
     <figure class="fig">
-      <img src="../assets/touchline/cost_latency.png" alt="Cost per question and latency per question, frontier vs local." />
-      <figcaption>The price of accuracy: the local model is free and runs on-device; the frontier model
-        costs a few cents and a round-trip per question.</figcaption>
+      <img src="../assets/touchline/cost_latency.png" alt="Cost per question and latency per question, Opus 4.8 vs local." />
+      <figcaption>The price of frontier accuracy: the local models are free and on-device; Opus costs
+        0.8¢ per question — and, despite the network round-trip, is actually <em>faster</em> than either
+        local model.</figcaption>
     </figure>
 
     <h2>Worked runs</h2>
     <p>Every recorded run — the question, the SQL each model wrote, the live result, the answer — is
       playable in the <a href="#" onclick="document.querySelector('[data-tab=app]')?.click();return false;">App</a> tab:
-      pick a question, toggle between the two models, and watch the SQL run in your browser. A set of
-      verbatim pasted traces (including a failure) lands here alongside the frontier run.</p>
+      pick a question, toggle between all three models (Opus 4.8, qwen, llama), and watch the SQL run in
+      your browser. The local models include a verbatim failure trace; Opus answers each one cleanly.</p>
   </article>
 </template>
 
