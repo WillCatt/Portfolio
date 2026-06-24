@@ -23,7 +23,7 @@
     title: "PolicyDesk",
     subtitle: "A LangGraph multi-agent research desk over an insurance policy document",
     color: "oklch(52% 0.14 295)",
-    status: "wip", // "live" | "wip" | "archived"
+    status: "live", // "live" | "wip" | "archived"
     tags: ["LangGraph","PydanticAI","Multi-agent","Agents","RAG"],
     repo: "github.com/WillCatt/PolicyDesk",
     demo: true,
@@ -170,8 +170,26 @@
       <figcaption>Quality by question type (n=45). The desk's grounding edge is consistent; gold-page coverage is level, CIs overlapping.</figcaption>
     </figure>
 
+    <h2>Does it hold on a frontier model?</h2>
+    <p>The whole point of <code>models.py</code> is that the backend is one flag. Re-running the same 45 questions on <strong>Claude Sonnet 4.6</strong> (<code>POLICYDESK_BACKEND=claude</code>) keeps the architecture fixed and changes only the model — so it isolates what the orchestration is worth as the base model gets stronger.</p>
+    <table class="metrics">
+      <thead><tr><th>Question type</th><th>System</th><th>Grounded</th><th>Gold coverage</th><th>LLM calls</th><th>Latency</th></tr></thead>
+      <tbody>
+        <tr><td rowspan="2">Simple</td><td>Single-shot</td><td>95%</td><td class="f1">73%</td><td>1.0</td><td>4s</td></tr>
+        <tr><td>Multi-agent</td><td>100%</td><td>59%</td><td>5.6</td><td>21s</td></tr>
+        <tr><td rowspan="2">Multi-part</td><td>Single-shot</td><td>100%</td><td>51%</td><td>1.0</td><td>6s</td></tr>
+        <tr class="overall"><td>Multi-agent</td><td>100%</td><td class="f1">70%</td><td>7.6</td><td>29s</td></tr>
+      </tbody>
+    </table>
+    <p class="run-note">The story <strong>inverts</strong>. The grounding edge that mattered most on the 8B model nearly vanishes — Claude's single-shot baseline is already grounded 98% of the time, so the desk's 100% is a +2pt formality, not a +9pt win. What appears instead is <strong>coverage</strong>: absolute gold-page coverage jumps (~36% → ~64%), and the desk now <em>beats</em> single-shot by +19pts on multi-part questions while <em>losing</em> 14pts on simple ones. A capable model answers a simple question better in one pass than it does after being made to decompose it — but it genuinely benefits from the structured fan-out on compound questions. So the desk's value doesn't disappear on a strong model; it moves from grounding to completeness, and it sharpens the case for the router: send simple questions straight to single-shot, reserve the desk for the compound ones.</p>
+    <figure class="fig">
+      <img src="../assets/policydesk/model_dependence.png" alt="Multi-agent edge over single-shot for two base models: grounding edge shrinks from +9pts (llama) to +2pts (Claude); coverage edge on multi-part questions grows from +4pts to +19pts." />
+      <figcaption>The same desk, two base models. Left: the grounding advantage shrinks as the base model strengthens. Right: the coverage advantage concentrates where decomposition helps (multi-part, +19pts) and the penalty deepens where it doesn't (simple, −14pts).</figcaption>
+    </figure>
+    <p class="run-note" style="color:var(--text-muted)">The llama-3.1-8b run stays the headline because it's free and reproducible on a laptop; the Claude pass is the check that the design isn't an artefact of a weak model. Reproduce with <code>POLICYDESK_BACKEND=claude python eval/run.py</code>.</p>
+
     <h2>Does the critic loop help?</h2>
-    <p>A little. The share of grounded sub-answers rises from 74% to 79% across the critic ⇄ revise loop. Most of the protection comes earlier: a deterministic check (cited pages must be real and retrieved) blocks fabrications before the LLM critic runs, and the model-based revision adds a few points on top. The loop is more a safety net (it forces a citation where one is missing) than a grounding engine; a faithfulness judge instead of a citation-presence proxy is where a larger lift would come from.</p>
+    <p>A little. The share of grounded sub-answers rises from 74% to 79% across the critic ⇄ revise loop. Most of the protection comes earlier: a deterministic check (cited pages must be real and retrieved) blocks fabrications before the LLM critic runs, and the model-based revision adds a few points on top. The loop is more a safety net (it forces a citation where one is missing) than a grounding engine; a faithfulness judge instead of a citation-presence proxy is where a larger lift would come from. The pattern holds on Claude (91% → 99%, +8pts) — the same small, real correction, not a transformation.</p>
     <figure class="fig">
       <img src="../assets/policydesk/critic_lift.png" alt="Grounded sub-answer rate before vs after the critic loop." />
       <figcaption>Grounding of sub-answers, first draft vs after the critic ⇄ revise loop (74% → 79%).</figcaption>
