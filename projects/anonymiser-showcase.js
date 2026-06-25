@@ -296,6 +296,15 @@
       out.push(line(icx+16,sy,icx+icw-16,sy,AMBER,{sw:2.5,op:a*0.8*(1-Math.abs(sp-0.5)*0.6)}));
       out.push(rrect(icx+16,icy+18,icw-32,sy-(icy+18),0,AMBER,{op:a*0.05}));
     }
+    // underline the direct identifiers in the raw text, before they're stripped
+    const UND1=[[1,"Dr. Eleanor Whitcombe"],[2,"St. Andrew's Regional Hospital Trust"],[3,"Case no. 2402319/2021"]];
+    for(let u=0;u<UND1.length;u++){
+      const [row,word]=UND1[u], lnT=IN1[row], k=lnT.indexOf(word);
+      if(k<0) continue;
+      const ux=inx+mono_w(lnT.slice(0,k),msize), uw=mono_w(word,msize), uy=iny+row*lh+9;
+      const ud=ease_out(clamp((dt-(0.65+u*0.16))/0.4));
+      if(ud>0.01) out.push(line(ux,uy,ux+uw*ud,uy,AMBER,{sw:3,op:a*ia}));
+    }
     const ocx=150,ocy=510,ocw=1180,och=234, oca=smooth(clamp((dt-1.6)/0.5));
     out.push(group(card(ocx,ocy,ocw,och,"OUTPUT  ·  REDACT",AMBER,{op:a}),{op:oca}));
     const onx=ocx+34,ony=ocy+62, base=2.0;
@@ -352,6 +361,15 @@
     out.push(group(card(icx,icy,icw,ich,"INPUT",MUTED,{op:a}),{op:smooth(clamp(dt/0.5))}));
     const ia=smooth(clamp((dt-0.15)/0.5));
     for(let i=0;i<IN2.length;i++) out.push(txt(icx+34,icy+54+i*lh,IN2[i],msize,{fill:"#5b5346",family:FT_MONO,op:a*ia}));
+    // underline the quasi-identifiers that get generalised (amber for the name that's redacted)
+    const UND2=[[0,"Maria Petrova",AMBER],[0,"47-year-old",GREEN],[1,"Bulgarian",GREEN],[1,"Plovdiv",GREEN],[2,"2010",GREEN]];
+    for(let u=0;u<UND2.length;u++){
+      const [row,word,col]=UND2[u], lnT=IN2[row], k=lnT.indexOf(word);
+      if(k<0) continue;
+      const ux=icx+34+mono_w(lnT.slice(0,k),msize), uw=mono_w(word,msize), uy=icy+54+row*lh+9;
+      const ud=ease_out(clamp((dt-(0.6+u*0.14))/0.4));
+      if(ud>0.01) out.push(line(ux,uy,ux+uw*ud,uy,col,{sw:3,op:a*ia}));
+    }
     const ocx=150,ocy=470,ocw=980,och=188, oca=smooth(clamp((dt-1.4)/0.5));
     out.push(group(card(ocx,ocy,ocw,och,"OUTPUT  ·  ANONYMISE",GREEN,{op:a}),{op:oca}));
     const base=1.8;

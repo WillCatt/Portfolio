@@ -312,8 +312,8 @@
    each pointing at project ids in P. Planned projects render greyed. */
 const P = {
   anonymiser: { index:"01", title:"Legal Text Anonymiser", href:"projects/anonymiser-showcase.html",
-    hook:'How redacted is *"redacted"*? Measuring re-identification risk.',
-    chips:["F1 0.85","re-ID risk modelled"], color:"oklch(52% 0.14 145)", status:"live",
+    hook:"Use AI on the files *you're not allowed to upload* — names never leave your machine.",
+    chips:["works with any LLM","redact · anonymise · pseudonymise","names stay local"], color:"oklch(52% 0.14 145)", status:"live",
     video:"assets/anonymiser-thumb.mp4", poster:"assets/anonymiser-thumb-poster.jpg",
     tags:["NLP","NER","RoBERTa"] },
   quoteguard: { index:"02", title:"QuoteGuard", href:"showcase-quoteguard.html",
@@ -418,7 +418,7 @@ function renderLanding(){
       <div class="section-head">
         <div class="k">// flagship</div>
         <h2>The one I'd open with</h2>
-        <p>My most complete piece end-to-end: a model, a risk analysis most redaction tools skip, and a demo you can run.</p>
+        <p>Most firms sit on confidential text they can't run through AI tools. This redacts, anonymises or pseudonymises it so it's safe to send to a model — then re-links the real names into the answer locally. The privacy step is what makes the AI step possible.</p>
       </div>
       ${spotlightHTML(P[HERO])}
     </section>`;
