@@ -82,30 +82,12 @@
     .sim-delta b.up { color: #1f6d6d; } .sim-delta b.dn { color: #a23c28; }
     .sim-reset { font-family: "JetBrains Mono", monospace; font-size: 11.5px; background: none; border: none; color: var(--muted); cursor: pointer; text-decoration: underline; margin-top: 8px; }
 
-    /* ── inside the model tab ─────────────────────────── */
-    .mdl-legend { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; margin: 2px 0 14px; font-family: "JetBrains Mono", monospace; font-size: 11px; color: var(--muted); }
-    .mdl-legend span { display: inline-flex; align-items: center; gap: 6px; }
-    .mdl-legend i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-    .mdl-dot-label { font-size: 11px; font-weight: 600; fill: var(--ink); pointer-events: none; font-family: "Space Grotesk", sans-serif; }
-
-    /* the prediction ledger */
-    .mdl-eq { max-width: 600px; margin: 6px auto 0; }
-    .mdl-eqrow { border: 1px solid var(--line); border-radius: 12px; padding: 13px 16px; margin-bottom: 10px; background: var(--panel); }
-    .mdl-eqrow .who { font-weight: 600; font-size: 14px; margin-bottom: 9px; }
-    .mdl-eqrow .who b { float: right; font-family: "JetBrains Mono", monospace; color: var(--amber); }
-    .mdl-terms { display: flex; gap: 7px; flex-wrap: wrap; align-items: center; font-family: "JetBrains Mono", monospace; font-size: 12px; }
-    .mdl-term { display: inline-flex; flex-direction: column; align-items: center; padding: 6px 10px; border-radius: 8px; line-height: 1.25; }
-    .mdl-term small { font-size: 9.5px; opacity: .8; text-transform: uppercase; letter-spacing: .04em; }
-    .mdl-term.att { background: rgba(176,106,22,.12); color: #8a5212; }
-    .mdl-term.def { background: rgba(42,143,143,.13); color: #1f6d6d; }
-    .mdl-term.adv { background: rgba(192,83,59,.12); color: #a23c28; }
-    .mdl-op { color: var(--muted); font-size: 14px; }
-    .mdl-stage { font-family: "JetBrains Mono", monospace; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); text-align: center; margin: 22px 0 2px; }
-    .mdl-stage span { color: var(--amber); }
-    .mdl-grid-row { display: flex; gap: 22px; align-items: flex-start; flex-wrap: wrap; justify-content: center; }
-    .mdl-rho { font-family: "JetBrains Mono", monospace; font-size: 12px; color: #443e38; max-width: 220px; }
-    .mdl-rho .k { color: var(--muted); }
-    .mdl-rho b.up { color: #1f6d6d; } .mdl-rho b.dn { color: #a23c28; }
+    /* betting "what if?" */
+    .bet-controls { display: flex; flex-direction: column; gap: 11px; max-width: 540px; margin: 0 auto 18px; }
+    .bet-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .bet-lbl { font-family: "JetBrains Mono", monospace; font-size: 10.5px; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); width: 88px; flex: none; }
+    #bet-chart svg { overflow: visible; }
+    #bet-cards .v small { font-size: 15px; color: var(--muted); }
   </style>
 </head>
 <body>
@@ -120,14 +102,6 @@
         and then it's graded against what actually happens. <em>See how it rates any match — then
         watch it mark its own homework as the tournament unfolds.</em></p>
     </header>
-
-    <div class="tabs" role="tablist">
-      <button class="tab-btn active" id="tab-btn-forecast" role="tab" aria-selected="true" data-tab="pane-forecast">The forecast</button>
-      <button class="tab-btn" id="tab-btn-model" role="tab" aria-selected="false" data-tab="pane-model">Inside the model</button>
-    </div>
-
-    <!-- ════════════════ TAB · THE FORECAST ════════════════ -->
-    <div class="tab-pane" id="pane-forecast" role="tabpanel">
 
     <section class="stats" id="stats"><!-- filled --></section>
 
@@ -148,7 +122,7 @@
         </div>
         <div class="fc-card" id="fc-card"><!-- filled --></div>
       </div>
-      <p class="pen-take">Even a 60% favourite loses two times in five. A forecast isn't a prediction of what will happen; it's a spread of what might.</p>
+      <p class="pen-take">Even a 60% favourite loses two times in five. A forecast isn't a prediction of what will happen — it's an honest spread of what might.</p>
     </section>
 
     <!-- ════════ PART II ════════ -->
@@ -178,105 +152,8 @@
       <p class="pen-take" id="fc-take">—</p>
     </section>
 
-    <section class="findings" id="findings"><!-- filled --></section>
-
-    </div><!-- /pane-forecast -->
-
-    <!-- ════════════════ TAB · INSIDE THE MODEL ════════════════ -->
-    <div class="tab-pane" id="pane-model" role="tabpanel" hidden>
-
-      <p style="max-width:760px;font-size:16px;color:#443e38;margin:0 0 36px">No magic and no neural net —
-        the forecast is built from a handful of numbers the model fits from history, combined by one
-        compact formula. This tab opens it up: what the model believes about each team, how those beliefs
-        become a single match's odds, and what makes a rating move. Every figure is recomputed live from
-        the genuinely fitted strengths — nothing here is a mockup.</p>
-
-      <!-- ── 01 · ratings map ── -->
-      <div class="part"><span class="part-no">01</span><h2 class="part-title">What the model believes</h2></div>
-      <section class="block">
-        <div class="block-head">
-          <h3>Every team in two numbers</h3>
-          <p class="sub">The model reduces 150 years of results to just two ratings per team — how much it
-            tends to score (attack) and how much it concedes (defence). That is its entire opinion of the
-            world. Up and to the right is elite at both ends; the dashed lines mark the field average.</p>
-        </div>
-        <div class="chart-wrap narrow">
-          <div class="mdl-legend" id="mdl-legend"></div>
-          <div id="mdl-ratings" aria-label="Team attack vs defence ratings"></div>
-          <p class="caption">Strengths are log-scale coefficients from the Dixon-Coles fit at a 2-year
-            half-life. Hover any dot for the team. <strong>Two numbers</strong> are all that separate a
-            favourite from an underdog here.</p>
-        </div>
-      </section>
-
-      <!-- ── 02 · anatomy of a prediction ── -->
-      <div class="part"><span class="part-no">02</span><h2 class="part-title">From two teams to one set of odds</h2></div>
-      <section class="block">
-        <div class="block-head">
-          <h3>Anatomy of a single prediction</h3>
-          <p class="sub">Pick a fixture and watch the published odds get built from scratch: each side's
-            expected goals from its attack minus the opponent's defence (plus any host edge), two Poisson
-            distributions over goals, the full score grid with the draw correction, and finally the
-            win / draw / loss split.</p>
-        </div>
-        <div class="chart-wrap narrow">
-          <div class="fc-pick"><select id="mdl-pipe-select" style="max-width:100%"></select></div>
-
-          <div class="mdl-stage">Step 1 · <span>expected goals</span> = exp( attack − opponent defence + edges )</div>
-          <div class="mdl-eq" id="mdl-eq"></div>
-
-          <div class="mdl-stage">Step 2 · <span>two Poisson distributions</span> over goals scored</div>
-          <div id="mdl-pois" aria-label="Poisson goal distributions"></div>
-
-          <div class="mdl-stage">Step 3 · <span>the score grid</span> with the Dixon-Coles draw correction</div>
-          <div class="mdl-grid-row">
-            <div class="fc-heat" id="mdl-pipe-grid"></div>
-            <div class="mdl-rho" id="mdl-rho"></div>
-          </div>
-
-          <div class="mdl-stage">Step 4 · <span>collapse to win / draw / loss</span></div>
-          <div class="fc-1x2" id="mdl-pipe-1x2" style="max-width:560px;margin:0 auto"></div>
-          <div class="fc-1x2lbl" id="mdl-pipe-1x2lbl" style="max-width:560px;margin:5px auto 0"></div>
-          <p class="caption" id="mdl-pipe-cap">—</p>
-        </div>
-      </section>
-
-      <!-- ── 03 · recency ── -->
-      <div class="part"><span class="part-no">03</span><h2 class="part-title">What makes a rating move</h2></div>
-      <section class="block">
-        <div class="block-head">
-          <h3>How much should the recent past count?</h3>
-          <p class="sub">The fit weights older matches less, on a half-life you can choose. Weight all
-            history equally and old dynasties look strong forever; weight only the last few months and a
-            team in form leaps up. These are the teams the choice moves most.</p>
-        </div>
-        <div class="chart-wrap narrow">
-          <div id="mdl-recency" aria-label="Team rating across time-decay half-lives"></div>
-          <p class="caption">Overall rating (attack + defence) under each half-life, from all-history on the
-            left to a 6-month window on the right. The published model uses the <strong>2-year</strong>
-            setting — a deliberate middle ground.</p>
-        </div>
-      </section>
-
-      <!-- ── 04 · squad value ── -->
-      <div class="part"><span class="part-no">04</span><h2 class="part-title">Does the money agree?</h2></div>
-      <section class="block">
-        <div class="block-head">
-          <h3>On-pitch strength vs squad value</h3>
-          <p class="sub">A reality check on the results-only ratings: how well does each squad's
-            Transfermarkt market value line up with what the model learned from matches? Closely — but not
-            perfectly, which is exactly why squad value is offered as an optional extra, not a core term.</p>
-        </div>
-        <div class="chart-wrap narrow">
-          <div id="mdl-value" aria-label="Squad value vs on-pitch rating"></div>
-          <p class="caption">Each team's market-value z-score against its fitted overall rating. The model
-            blends value in only when you ask it to (see the dials below), and even then at a gentle
-            <strong>0.15</strong> weight.</p>
-        </div>
-      </section>
-
-      <!-- ════════ 05 · tune the model (moved) ════════ -->
-      <div class="part"><span class="part-no">05</span><h2 class="part-title">Tune the model</h2></div>
+    <!-- ════════ PART III ════════ -->
+    <div class="part"><span class="part-no">Part III</span><h2 class="part-title">Tune the model</h2></div>
     <section class="block">
       <div class="block-head">
         <h3>What if it weighed things differently?</h3>
@@ -308,22 +185,34 @@
           the exact model math. Manager is deliberately absent — no clean free data, and a fabricated term
           would defeat the point.</p>
       </div>
-      <p class="pen-take">A model is a stack of assumptions. The right move isn't to hide them; it's to hand you the dials.</p>
+      <p class="pen-take">A model is a stack of assumptions. The honest move isn't to hide them — it's to hand you the dials.</p>
     </section>
 
-    <section class="findings">
-      <article><h3>One formula, fully exposed</h3><p>The whole model is four ideas — <strong>attack</strong>,
-        <strong>defence</strong>, a fitted <strong>home edge</strong> and a low-score draw tweak. No hidden
-        layers; every number on this page comes straight out of that formula.</p></article>
-      <article><h3>Ratings, not rankings</h3><p>Each team is two continuous numbers learned from results —
-        not a seeding or a bracket. That's what lets the model price <strong>any</strong> matchup, including
-        ones that have never been played.</p></article>
-      <article><h3>Choices you can see</h3><p>How far back history counts, and whether money matters, are
-        judgement calls. Better to <strong>show the dials</strong> and let you watch the odds
-        move than to bury them.</p></article>
+    <!-- ════════ PART IV ════════ -->
+    <div class="part"><span class="part-no">Part IV</span><h2 class="part-title">The bettor's question: "What if?"</h2></div>
+    <section class="block">
+      <div class="block-head">
+        <h3>What if you'd bet the same way on every match?</h3>
+        <p class="sub">Pick a stake and a strategy, and walk it through all
+          <span data-fc="n_played">—</span> played group games in order. The odds come from the model's
+          own probabilities (decimal odds = 1 ÷ the model's chance) — we don't have captured bookmaker
+          prices, so this is a clean test of the strategy itself rather than a real-money return. Flip
+          on a bookmaker's margin to see what the house cut does to it.</p>
+      </div>
+      <div class="chart-wrap narrow">
+        <div class="bet-controls">
+          <div class="bet-row"><span class="bet-lbl">Stake / game</span><div class="sim-seg" id="bet-stake"></div></div>
+          <div class="bet-row"><span class="bet-lbl">Bet on</span><div class="sim-seg" id="bet-strat"></div></div>
+          <div class="bet-row"><span class="bet-lbl">Odds</span><div class="sim-seg" id="bet-margin"></div></div>
+        </div>
+        <div class="fc-cards" id="bet-cards"><!-- filled --></div>
+        <div id="bet-chart" style="margin-top:20px" aria-label="Cumulative profit/loss by strategy"></div>
+        <p class="caption" id="bet-cap">—</p>
+      </div>
+      <p class="pen-take" id="bet-take">—</p>
     </section>
 
-    </div><!-- /pane-model -->
+    <section class="findings" id="findings"><!-- filled --></section>
 
     <footer>
       <p>Dixon-Coles bivariate-Poisson with exponential time-decay, fit on the
@@ -336,8 +225,6 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
-  <script src="../js/dixon-coles.js"></script>
   <script src="../js/forecast.js"></script>
-  <script src="../js/forecast-model.js"></script>
 </body>
 </html>
