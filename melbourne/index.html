@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Melbourne Pulse · A daily read on the city</title>
+  <meta name="description" content="Yesterday's Melbourne — the city's #melbourne fediverse discussion scraped, summarised and scored for sentiment, with weather, events and headlines, tracked over time." />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <main>
+    <nav class="topnav">
+      <a class="home" href="../index.html">← williamcatt.dev</a>
+      <a href="https://github.com/WillCatt/melbourne-pulse" target="_blank" rel="noopener">source ↗</a>
+    </nav>
+
+    <header class="hero">
+      <p class="eyebrow"><span class="dot"></span> Melbourne · refreshed daily</p>
+      <h1>Melbourne, in the last 24 hours</h1>
+      <p class="lede" id="mood">Reading the city…</p>
+      <p class="asof" id="asof"></p>
+    </header>
+
+    <div class="srcrow" id="srcrow"></div>
+
+    <!-- ── dashboard grid ─────────────────────────────── -->
+    <section class="grid">
+      <div class="card digest col-4">
+        <h3>The day, summarised</h3>
+        <div class="mood" id="d-mood">—</div>
+        <p class="body" id="d-body"></p>
+        <ul class="threads" id="d-threads"></ul>
+        <div class="by" id="d-by"></div>
+      </div>
+
+      <div class="card col-2">
+        <h3>Mood score</h3>
+        <div class="gauge-num" id="g-num">—</div>
+        <div class="gauge-lbl" id="g-lbl"></div>
+        <div class="gauge-bar" id="g-bar"></div>
+        <div class="gauge-key" id="g-key"></div>
+        <div class="gauge-meta" id="g-meta"></div>
+      </div>
+
+      <div class="card col-2">
+        <h3>Weather</h3>
+        <div class="wx-big" id="wx-big">—</div>
+        <div class="wx-label" id="wx-label"></div>
+        <div class="wx-rows" id="wx-rows"></div>
+      </div>
+
+      <div class="card col-4">
+        <h3>What the city talked about</h3>
+        <div class="topics" id="topics"></div>
+      </div>
+
+      <div class="card col-4">
+        <h3 id="posts-head">What Melbourne's posting</h3>
+        <ul class="posts" id="posts"></ul>
+      </div>
+
+      <div class="card col-2">
+        <h3>What's on</h3>
+        <ul class="list" id="events"></ul>
+      </div>
+
+      <div class="card col-6">
+        <h3>Around town</h3>
+        <ul class="list" id="news"></ul>
+      </div>
+    </section>
+
+    <!-- ── trend ──────────────────────────────────────── -->
+    <section class="block">
+      <div class="block-head">
+        <h2>The mood, day by day</h2>
+        <p class="sub">Each evening's discussion scored and added to the line. The story is in the
+          drift — weekend lifts, wet-week dips, the odd spike when something kicks off.</p>
+      </div>
+      <div class="chart-wrap">
+        <svg id="trend" width="100%" height="320" viewBox="0 0 1000 320" preserveAspectRatio="xMidYMid meet"></svg>
+        <p class="caption" id="trend-cap"></p>
+      </div>
+    </section>
+
+    <!-- ── how it's built ─────────────────────────────── -->
+    <section class="writeup">
+      <h2>How it's built</h2>
+      <div class="pipeline">
+        <span class="step">scrape</span><span class="arr">→</span>
+        <span class="step">sentiment</span><span class="arr">→</span>
+        <span class="step">summarise</span><span class="arr">→</span>
+        <span class="step">commit JSON</span><span class="arr">→</span>
+        <span class="step">static render</span>
+      </div>
+      <p>A small Python job runs on my machine each morning. It pulls the day's most-engaged
+        <code>#melbourne</code> posts from the <strong>fediverse</strong> (Mastodon's public tag
+        timelines via <code>aus.social</code>), the day's weather and air quality
+        (<code>Open-Meteo</code>), what's on (<code>Ticketmaster</code>) and a handful of local
+        headlines (<code>RSS</code>). Every post is scored with <code>VADER</code> for sentiment;
+        <code>Claude</code> writes the short digest. The job commits two JSON files into this site and
+        pushes — so the page you're reading is plain static HTML with no backend and nothing called at
+        view time.</p>
+      <p>Why the fediverse and not Reddit? Reddit now blocks unauthenticated reads outright (a
+        network-level block, even from a browser), so the open, keyless Mastodon timelines are both the
+        practical choice and the more honest one. The <strong>trend</strong> is the point of the piece:
+        one snapshot is just a mood ring; a line over weeks is where patterns show up, so each run
+        appends a row to a history file.</p>
+      <h2 style="margin-top:28px">Where it's honest about itself</h2>
+      <ul>
+        <li><strong>VADER misses tone.</strong> It's a lexicon model — fast and transparent, but blind
+          to sarcasm and local slang (a post calling Metro delays "great, just great" reads as
+          positive). Treat the score as a coarse weather-vane, not a verdict.</li>
+        <li><strong>Small daily samples.</strong> A quiet day might be 20-30 posts; the mean can swing
+          on a single popular post. Sentiment on the fediverse also runs gentler than Reddit — fewer
+          pile-ons — so expect a kinder baseline.</li>
+        <li><strong>The fediverse isn't a city.</strong> <code>#melbourne</code> on Mastodon skews
+          techie, arty and older than Melbourne at large. It's a lens, not a census.</li>
+        <li><strong>Thin at launch.</strong> A tag timeline is only ever "recent", so sentiment history
+          can't be backfilled — the line starts short and fills in daily. Weather history seeds the
+          overlay so the chart isn't a lone dot on day one.</li>
+      </ul>
+      <p class="take">A daily, self-refreshing read on the city — and an honest one about how far a
+        lexicon model and one subreddit can actually see.</p>
+    </section>
+
+    <footer>
+      <p>Built by William Catt · scraping + NLP in Python, charts hand-drawn in D3 ·
+        data refreshes each morning via <code>launchd</code> · <a href="../index.html">back to portfolio</a></p>
+    </footer>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+  <script src="js/dashboard.js" defer></script>
+</body>
+</html>
