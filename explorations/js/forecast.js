@@ -13,6 +13,16 @@
     return i >= n ? HEAT[n] : d3.interpolateRgb(HEAT[i], HEAT[i + 1])(f);
   }
   var OUT = { home: "home win", draw: "draw", away: "away win" };
+  // All match times shown in AEST. Australia/Brisbane is always UTC+10 (no daylight
+  // saving), so it reads as AEST year-round — exactly the label we want.
+  var AEST = "Australia/Brisbane";
+  function _dt(o) { return o.kickoff ? new Date(o.kickoff) : new Date((o.date || o) + "T00:00:00Z"); }
+  function aDate(o, opts) { return _dt(o).toLocaleDateString("en-AU", Object.assign({ timeZone: AEST }, opts)); }
+  function aTime(o) {
+    return o.kickoff ? _dt(o).toLocaleTimeString("en-AU", { timeZone: AEST, hour: "numeric", minute: "2-digit" }).replace(/\s/g, "").toLowerCase() : "";
+  }
+  // "12 Jun 4:00am" for compact pickers/log; weekday+time variant for the card.
+  function whenShort(o) { return aDate(o, { day: "numeric", month: "short" }) + (o.kickoff ? " " + aTime(o) : ""); }
   // chronological fixture order (ISO dates sort lexically); stable tiebreak by group+home
   var byDate = function (a, b) {
     return a.date < b.date ? -1 : a.date > b.date ? 1
@@ -36,8 +46,7 @@
     var fx = B.fixtures.filter(function (f) { return f.known; }).sort(byDate);
     var sel = d3.select("#fc-select"), i = 0;
     fx.forEach(function (f, k) {
-      var date = new Date(f.date + "T00:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
-      sel.append("option").attr("value", k).text(date + " · " + f.home + " v " + f.away + "  (Grp " + f.group + ")");
+      sel.append("option").attr("value", k).text(whenShort(f) + " · " + f.home + " v " + f.away + "  (Grp " + f.group + ")");
     });
     // default to the first not-yet-played fixture
     var played = new Set(B.log.map(function (l) { return l.home + "|" + l.away; }));
@@ -53,7 +62,7 @@
   function renderCard(f, B) {
     var box = d3.select("#fc-card"); box.html("");
     var log = B.log.find(function (l) { return l.home === f.home && l.away === f.away; });
-    var date = new Date(f.date + "T00:00:00Z").toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "long", timeZone: "UTC" });
+    var date = aDate(f, { weekday: "short", day: "numeric", month: "long" }) + (f.kickoff ? " · " + aTime(f) + " AEST" : "");
     // header
     var mh = box.append("div").attr("class", "fc-mh");
     mh.append("div").attr("class", "tm home").text(f.home);
@@ -179,7 +188,7 @@
   function logTable(B) {
     var tb = d3.select("#fc-logtable tbody");
     B.log.forEach(function (l) {
-      var date = new Date(l.date + "T00:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
+      var date = aDate(l, { day: "numeric", month: "short" });
       var probs = pct(l.p_home) + "/" + pct(l.p_draw) + "/" + pct(l.p_away);
       tb.append("tr").html(
         "<td>" + date + "</td><td>" + l.home + " v " + l.away + "</td>" +
@@ -196,9 +205,9 @@
 
   function findings(B) {
     var f = d3.select("#findings"), sc = B.scorecard;
-    [{ h: "Frozen, so it's a real test", p: "The model is fit only on matches before <strong>" + B.meta.asof + "</strong>, then never touched — so every call is a true out-of-sample prediction, not hindsight." },
+    [{ h: "Frozen, so it's honest", p: "The model is fit only on matches before <strong>" + B.meta.asof + "</strong>, then never touched — so every call is a true out-of-sample prediction, not hindsight." },
      { h: "Probabilities, not prophecies", p: "A 60% favourite is meant to lose 40% of the time. The piece scores the model on calibration and Brier, not just whether the headline pick came in." },
-     { h: "No verdict without N", p: "After <strong>" + sc.n_played + "</strong> games the scoreboard is mostly noise. The real read comes near the end of the group stage, and the page updates as it gets there." }
+     { h: "No verdict without N", p: "After <strong>" + sc.n_played + "</strong> games the scoreboard is mostly noise. The honest read comes near the end of the group stage, and the page updates as it gets there." }
     ].forEach(function (c) { var a = f.append("article"); a.append("h3").text(c.h); a.append("p").html(c.p); });
   }
 
@@ -220,15 +229,22 @@
     var def = sim.decay_presets.find(function (p) { return p.key === "default"; });
     var eq = sim.decay_presets.find(function (p) { return p.key === "equal"; }) || def;
     var pre = st.recency ? def : eq;
-    var r = DC.match({
-      S: pre.strengths, ha: pre.home_adv, rho: st.rho ? pre.rho : 0,
-      vz: sim.value_z, vscale: sim.meta.value_scale, hosts: sim.hosts, country: f.country,
-      home: f.home, away: f.away, N: sim.meta.max_goals,
-      wA: st.att ? st.attW : 0, wD: st.def ? st.defW : 0,
-      wH: st.home ? st.homeW : 0, wV: st.value ? st.valueW : 0
-    });
-    if (!r) return null;
-    return { home: r.home, draw: r.draw, away: r.away, muH: r.muH, muA: r.muA };
+    var S = pre.strengths, vz = sim.value_z, sc = sim.meta.value_scale, N = sim.meta.max_goals;
+    var hosts = sim.hosts, ha = pre.home_adv, rho = st.rho ? pre.rho : 0;
+    if (!S[f.home] || !S[f.away]) return null;
+    var wA = st.att ? st.attW : 0, wD = st.def ? st.defW : 0, wH = st.home ? st.homeW : 0, wV = st.value ? st.valueW : 0;
+    function logmu(team, oppo) {
+      var adv = (hosts.indexOf(team) >= 0 && team === f.country) ? wH * ha : 0;
+      return wA * S[team][0] - wD * S[oppo][1] + wV * sc * (vz[team] || 0) + adv;
+    }
+    var muH = Math.exp(logmu(f.home, f.away)), muA = Math.exp(logmu(f.away, f.home));
+    function pois(mu, k) { var p = Math.exp(-mu), t = p; for (var i = 1; i <= k; i++) t *= mu / i; return t; }
+    var ph = [], pa = [], i, j;
+    for (i = 0; i <= N; i++) { ph.push(pois(muH, i)); pa.push(pois(muA, i)); }
+    var g = []; for (i = 0; i <= N; i++) { g.push([]); for (j = 0; j <= N; j++) g[i].push(ph[i] * pa[j]); }
+    g[0][0] *= 1 - muH * muA * rho; g[0][1] *= 1 + muH * rho; g[1][0] *= 1 + muA * rho; g[1][1] *= 1 - rho;
+    var tot = 0, h = 0, d = 0; for (i = 0; i <= N; i++) for (j = 0; j <= N; j++) { tot += g[i][j]; if (i > j) h += g[i][j]; else if (i === j) d += g[i][j]; }
+    return { home: h / tot, draw: d / tot, away: 1 - (h + d) / tot, muH: muH, muA: muA };
   }
   var EVEN_STATE = { att: 0, def: 0, home: 0, recency: 1, rho: 0, value: 0, attW: 0, defW: 0, homeW: 0, valueW: 0 };
 
@@ -237,8 +253,7 @@
     st.i = Math.max(0, fx.findIndex(function (f) { return f.home === "Spain" || f.away === "Spain"; }));
     var sel = d3.select("#sim-select");
     fx.forEach(function (f, k) {
-      var date = new Date(f.date + "T00:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
-      sel.append("option").attr("value", k).text(date + " · " + f.home + " v " + f.away);
+      sel.append("option").attr("value", k).text(whenShort(f) + " · " + f.home + " v " + f.away);
     });
     sel.property("value", st.i).on("change", function () { st.i = +this.value; render(); });
 
