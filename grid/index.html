@@ -4,7 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Grid Lens — how green is Australia's grid, right now?</title>
-  <meta name="description" content="A live read on Australia's National Electricity Market: carbon intensity, the generation mix, and how the five regions compare — refreshed through the day." />
+  <meta name="description" content="A live read on Australia's National Electricity Market: carbon intensity computed two ways and cross-checked, the generation mix hour by hour, and why the five regions sit anywhere from 0 to ~700 gCO2/kWh. By William Catt." />
+  <link rel="canonical" href="https://williamcatt.dev/grid/" />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://williamcatt.dev/grid/" />
+  <meta property="og:title" content="Grid Lens — how green is Australia's grid, right now?" />
+  <meta property="og:description" content="Live carbon intensity of the National Electricity Market, computed two ways and cross-checked, with a 120-day trend and a per-region breakdown." />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -15,11 +21,12 @@
     <div class="wrap head-inner">
       <div class="eyebrow"><a class="back" href="../">← williamcatt.dev</a> &nbsp;/&nbsp; Data viz</div>
       <h1>Grid Lens</h1>
-      <p class="tagline">How green is Australia's grid right now — and when is it greenest? A live read on the National Electricity Market: carbon intensity, the fuel mix, and how the five regions compare.</p>
+      <p class="lead">A kilowatt-hour isn't a fixed thing. Run your dishwasher at noon and it might be three-quarters wind and solar; run it at dinner and it's mostly coal. Grid Lens makes that visible — a live read on Australia's electricity grid, asking how green it is right now, and when it's greenest.</p>
       <div class="statusline">
         <span class="live"><span class="dot"></span> <span id="asof">loading…</span></span>
         <span>NEM · 5-region eastern grid</span>
         <span>data: <a href="https://openelectricity.org.au/" target="_blank" rel="noopener">Open Electricity</a> (CC BY-NC)</span>
+        <span><a href="https://github.com/WillCatt/grid-lens" target="_blank" rel="noopener">source ↗</a></span>
       </div>
     </div>
   </header>
@@ -28,6 +35,7 @@
     <!-- hero -->
     <section class="hero">
       <div class="stats" id="stats"></div>
+      <p class="sec-note" style="margin-top:18px">The headline number is grams of CO₂ per kilowatt-hour. It's an estimate — the live fuel mix weighted by emission factors — because the operator's settled emissions lag real time. <a href="#method" style="color:var(--accent)">How it's checked ↓</a></p>
     </section>
 
     <!-- current mix -->
@@ -43,23 +51,39 @@
     <section>
       <div class="sec-label">Last 48 hours</div>
       <h2>The daily rhythm of the grid</h2>
-      <p class="sec-note">Generation by fuel, hour by hour. Watch solar swell at midday and push the fossil fleet down — then fall away into the evening peak when gas and hydro step in.</p>
+      <p class="sec-note">Generation by fuel, hour by hour. Watch solar swell at midday and push the fossil fleet down — then fall away into the evening peak, when gas and hydro step in.</p>
       <div class="chart" id="area"></div>
     </section>
 
-    <!-- regions -->
+    <!-- regions + prose -->
     <section>
       <div class="sec-label">Same grid, five different stories</div>
       <h2>One market, wildly different carbon</h2>
-      <p class="sec-note">Every region buys and sells into the same market, yet what comes out of the wall ranges from near-zero to coal-heavy. Sorted cleanest first.</p>
+      <p class="sec-note">Every region trades into the same market, yet what comes out of the wall ranges from near-zero to coal-heavy. Sorted cleanest first.</p>
       <div class="regions" id="regions"></div>
+      <div class="prose" style="margin-top:22px">
+        <p>The spread is the whole point. On a recent winter afternoon Tasmania was running at effectively <strong>zero</strong> grams — all hydro — while New South Wales sat near <strong>690</strong>, a coal grid through and through. South Australia, which a decade ago was coal too, came in around 160 on wind and solar. So "is electricity clean in Australia?" has no single answer; it depends entirely on which side of a state border you're standing on. The order isn't even fixed: at midday a sunny South Australia can briefly run carbon-free and negative-priced, while a still, overcast evening pushes every mainland region up.</p>
+      </div>
+    </section>
+
+    <!-- greenest hour -->
+    <section>
+      <div class="sec-label">There's a best time to use power</div>
+      <h2>When is the grid greenest?</h2>
+      <div class="prose">
+        <p>Averaged over the last month, the grid is cleanest in the <strong>late morning</strong>, when rooftop and grid-scale solar peak together and shove the coal and gas fleet down. It's dirtiest in the evening, after the sun drops and demand climbs for cooking and heating. The gap is big enough to act on: shifting a dishwasher or an EV charge from 7pm to 11am is a real emissions cut, for free.</p>
+      </div>
+      <figure class="fig">
+        <img src="../assets/grid/greenest_hour.png" alt="Average carbon intensity by hour of day, lowest in the late morning around 11am and highest in the evening." />
+        <figcaption>Average intensity by hour over 30 days. The late-morning trough is the solar peak; the evening ridge is the post-sunset demand climb on gas and hydro.</figcaption>
+      </figure>
     </section>
 
     <!-- history -->
     <section>
       <div class="sec-label">Last 120 days</div>
       <h2>The transition, day by day</h2>
-      <p class="sec-note">Each point is a whole day across the NEM. Carbon intensity here is the authoritative figure — the market operator's settled emissions over energy, not my estimate.</p>
+      <p class="sec-note">Each point is a whole day across the NEM. Carbon intensity here is the authoritative figure — the operator's settled emissions over energy, not my estimate.</p>
       <div class="toggle" id="histtoggle">
         <button data-metric="carbon_intensity" class="on">Carbon intensity</button>
         <button data-metric="renewable_pct">Renewable %</button>
@@ -67,28 +91,42 @@
         <button data-metric="avg_price">Price</button>
       </div>
       <div class="chart" id="history"></div>
+      <div class="prose" style="margin-top:22px">
+        <p>Two relationships fall out of four months of this. Renewable share tracks carbon intensity at <strong>r = −0.98</strong> — a near-perfect inverse, which is really a sanity check that two independent measurements agree. More interesting: renewable share versus the daily wholesale price comes in at <strong>r = −0.80</strong>. High-renewable days are cheaper days, because zero-fuel-cost wind and solar displace expensive gas at the margin — the <em>merit-order effect</em>. Over the window price swung from $29 to $328 per megawatt-hour; flip the toggle to renewable share and the two move as mirror images.</p>
+      </div>
     </section>
 
     <!-- method -->
-    <section class="method">
+    <section id="method" class="method">
       <div class="sec-label">How it's built</div>
-      <h2>Method &amp; caveats</h2>
-      <div class="cols">
+      <h2>Carbon intensity, two ways — and a cross-check</h2>
+      <div class="prose">
+        <p>The headline number is computed two different ways on purpose. The <strong>live gauge</strong> weights the current fuel mix by emission factors (<code>coal 0.98</code>, <code>gas 0.49</code>, <code>distillate 0.85</code> tCO₂/MWh; renewables and storage zero) and divides by total generation — an estimate, because settled emissions don't exist until a day closes. The <strong>120-day trend</strong> uses the operator's own settled emissions over energy: authoritative, but lagged.</p>
+        <p>The estimate is only worth showing if it tracks the truth, so the page measures its own error: on the latest overlapping day the live figure lands within about <strong id="xcheck">2%</strong> of the settled one. That agreement is what licenses the live gauge — without it, the "right now" number would just be a guess in a lab coat.</p>
+      </div>
+      <div class="cols" style="margin-top:18px">
         <div>
-          <h3>Carbon intensity, two ways</h3>
-          <p>The big "right now" number weights the live fuel mix by emission factors (<code>coal 0.98</code>, <code>gas 0.49</code>, <code>distillate 0.85</code> tCO₂/MWh; renewables and storage zero). It's an estimate, because settled emissions lag real time.</p>
-          <p>The 120-day trend uses the operator's own settled emissions over energy — the authoritative figure. On the latest overlapping day the two agree to within about <b id="xcheck">2%</b>, which is the check that keeps the live gauge honest.</p>
+          <h3>The pipeline</h3>
+          <p>A small Python job pulls generation, emissions, price and demand from the <a href="https://openelectricity.org.au/" target="_blank" rel="noopener">Open Electricity</a> API, computes the metrics, and writes two JSON files straight into this static page — a live snapshot plus a back-filled daily history. A launchd job reruns it five times a day and pushes; there's no server and nothing to pay at view time.</p>
+          <pre class="codeblock"><code><span class="c"># the whole live gauge: mix (MW) × factors ÷ generation</span>
+<span class="k">def</span> intensity_from_mix(mix_mw):
+    gen  = sum(mw <span class="k">for</span> f, mw <span class="k">in</span> mix_mw.items() <span class="k">if</span> mw &gt; 0)
+    emit = sum(mw * FACTOR[f] <span class="k">for</span> f, mw <span class="k">in</span> mix_mw.items() <span class="k">if</span> mw &gt; 0)
+    <span class="k">return</span> emit / gen * 1000   <span class="c"># tCO2/MWh → gCO2/kWh</span></code></pre>
+          <p style="font-size:14px;color:var(--text-muted)"><a href="https://github.com/WillCatt/grid-lens" target="_blank" rel="noopener" style="color:var(--accent)">Full source on GitHub ↗</a> — Python · requests · D3, pytest over the pure transforms.</p>
         </div>
         <div>
-          <h3>What this is and isn't</h3>
-          <p>Battery <em>discharge</em> counts as generation; charging and pumped-hydro load are excluded so the mix doesn't double-count. Bioenergy is treated carbon-neutral, per the national greenhouse convention — debatable, but standard.</p>
-          <p>This is the wholesale grid, not your retail plan: rooftop solar that never hits the market isn't fully here, and emission factors are fleet averages, not per-station. Refreshes through the day; numbers settle as the operator finalises them.</p>
+          <h3>What's approximate, and what this isn't</h3>
+          <p>Emission factors are fleet averages, not per-station — the <code>coal</code> group blends black and brown at a sent-out-weighted 0.98. Battery discharge counts as generation; charging and pumped-hydro load are excluded so storage isn't double-counted. Bioenergy is treated carbon-neutral, per the national greenhouse convention — standard, and debatable.</p>
+          <p>And this is the <em>wholesale</em> grid, not your bill: rooftop solar consumed behind the meter never reaches the market, so it isn't fully here. The settled daily figure is the one to trust; the live gauge is a well-checked stand-in for the number that won't exist until the day is done.</p>
         </div>
       </div>
+      <blockquote>Electricity has a time and a place. The same socket swings from near-clean to coal-heavy across a day, and from zero to seven hundred grams across a state line — and almost nobody can see it happening.</blockquote>
     </section>
 
     <footer class="wrap">
       Built by William Catt · data from <a href="https://openelectricity.org.au/" target="_blank" rel="noopener">Open Electricity</a> / OpenNEM under CC BY-NC 4.0 ·
+      <a href="https://github.com/WillCatt/grid-lens" target="_blank" rel="noopener">source</a> ·
       <span id="genat"></span>
     </footer>
   </main>
