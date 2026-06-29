@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grid Lens · William Catt</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <meta name="description" content="A live read on Australia's electricity grid: carbon intensity computed two ways and cross-checked, the generation mix hour by hour, and why the five NEM regions sit anywhere from 0 to ~700 gCO2/kWh. By William Catt." />
+  <link rel="canonical" href="https://williamcatt.dev/projects/grid.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://williamcatt.dev/projects/grid.html" />
+  <meta property="og:title" content="Grid Lens — how green is Australia's grid, right now?" />
+  <meta property="og:description" content="Live carbon intensity of the National Electricity Market, computed two ways and cross-checked, with a 120-day trend and a per-region breakdown." />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../project.css" />
+</head>
+<body>
+<script>
+  window.PROJECT = {
+    id: "grid",
+    index: "12",
+    title: "Grid Lens",
+    subtitle: "Live carbon intensity of Australia's electricity grid",
+    color: "oklch(52% 0.12 200)",
+    status: "live",
+    tags: ["D3","Time-series","APIs","Energy"],
+    repo: "github.com/WillCatt/grid-lens",
+    demo: true,
+  };
+</script>
+
+<div id="root"></div>
+<script src="../project-page.js" defer></script>
+
+<!-- OVERVIEW -->
+<template id="tab-overview">
+  <article class="writeup">
+    <h2>The problem</h2>
+    <p>A kilowatt-hour isn't a fixed thing. Run your dishwasher at noon and it might be three-quarters wind and solar; run it at dinnertime and it's mostly coal. Across a day the carbon behind the same wall socket can more than double. None of that is visible — the meter shows cents, never grams.</p>
+    <p>Grid Lens makes it visible. It's a live read on Australia's National Electricity Market — the grid for the five eastern states — answering two plain questions: <em>how green is the grid right now</em>, and <em>when is it greenest</em>.</p>
+
+    <h2>Finding 1 — same market, wildly different carbon</h2>
+    <p>The five regions trade into one market, yet what comes out of the wall is nothing alike. On a recent winter afternoon Tasmania was running at <strong>zero</strong> grams (all hydro) while New South Wales sat near <strong>690</strong> — a coal grid. South Australia, which a decade ago was coal too, came in around 160 on wind and solar.</p>
+    <img src="../assets/grid/regions.png" alt="Carbon intensity by region: Tasmania near zero, South Australia ~160, and Queensland, Victoria and New South Wales between 560 and 690 gCO2/kWh." />
+    <p>So "is electricity clean in Australia?" has no single answer; it depends entirely on which side of a state border you're standing on.</p>
+    <a class="deeper" href="#" onclick="document.querySelector('[data-tab=app]')?.click();return false;">See the live regional breakdown →</a>
+
+    <h2>Finding 2 — there's a best time to use power</h2>
+    <p>Averaged over the last month, the grid is cleanest in the <strong>late morning</strong>, when rooftop and grid-scale solar peak together and push the coal and gas fleet down. It's dirtiest in the evening, after the sun drops and demand climbs for cooking and heating. The gap is large enough to matter: shifting a load like a dishwasher or an EV charge from 7pm to 11am is a real cut in emissions, for free.</p>
+    <img src="../assets/grid/greenest_hour.png" alt="Average carbon intensity by hour of day, lowest in the late morning around 11am and highest in the evening." />
+
+    <h2>What I built</h2>
+    <p>A self-refreshing dashboard. A small pipeline pulls the live generation mix, demand, price and emissions from the market operator's open data several times a day, works out the carbon intensity, and writes it into a static page that renders the lot — the live mix, a 48-hour rhythm, the five regions, and a four-month trend. No server, no login, nothing to pay; it just stays current.</p>
+
+    <blockquote>Electricity has a time and a place. The same socket swings from near-clean to coal-heavy across a day, and from zero to seven hundred grams across a state line — and almost nobody can see it happening. <a href="#" onclick="document.querySelector('[data-tab=technical]')?.click();return false;">How the carbon number is worked out →</a></blockquote>
+  </article>
+</template>
+
+<!-- TECHNICAL -->
+<template id="tab-technical">
+  <article class="writeup">
+    <h2>Data source</h2>
+    <p>Everything comes from the <a href="https://openelectricity.org.au/" target="_blank" rel="noreferrer">Open Electricity</a> (formerly OpenNEM) API, the open front-end to the Australian Energy Market Operator's data, under a CC BY-NC licence. Two endpoints do the work: <code>/data/network/NEM</code> for generation, energy and settled emissions by fuel (and by region), and <code>/market/network/NEM</code> for spot price and demand. Native resolution is five-minutely; I pull hourly for the 48-hour charts and daily for the trend, and the API serves roughly six months back, so the history is rich from day one rather than accreting slowly.</p>
+
+    <h2>Carbon intensity, two ways — and a cross-check</h2>
+    <p>The headline number is grams of CO₂ per kilowatt-hour, and I compute it two different ways on purpose.</p>
+    <ul>
+      <li><strong>Instantaneous (the live gauge)</strong> — weight the current fuel mix by emission factors (<code>coal 0.98</code>, <code>gas 0.49</code>, <code>distillate 0.85</code> tCO₂/MWh; renewables and storage zero) and divide by total generation. This exists because settled emissions lag real time; an estimate from the mix is the only way to get a <em>now</em> figure.</li>
+      <li><strong>Settled (the daily trend)</strong> — the operator's own published emissions over energy. Authoritative, but only available once the day is finalised.</li>
+    </ul>
+    <p>The estimate is only worth showing if it tracks the truth, so the page measures its own error: on the latest overlapping day the instantaneous figure lands within about <strong>2%</strong> of the settled one. That agreement is what licenses the live gauge — without it, the "right now" number would just be a guess wearing a lab coat.</p>
+
+    <h2>What the data says</h2>
+    <ul>
+      <li><strong>Region dominates everything.</strong> Across the last four months, daily carbon intensity ranged 441–662 gCO₂/kWh NEM-wide, but the instantaneous regional spread is far wider — 0 in hydro-only Tasmania to near 700 in coal-heavy New South Wales.</li>
+      <li><strong>Renewables and carbon move together, as they must.</strong> Daily renewable share correlates with carbon intensity at <strong>r = −0.98</strong> — a near-perfect inverse, which is really a sanity check that the two independent measurements agree.</li>
+      <li><strong>Renewables and price move together too — the merit-order effect.</strong> Renewable share versus average daily wholesale price comes in at <strong>r = −0.80</strong>: high-renewable days are cheaper days, because zero-fuel-cost wind and solar displace expensive gas at the margin. Price over the window swung from $29 to $328/MWh.</li>
+      <li><strong>Time of day is a lever.</strong> Averaged over 30 days, intensity troughs in the late morning at the solar peak and peaks in the evening — the basis for the "when is it greenest" finding.</li>
+    </ul>
+
+    <h2>The pipeline</h2>
+    <ul>
+      <li><code>client.py</code> — a thin wrapper over the two endpoints; one <code>tidy()</code> flattens any response into <code>(columns, [(ts, value)])</code> series.</li>
+      <li><code>emissions.py</code> — the emission factors plus the instantaneous-intensity and renewable-share calculators (pure functions, unit-tested).</li>
+      <li><code>build.py</code> — orchestrates the calls and writes two files: <code>grid.json</code> (live snapshot + 48-hour series + per-region breakdown) and <code>history.json</code> (≈120 daily rows, back-filled from the API).</li>
+      <li>A launchd job runs <code>update.sh</code> five times a day, which rebuilds the JSON straight into the site and pushes — the same publish-on-schedule pattern as my World Cup forecast tracker.</li>
+    </ul>
+
+    <h2>What's approximate, and what this isn't</h2>
+    <ul>
+      <li><strong>The live gauge is an estimate.</strong> Emission factors are fleet averages, not per-station — black and brown coal differ, and the <code>coal</code> group blends both at a sent-out-weighted 0.98. The settled daily figure is the one to trust; the 2% cross-check is there precisely so the estimate isn't taken on faith.</li>
+      <li><strong>Battery and pumped-hydro accounting.</strong> Discharge counts as generation; charging and pumping are load and are excluded, so the mix doesn't double-count storage.</li>
+      <li><strong>Bioenergy is treated carbon-neutral</strong>, following the national greenhouse convention. Defensible, standard, and debatable — flagged rather than hidden.</li>
+      <li><strong>It's the wholesale grid, not your bill.</strong> Rooftop solar consumed behind the meter never reaches the market and so isn't fully represented; this is the carbon of <em>grid</em> electricity, not a household's net footprint.</li>
+    </ul>
+
+    <h2>From prototype to product</h2>
+    <p>As a personal dashboard this is complete; the honest gaps are about what a dependable public tool would add. A real product would pull the operator's settled five-minute emissions for an authoritative live figure rather than a factor estimate; split black from brown coal and ideally go per-station; widen the regional carbon view to the same depth as the NEM-wide one; and add alerting ("the grid is unusually clean right now — run the heavy loads"), which is the genuinely useful thing a carbon-aware home or fleet would act on.</p>
+  </article>
+</template>
+
+<!-- RESULTS -->
+<template id="tab-results">
+  <article class="writeup">
+    <p>This piece is a live instrument rather than a model with a held-out score, so "results" means two things: evidence that the live carbon figure is <em>trustworthy</em>, and the findings that fall out of four months of data. The numbers below are a recent snapshot; the <a href="#" onclick="document.querySelector('[data-tab=app]')?.click();return false;">live dashboard</a> always shows current values.</p>
+
+    <div class="statrow">
+      <div class="stat"><div class="num">~2%</div><div class="lbl">gap between the live estimate and the operator's settled carbon figure</div></div>
+      <div class="stat"><div class="num">0–690</div><div class="lbl">gCO₂/kWh spread across the five regions at one moment</div></div>
+      <div class="stat"><div class="num">−0.80</div><div class="lbl">correlation, daily renewable share vs wholesale price</div></div>
+      <div class="stat"><div class="num">121</div><div class="lbl">days of daily history, back-filled from the API on first run</div></div>
+    </div>
+
+    <h2>Is the live number trustworthy?</h2>
+    <p>The live gauge weights the fuel mix by emission factors; the daily trend uses the operator's settled emissions. The check is whether they agree where they overlap. On the latest finalised day they sit within roughly 2% of each other — close enough that the instantaneous estimate is a fair stand-in for the settled figure that won't exist until the day closes. If that gap blew out, the estimate would be the thing to distrust, and the page would be saying so.</p>
+
+    <h2>The regional spread</h2>
+    <p>A snapshot of the five regions, sorted cleanest first. Same market, same instant:</p>
+    <table class="metrics">
+      <thead><tr><th>Region</th><th>Carbon intensity</th><th>Renewable share</th><th>Lead fuel</th></tr></thead>
+      <tbody>
+        <tr><td>Tasmania</td><td class="f1">~0 g/kWh</td><td>~100%</td><td>Hydro</td></tr>
+        <tr><td>South Australia</td><td class="f1">~160</td><td>~70%</td><td>Wind &amp; solar</td></tr>
+        <tr><td>Queensland</td><td class="f1">~560</td><td>~43%</td><td>Coal</td></tr>
+        <tr><td>Victoria</td><td class="f1">~600</td><td>~36%</td><td>Brown coal</td></tr>
+        <tr><td>New South Wales</td><td class="f1">~690</td><td>~29%</td><td>Black coal</td></tr>
+      </tbody>
+    </table>
+    <p class="run-note">The order isn't fixed — at midday a sunny South Australia can briefly run negative-priced and effectively carbon-free, while a still, overcast evening pushes every mainland region up. The dashboard's region cards re-sort live.</p>
+
+    <figure class="fig">
+      <img src="../assets/grid/regions.png" alt="Bar chart of carbon intensity by region." />
+      <figcaption>Carbon intensity by region, a winter weekday afternoon. Tasmania's hydro grid emits effectively nothing; the coal mainland sits five-to-seven times higher.</figcaption>
+    </figure>
+    <figure class="fig">
+      <img src="../assets/grid/greenest_hour.png" alt="Average carbon intensity by hour of day." />
+      <figcaption>Average intensity by hour over 30 days. The late-morning trough is the solar peak; the evening ridge is the post-sunset demand climb on gas and hydro.</figcaption>
+    </figure>
+  </article>
+</template>
+
+<!-- CODE -->
+<template id="tab-code">
+  <article class="code-tab">
+    <h2>Repository</h2>
+    <p>
+      <a href="https://github.com/WillCatt/grid-lens" target="_blank" rel="noreferrer">
+        ⌥ github.com/WillCatt/grid-lens ↗
+      </a>
+    </p>
+    <p style="color:var(--text-muted);font-size:14px">Python · requests · D3 (no build step). Pytest suite over the pure transforms; a launchd job publishes refreshed JSON into the static site five times a day.</p>
+
+    <h2>Structure</h2>
+    <pre class="tree"><code>grid/
+├── client.py          OEClient + tidy() over the two API endpoints
+├── emissions.py       emission factors, instantaneous CI, renewable share
+└── build.py           fetch → transform → grid.json + history.json
+figures/build_figures.py   palette-matched writeup PNGs
+tests/                 pytest over the pure transforms (no network)
+update.sh              build → commit JSON into the site → push
+deploy/…grid.plist     launchd schedule (5×/day)</code></pre>
+
+    <h2>Carbon intensity from the live mix</h2>
+    <p>The whole live gauge is this: weight each fuel's megawatts by its emission factor, divide by generation. Tonnes-per-MWh equals grams-per-kWh numerically, which keeps it tidy.</p>
+    <pre><code class="lang-python">EMISSION_FACTORS = {            # tCO2e/MWh, NEM-representative
+    "coal": 0.98, "gas": 0.49, "distillate": 0.85,
+    "bioenergy": 0.0, "hydro": 0.0, "wind": 0.0, "solar": 0.0,
+}
+
+def intensity_from_mix(mix_mw: dict[str, float]) -> float:
+    gen = sum(mw for f, mw in mix_mw.items() if mw > 0 and f in EMISSION_FACTORS)
+    if gen <= 0:
+        return 0.0
+    emit = sum(mw * EMISSION_FACTORS.get(f, 0.0) for f, mw in mix_mw.items() if mw > 0)
+    return round(emit / gen * 1000, 1)   # tCO2/MWh -> gCO2/kWh</code></pre>
+
+    <h2>One response shape, flattened</h2>
+    <p>Generation, emissions and price all come back in the same envelope, so a single helper turns any of them into tidy series the build can index by timestamp:</p>
+    <pre><code class="lang-python">def tidy(payload):                # -> [(columns, [[ts, value], ...]), ...]
+    return [(s.get("columns", {}), s.get("data", []))
+            for block in payload.get("data", [])
+            for s in block.get("results", [])]</code></pre>
+
+    <h2>Settled carbon, the authoritative way</h2>
+    <p>The daily trend doesn't estimate at all — it divides the operator's settled emissions by energy, the figure the live gauge is cross-checked against:</p>
+    <pre><code class="lang-python">carbon_intensity = emissions_tonnes / energy_mwh * 1000   # gCO2/kWh</code></pre>
+  </article>
+</template>
+
+<!-- APP -->
+<template id="tab-app">
+  <article class="app-tab">
+    <p>The live dashboard. The current generation mix across the NEM, a 48-hour rhythm by fuel, the five regions sorted cleanest-first, and a 120-day trend you can switch between carbon intensity, renewable share, coal share and price. Hover anything for the underlying numbers.</p>
+    <p style="font-size:14px;color:var(--text-muted)">This is the real thing, not a cut-down version — it reads the same JSON the pipeline publishes. It refreshes a few times a day; the "live" timestamp up top shows when it last ran. Opens full-screen at <a href="../grid/" target="_blank" rel="noreferrer">williamcatt.dev/grid ↗</a>.</p>
+    <iframe
+      src="../grid/"
+      title="Grid Lens — live dashboard"
+      style="width:100%;height:1200px;border:1px solid var(--border);border-radius:8px"
+      loading="lazy"></iframe>
+  </article>
+</template>
+
+</body>
+</html>
