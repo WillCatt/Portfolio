@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Suppression Effect · Data Curiosities</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <meta name="description" content="The suppression effect, explained interactively: a real effect can stay hidden until you account for a variable working against it. Practice vs test scores, masked by task difficulty." />
+  <link rel="canonical" href="https://williamcatt.dev/curiosities/pieces/suppression.html" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <main>
+    <a class="back-link" href="../index.html">← Data Curiosities</a>
+    <header class="hub-hero" style="padding-bottom:0">
+      <p class="eyebrow"><a href="../index.html">Data Curiosities</a> · 05</p>
+      <h1>The Suppression Effect</h1>
+    </header>
+
+    <article class="piece">
+      <p class="plain">Sometimes a real effect is hidden — or even pointed backwards — by a second
+        variable pulling the other way. Account for that variable and the effect steps into view. It's
+        confounding's optimistic cousin: adjusting <em>reveals</em> a relationship instead of dissolving one.</p>
+
+      <h2>Try it</h2>
+      <p>Does practising for a test help? In the raw data it looks like it doesn't. Drag from
+        <strong>Ignore difficulty</strong> to <strong>Group by difficulty</strong>.</p>
+      <iframe class="toy-frame" src="../assets/suppression/toy.html" style="height:690px"
+        title="Interactive: practice vs test score, grouped by task difficulty"></iframe>
+
+      <h2>What's going on</h2>
+      <p>Pooled together, more practice goes with <em>lower</em> scores — practice looks pointless, even
+        harmful. But split by how hard the tasks were and within every difficulty band, more practice
+        clearly raises the score. The overall picture had it backwards.</p>
+      <p>The trick is that the keen practisers took on harder tasks, and harder tasks score lower. That
+        difficulty effect runs opposite to the practice effect and, across the whole sample, more than
+        cancels it. Difficulty is a <em>suppressor</em>: hold it fixed and you stop it masking practice,
+        so practice's true positive effect appears. Mechanically it's the same adjustment as removing a
+        confounder; the difference is the direction it moves the answer.</p>
+      <figure class="shot">
+        <img src="../assets/suppression/fig_split.png" alt="Pooled trend slopes down; within each difficulty band, practice raises scores." />
+        <figcaption>The pooled trend slopes down; inside each difficulty band, more practice means higher scores.</figcaption>
+      </figure>
+
+      <h2>In the real world</h2>
+      <p>Suppression was first described by Paul Horst in 1941, analysing how the US Army selected
+        pilots. Some test scores barely predicted success on their own, yet sharply improved predictions
+        once combined with others — they worked by removing irrelevant variance from a second predictor
+        rather than by correlating with the outcome directly. The idea is now standard in regression:
+        adding a variable can <em>increase</em> another predictor's coefficient, the signature of
+        suppression.</p>
+
+      <h2>How not to get fooled</h2>
+      <p>A weak or zero raw correlation doesn't mean no effect; it can mean two effects cancelling.
+        Before concluding "X doesn't matter," ask whether the people high in X also differ on something
+        that pushes the outcome the other way. The flip side of the same coin: watch for a coefficient
+        that jumps when you add a control — that's worth understanding, not just reporting.</p>
+
+      <h2>Sources</h2>
+      <ul class="sources">
+        <li>P. Horst (1941), <em>The role of predictor variables which are independent of the criterion</em>, in <em>The Prediction of Personal Adjustment</em>, Social Science Research Council — the original suppressor variable.</li>
+        <li>A. J. Conger (1974), <em>A revised definition for suppressor variables</em>, Educational and Psychological Measurement, 34(1): 35–46. <a href="https://doi.org/10.1177/001316447403400105">doi</a></li>
+        <li>D. P. MacKinnon, J. L. Krull &amp; C. M. Lockwood (2000), <em>Equivalence of the mediation, confounding and suppression effect</em>, Prevention Science, 1(4): 173–181. <a href="https://doi.org/10.1023/A:1026595011371">doi</a></li>
+      </ul>
+
+      <nav class="piece-nav">
+        <a href="berksons.html">← Berkson's paradox</a>
+        <a href="../index.html">All curiosities</a>
+        <a href="../index.html">All curiosities →</a>
+      </nav>
+    </article>
+  </main>
+</body>
+</html>

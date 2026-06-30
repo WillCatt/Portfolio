@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Confounding · Data Curiosities</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <meta name="description" content="Confounding, explained interactively: ice-cream sales appear to cause drownings until you account for temperature. Drag the slider and watch the link vanish. With the real storks-and-babies study." />
+  <link rel="canonical" href="https://williamcatt.dev/curiosities/pieces/confounding.html" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <main>
+    <a class="back-link" href="../index.html">← Data Curiosities</a>
+    <header class="hub-hero" style="padding-bottom:0">
+      <p class="eyebrow"><a href="../index.html">Data Curiosities</a> · 02</p>
+      <h1>Confounding</h1>
+    </header>
+
+    <article class="piece">
+      <p class="plain">Two things move together, so it looks like one drives the other. Often neither
+        does — a hidden third thing is pushing both, and the link between them is just its shadow.</p>
+
+      <h2>Try it</h2>
+      <p>On days when more ice cream is sold, more people drown. Drag from <strong>Ignore weather</strong>
+        to <strong>Group by temperature</strong>.</p>
+      <iframe class="toy-frame" src="../assets/confounding/toy.html" style="height:690px"
+        title="Interactive: ice cream vs drownings, grouped by temperature"></iframe>
+
+      <h2>What's going on</h2>
+      <p>Ignore the weather and the link is strong and upward. But ice cream doesn't make anyone drown.
+        Hot days do both: they sell ice cream <em>and</em> send people to the water. Once you compare days
+        that share the same temperature — each coloured band — the supposed link between ice cream and
+        drownings flattens to nothing.</p>
+      <p>Temperature is a <em>confounder</em>: a common cause sitting upstream of both things you measured.
+        Because it drives each of them, it manufactures a correlation between them that has no causal
+        link behind it. The fix is to compare like with like — hold the confounder fixed (here, by
+        grouping on temperature) so it can't do the talking.</p>
+      <figure class="shot">
+        <img src="../assets/confounding/fig_split.png" alt="Pooled trend climbs; within each temperature band the trend is flat." />
+        <figcaption>The pooled line climbs with temperature; inside any one temperature band, ice cream and drownings barely move together.</figcaption>
+      </figure>
+
+      <h2>In the real world</h2>
+      <p>In 2000 the physicist Robert Matthews showed, across 17 European countries, a
+        <em>statistically significant</em> correlation between the number of breeding stork pairs and the
+        number of human births (p = 0.008). Storks do not deliver babies. The confounder is land area:
+        bigger countries have more storks and more people. Account for area and the correlation
+        evaporates — a deliberately absurd example chosen to make the point that significance is not
+        causation.</p>
+
+      <h2>How not to get fooled</h2>
+      <p>When two things correlate, ask what sits upstream of both. A confounder has to be a plausible
+        common cause — something that influences your supposed cause and your effect independently.
+        Randomised experiments break confounding by assigning the cause at random; with observational
+        data you have to find the confounders and adjust for them, and you can never be sure you found
+        them all.</p>
+
+      <h2>Sources</h2>
+      <ul class="sources">
+        <li>R. Matthews (2000), <em>Storks Deliver Babies (p = 0.008)</em>, Teaching Statistics, 22(2): 36–38. <a href="https://doi.org/10.1111/1467-9639.00013">doi</a></li>
+        <li>J. Pearl (2009), <em>Causality: Models, Reasoning, and Inference</em> (2nd ed.), Cambridge University Press — the modern treatment of confounding and the back-door criterion.</li>
+        <li>K. J. Rothman, S. Greenland &amp; T. L. Lash (2008), <em>Modern Epidemiology</em> (3rd ed.) — confounding and its control.</li>
+      </ul>
+
+      <nav class="piece-nav">
+        <a href="simpsons.html">← Simpson's Paradox</a>
+        <a href="../index.html">All curiosities</a>
+        <a href="ecological-fallacy.html">Next: Ecological fallacy →</a>
+      </nav>
+    </article>
+  </main>
+</body>
+</html>

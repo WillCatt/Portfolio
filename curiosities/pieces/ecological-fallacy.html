@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Ecological Fallacy · Data Curiosities</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <meta name="description" content="The ecological fallacy, explained interactively: a correlation measured on groups can reverse for the individuals inside them. Robinson's 1950 literacy puzzle, with a draggable individual-vs-aggregate view." />
+  <link rel="canonical" href="https://williamcatt.dev/curiosities/pieces/ecological-fallacy.html" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <main>
+    <a class="back-link" href="../index.html">← Data Curiosities</a>
+    <header class="hub-hero" style="padding-bottom:0">
+      <p class="eyebrow"><a href="../index.html">Data Curiosities</a> · 03</p>
+      <h1>The Ecological Fallacy</h1>
+    </header>
+
+    <article class="piece">
+      <p class="plain">A relationship you measure on whole groups — countries, regions, schools — need
+        not hold for the individuals inside them. Sometimes it points the other way entirely.</p>
+
+      <h2>Try it</h2>
+      <p>Across regions, places with more foreign-born residents had higher literacy. So are immigrants
+        more literate? Drag from <strong>Each person</strong> to <strong>Region averages</strong>.</p>
+      <iframe class="toy-frame" src="../assets/ecological-fallacy/toy.html" style="height:690px"
+        title="Interactive: literacy vs % foreign-born, individuals vs region averages"></iframe>
+
+      <h2>What's going on</h2>
+      <p>The five region-average dots slope clearly upward: more foreign-born, higher literacy. But each
+        person's dot tells the opposite story — within any region, being foreign-born goes with
+        <em>lower</em> literacy. The averages and the individuals genuinely disagree about the sign.</p>
+      <p>It happens because immigrants settled where literacy was already high — the industrial,
+        better-schooled regions — for reasons that have nothing to do with their own literacy. A region's
+        average literacy is set mostly by that region, not by its immigrants. So comparing region
+        averages tells you about regions, not about people. Reading an individual-level claim ("immigrants
+        are more literate") off a group-level correlation is the ecological fallacy.</p>
+      <figure class="shot">
+        <img src="../assets/ecological-fallacy/fig_split.png" alt="Individual people slope down; region averages slope up." />
+        <figcaption>Individual people (amber) slope down; the five region averages (teal) slope up. Same data, two scales.</figcaption>
+      </figure>
+
+      <h2>In the real world</h2>
+      <p>This is exactly what W. S. Robinson found in 1950. Using the 1930 US census, he computed the
+        correlation between the share of foreign-born residents and literacy. Across the 48 states it was
+        <strong>+0.53</strong> — immigrant-heavy states were more literate. For individuals it was
+        <strong>−0.11</strong> — the foreign-born were, person for person, slightly less literate. His
+        paper is why we now treat group-level correlations with care, and it underlies the modern warning
+        against drawing personal conclusions from aggregated data.</p>
+
+      <h2>How not to get fooled</h2>
+      <p>Match the level of your data to the level of your claim. If you want to say something about
+        people, you generally need data on people; group averages can mislead about them, and the reverse
+        (the "atomistic" fallacy) holds too. When only aggregate data exists, treat any individual-level
+        reading as a hypothesis, not a finding.</p>
+
+      <h2>Sources</h2>
+      <ul class="sources">
+        <li>W. S. Robinson (1950), <em>Ecological Correlations and the Behavior of Individuals</em>, American Sociological Review, 15(3): 351–357. <a href="https://doi.org/10.2307/2087176">doi</a></li>
+        <li>S. Greenland &amp; J. Robins (1994), <em>Ecologic studies — biases, misconceptions, and counterexamples</em>, American Journal of Epidemiology, 139(8): 747–760. <a href="https://doi.org/10.1093/oxfordjournals.aje.a117069">doi</a></li>
+        <li>D. A. Freedman (1999), <em>Ecological Inference and the Ecological Fallacy</em>, International Encyclopedia of the Social &amp; Behavioral Sciences.</li>
+      </ul>
+
+      <nav class="piece-nav">
+        <a href="confounding.html">← Confounding</a>
+        <a href="../index.html">All curiosities</a>
+        <a href="berksons.html">Next: Berkson's paradox →</a>
+      </nav>
+    </article>
+  </main>
+</body>
+</html>

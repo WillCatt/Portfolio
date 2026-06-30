@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Berkson's Paradox · Data Curiosities</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <meta name="description" content="Berkson's paradox and collider bias, explained interactively: selecting a group can invent a negative correlation between independent traits. Drag the fame cutoff and watch a fake trade-off appear." />
+  <link rel="canonical" href="https://williamcatt.dev/curiosities/pieces/berksons.html" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <main>
+    <a class="back-link" href="../index.html">← Data Curiosities</a>
+    <header class="hub-hero" style="padding-bottom:0">
+      <p class="eyebrow"><a href="../index.html">Data Curiosities</a> · 04</p>
+      <h1>Berkson's Paradox</h1>
+    </header>
+
+    <article class="piece">
+      <p class="plain">Pick a group by some standard, and two qualities that are unrelated in the world
+        can suddenly look like a trade-off — not because they really clash, but because your filter let
+        in anyone who had enough of <em>either</em>.</p>
+
+      <h2>Try it</h2>
+      <p>Suppose acting talent and good looks are unrelated in the general population. Drag the cutoff
+        from <strong>Everyone</strong> toward <strong>Only the famous</strong> — where you need one or
+        the other to break through.</p>
+      <iframe class="toy-frame" src="../assets/berksons/toy.html" style="height:690px"
+        title="Interactive: talent vs looks, with a selection cutoff for fame"></iframe>
+
+      <h2>What's going on</h2>
+      <p>In the whole crowd the two traits are a shapeless blob — no correlation. But fame needs a high
+        <em>combined</em> score, so the famous are everyone above a diagonal line. Inside that selected
+        corner, the very talented tend to be ordinary-looking and the gorgeous tend to be middling
+        actors — because if you're short on one and still made it, you must be long on the other. The
+        negative correlation is manufactured entirely by the cutoff.</p>
+      <p>In causal terms, fame is a <em>collider</em>: talent and looks both point into it. Selecting on
+        a collider (only looking at the famous) opens a back-door path between its causes and links them.
+        It's the mirror image of confounding — there you adjust to remove a spurious link; here adjusting
+        (conditioning on the collider) is what creates one.</p>
+      <figure class="shot">
+        <img src="../assets/berksons/fig_select.png" alt="Unrelated in the population; negatively correlated among the selected famous." />
+        <figcaption>Unrelated across everyone (grey); a clear downward trade-off once you keep only the famous (amber, above the dashed cutoff).</figcaption>
+      </figure>
+
+      <h2>In the real world</h2>
+      <p>Joseph Berkson described this in 1946 for hospital data: two diseases that are independent in the
+        population can appear <em>negatively</em> associated among hospital inpatients, because being
+        admitted often requires having at least one of them. Sackett later catalogued it as "admission
+        rate bias." The same mechanism explains a lot of everyday cynicism — "why is the food good but
+        the service bad at popular restaurants?" — wherever you only ever see the cases that cleared some
+        bar.</p>
+
+      <h2>How not to get fooled</h2>
+      <p>Ask how your sample was selected. If membership depends on several traits at once, correlations
+        measured <em>within</em> the sample can be artefacts of the gate, not facts about the world. The
+        rule of thumb that mirrors confounding: don't control for (or select on) anything that your
+        cause and effect both influence.</p>
+
+      <h2>Sources</h2>
+      <ul class="sources">
+        <li>J. Berkson (1946), <em>Limitations of the Application of Fourfold Table Analysis to Hospital Data</em>, Biometrics Bulletin, 2(3): 47–53. <a href="https://doi.org/10.2307/3002000">doi</a></li>
+        <li>D. L. Sackett (1979), <em>Bias in analytic research</em>, Journal of Chronic Diseases, 32(1–2): 51–63. <a href="https://doi.org/10.1016/0021-9681(79)90012-2">doi</a></li>
+        <li>J. Pearl (2009), <em>Causality</em> (2nd ed.), Cambridge University Press — colliders and selection bias.</li>
+      </ul>
+
+      <nav class="piece-nav">
+        <a href="ecological-fallacy.html">← Ecological fallacy</a>
+        <a href="../index.html">All curiosities</a>
+        <a href="suppression.html">Next: Suppression effect →</a>
+      </nav>
+    </article>
+  </main>
+</body>
+</html>

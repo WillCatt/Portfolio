@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Does practice even help?</title>
+<style>
+  :root {
+    --bg: #faf8f4; --ink: #1a1714; --muted: #7a6e63; --grid: #e6ded2;
+    --amber: #b06a16; --grey: #cdbfae;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: ui-sans-serif, system-ui, "Helvetica Neue", Arial, sans-serif;
+    display: flex; justify-content: center; padding: 28px 16px;
+  }
+  .card { width: 100%; max-width: 760px; }
+  h1 { font-size: 1.3rem; margin: 0 0 .25rem; }
+  p.lede { color: var(--muted); margin: 0 0 1.1rem; max-width: 62ch; }
+  p.lede strong { color: var(--ink); }
+  .controls { display: flex; align-items: center; gap: 14px; margin: 6px 0 4px; }
+  .controls label { font-weight: 600; font-size: .92rem; white-space: nowrap; }
+  input[type=range] { flex: 1; accent-color: var(--amber); }
+  .state { font-variant-numeric: tabular-nums; color: var(--muted); font-size: .9rem; min-width: 8ch; }
+  svg { width: 100%; height: auto; display: block; }
+  .axis { stroke: var(--grid); stroke-width: 1; }
+  .axislabel { fill: var(--muted); font-size: 12px; }
+  .callout { font-size: 13px; font-weight: 600; }
+  .hint { color: var(--muted); font-size: .85rem; margin-top: .4rem; }
+  footer { color: var(--muted); font-size: .8rem; margin-top: 1.2rem; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>Does practice even help?</h1>
+  <p class="lede">Drag from <strong>Ignore difficulty</strong> to <strong>Group by difficulty</strong>. Overall, more practice looks like <em>lower</em> scores; inside each difficulty, practice clearly pays off.</p>
+
+  <div class="controls">
+    <label id="leftLabel">Ignore difficulty</label>
+    <input id="reveal" type="range" min="0" max="100" value="0" />
+    <label id="rightLabel">Group by difficulty</label>
+  </div>
+  <div class="state" id="state"></div>
+
+  <svg id="chart" viewBox="0 0 760 470" role="img"></svg>
+  <div class="hint">Illustrative synthetic data. Difficulty hides practice's real benefit.</div>
+  <footer>Data Curiosities · 05 — Suppression effect · williamcatt.dev</footer>
+</div>
+
+<script>
+const DATA = {"points": [{"x": 3.445, "y": 88.339, "band": 0}, {"x": 5.491, "y": 92.869, "band": 0}, {"x": 4.624, "y": 85.067, "band": 0}, {"x": 3.073, "y": 91.94, "band": 0}, {"x": 5.008, "y": 93.023, "band": 0}, {"x": 1.825, "y": 84.776, "band": 0}, {"x": 4.89, "y": 87.423, "band": 0}, {"x": 3.157, "y": 79.361, "band": 0}, {"x": 4.947, "y": 90.826, "band": 0}, {"x": 4.659, "y": 93.608, "band": 0}, {"x": 2.849, "y": 86.782, "band": 0}, {"x": 4.793, "y": 83.892, "band": 0}, {"x": 4.513, "y": 91.063, "band": 0}, {"x": 3.031, "y": 81.637, "band": 0}, {"x": 7.002, "y": 84.61, "band": 0}, {"x": 5.203, "y": 89.647, "band": 0}, {"x": 2.227, "y": 72.791, "band": 0}, {"x": 2.518, "y": 83.284, "band": 0}, {"x": 4.475, "y": 90.54, "band": 0}, {"x": 4.468, "y": 90.617, "band": 0}, {"x": 2.91, "y": 93.234, "band": 0}, {"x": 5.824, "y": 92.174, "band": 0}, {"x": 4.146, "y": 82.864, "band": 0}, {"x": 2.706, "y": 85.437, "band": 0}, {"x": 3.438, "y": 87.197, "band": 0}, {"x": 3.732, "y": 83.398, "band": 0}, {"x": 1.67, "y": 74.982, "band": 0}, {"x": 2.752, "y": 82.071, "band": 0}, {"x": 1.285, "y": 77.868, "band": 0}, {"x": 3.56, "y": 83.687, "band": 0}, {"x": 4.919, "y": 87.272, "band": 0}, {"x": 2.071, "y": 84.588, "band": 0}, {"x": 4.483, "y": 89.099, "band": 0}, {"x": 2.226, "y": 87.265, "band": 0}, {"x": 3.755, "y": 83.647, "band": 0}, {"x": 3.226, "y": 87.542, "band": 0}, {"x": 2.182, "y": 76.077, "band": 0}, {"x": 3.176, "y": 84.36, "band": 0}, {"x": 2.162, "y": 76.592, "band": 0}, {"x": 4.44, "y": 83.829, "band": 0}, {"x": 4.069, "y": 89.798, "band": 0}, {"x": 5.8, "y": 86.45, "band": 0}, {"x": 1.805, "y": 86.43, "band": 0}, {"x": 5.639, "y": 95.451, "band": 0}, {"x": 3.882, "y": 87.632, "band": 0}, {"x": 4.608, "y": 86.229, "band": 0}, {"x": 3.717, "y": 81.968, "band": 0}, {"x": 6.32, "y": 87.944, "band": 0}, {"x": 6.079, "y": 90.119, "band": 0}, {"x": 5.603, "y": 85.895, "band": 0}, {"x": 4.389, "y": 86.498, "band": 0}, {"x": 0.5, "y": 75.924, "band": 0}, {"x": 4.834, "y": 89.904, "band": 0}, {"x": 3.951, "y": 79.481, "band": 0}, {"x": 3.799, "y": 87.267, "band": 0}, {"x": 4.652, "y": 90.712, "band": 0}, {"x": 5.79, "y": 86.247, "band": 0}, {"x": 4.401, "y": 91.989, "band": 0}, {"x": 3.3, "y": 89.894, "band": 0}, {"x": 2.833, "y": 85.964, "band": 0}, {"x": 4.555, "y": 81.943, "band": 0}, {"x": 5.648, "y": 90.407, "band": 0}, {"x": 4.822, "y": 82.091, "band": 0}, {"x": 4.687, "y": 85.847, "band": 0}, {"x": 3.324, "y": 80.17, "band": 0}, {"x": 2.146, "y": 82.655, "band": 0}, {"x": 5.419, "y": 86.368, "band": 0}, {"x": 4.91, "y": 89.091, "band": 0}, {"x": 1.259, "y": 83.466, "band": 0}, {"x": 2.924, "y": 81.273, "band": 0}, {"x": 7.311, "y": 69.845, "band": 1}, {"x": 5.884, "y": 71.501, "band": 1}, {"x": 6.167, "y": 70.807, "band": 1}, {"x": 6.043, "y": 75.836, "band": 1}, {"x": 5.374, "y": 77.779, "band": 1}, {"x": 5.645, "y": 77.588, "band": 1}, {"x": 7.864, "y": 78.707, "band": 1}, {"x": 8.062, "y": 83.085, "band": 1}, {"x": 6.444, "y": 76.23, "band": 1}, {"x": 7.749, "y": 78.392, "band": 1}, {"x": 7.983, "y": 72.81, "band": 1}, {"x": 7.475, "y": 74.514, "band": 1}, {"x": 3.338, "y": 67.065, "band": 1}, {"x": 6.374, "y": 72.04, "band": 1}, {"x": 8.392, "y": 75.52, "band": 1}, {"x": 6.96, "y": 74.298, "band": 1}, {"x": 6.347, "y": 78.151, "band": 1}, {"x": 5.967, "y": 75.457, "band": 1}, {"x": 6.916, "y": 76.799, "band": 1}, {"x": 5.946, "y": 72.578, "band": 1}, {"x": 7.765, "y": 76.071, "band": 1}, {"x": 6.357, "y": 74.589, "band": 1}, {"x": 6.487, "y": 72.374, "band": 1}, {"x": 7.219, "y": 77.09, "band": 1}, {"x": 8.329, "y": 78.329, "band": 1}, {"x": 6.268, "y": 73.444, "band": 1}, {"x": 7.169, "y": 76.949, "band": 1}, {"x": 6.082, "y": 74.001, "band": 1}, {"x": 4.693, "y": 72.119, "band": 1}, {"x": 6.494, "y": 71.664, "band": 1}, {"x": 7.31, "y": 73.178, "band": 1}, {"x": 7.033, "y": 73.17, "band": 1}, {"x": 6.363, "y": 71.238, "band": 1}, {"x": 6.111, "y": 78.448, "band": 1}, {"x": 4.657, "y": 68.029, "band": 1}, {"x": 6.302, "y": 75.702, "band": 1}, {"x": 8.87, "y": 82.254, "band": 1}, {"x": 6.153, "y": 79.068, "band": 1}, {"x": 6.44, "y": 74.016, "band": 1}, {"x": 8.578, "y": 77.291, "band": 1}, {"x": 6.672, "y": 75.83, "band": 1}, {"x": 6.875, "y": 81.822, "band": 1}, {"x": 4.772, "y": 70.292, "band": 1}, {"x": 7.722, "y": 80.584, "band": 1}, {"x": 8.563, "y": 82.52, "band": 1}, {"x": 6.409, "y": 70.68, "band": 1}, {"x": 8.07, "y": 82.098, "band": 1}, {"x": 7.956, "y": 80.472, "band": 1}, {"x": 2.402, "y": 60.877, "band": 1}, {"x": 8.512, "y": 82.437, "band": 1}, {"x": 4.396, "y": 74.8, "band": 1}, {"x": 7.143, "y": 76.534, "band": 1}, {"x": 7.177, "y": 77.323, "band": 1}, {"x": 6.144, "y": 76.653, "band": 1}, {"x": 5.958, "y": 74.955, "band": 1}, {"x": 5.927, "y": 70.755, "band": 1}, {"x": 5.791, "y": 69.366, "band": 1}, {"x": 5.819, "y": 70.928, "band": 1}, {"x": 5.411, "y": 70.137, "band": 1}, {"x": 6.354, "y": 76.769, "band": 1}, {"x": 6.649, "y": 70.851, "band": 1}, {"x": 6.192, "y": 71.347, "band": 1}, {"x": 6.954, "y": 72.856, "band": 1}, {"x": 5.259, "y": 76.617, "band": 1}, {"x": 6.769, "y": 81.335, "band": 1}, {"x": 7.705, "y": 79.006, "band": 1}, {"x": 8.842, "y": 82.631, "band": 1}, {"x": 4.596, "y": 73.209, "band": 1}, {"x": 7.624, "y": 74.045, "band": 1}, {"x": 6.893, "y": 73.461, "band": 1}, {"x": 9.668, "y": 67.985, "band": 2}, {"x": 9.15, "y": 64.038, "band": 2}, {"x": 5.853, "y": 57.142, "band": 2}, {"x": 7.535, "y": 60.328, "band": 2}, {"x": 8.881, "y": 62.441, "band": 2}, {"x": 6.808, "y": 62.609, "band": 2}, {"x": 9.832, "y": 64.27, "band": 2}, {"x": 9.889, "y": 69.656, "band": 2}, {"x": 10.837, "y": 62.348, "band": 2}, {"x": 7.271, "y": 52.808, "band": 2}, {"x": 8.587, "y": 72.613, "band": 2}, {"x": 10.153, "y": 62.234, "band": 2}, {"x": 7.618, "y": 64.252, "band": 2}, {"x": 8.991, "y": 64.606, "band": 2}, {"x": 7.905, "y": 65.062, "band": 2}, {"x": 8.883, "y": 72.066, "band": 2}, {"x": 7.067, "y": 60.74, "band": 2}, {"x": 8.939, "y": 66.754, "band": 2}, {"x": 11.213, "y": 67.483, "band": 2}, {"x": 10.631, "y": 69.644, "band": 2}, {"x": 7.985, "y": 57.291, "band": 2}, {"x": 8.718, "y": 68.489, "band": 2}, {"x": 7.321, "y": 60.807, "band": 2}, {"x": 10.398, "y": 63.583, "band": 2}, {"x": 9.28, "y": 64.169, "band": 2}, {"x": 10.517, "y": 66.888, "band": 2}, {"x": 8.912, "y": 68.509, "band": 2}, {"x": 7.93, "y": 56.548, "band": 2}, {"x": 10.03, "y": 63.202, "band": 2}, {"x": 7.057, "y": 62.425, "band": 2}, {"x": 8.611, "y": 61.464, "band": 2}, {"x": 10.575, "y": 67.326, "band": 2}, {"x": 7.946, "y": 63.687, "band": 2}, {"x": 4.772, "y": 52.025, "band": 2}, {"x": 7.336, "y": 61.797, "band": 2}, {"x": 11.643, "y": 63.96, "band": 2}, {"x": 8.345, "y": 57.712, "band": 2}, {"x": 7.068, "y": 60.463, "band": 2}, {"x": 8.126, "y": 59.214, "band": 2}, {"x": 10.932, "y": 64.967, "band": 2}, {"x": 8.169, "y": 58.95, "band": 2}, {"x": 7.212, "y": 60.444, "band": 2}, {"x": 11.558, "y": 68.425, "band": 2}, {"x": 9.009, "y": 64.097, "band": 2}, {"x": 10.06, "y": 68.319, "band": 2}, {"x": 6.619, "y": 65.57, "band": 2}, {"x": 11.017, "y": 67.108, "band": 2}, {"x": 9.186, "y": 68.743, "band": 2}, {"x": 11.272, "y": 67.755, "band": 2}, {"x": 10.703, "y": 64.084, "band": 2}, {"x": 8.939, "y": 65.199, "band": 2}, {"x": 9.198, "y": 63.322, "band": 2}, {"x": 8.998, "y": 69.847, "band": 2}, {"x": 13.322, "y": 69.829, "band": 2}, {"x": 10.287, "y": 68.0, "band": 2}, {"x": 11.047, "y": 71.093, "band": 2}, {"x": 10.143, "y": 68.395, "band": 2}, {"x": 6.189, "y": 64.848, "band": 2}, {"x": 7.095, "y": 56.539, "band": 2}, {"x": 11.268, "y": 69.176, "band": 2}, {"x": 9.318, "y": 65.412, "band": 2}, {"x": 8.062, "y": 67.27, "band": 2}, {"x": 9.88, "y": 60.954, "band": 2}, {"x": 9.32, "y": 59.236, "band": 2}, {"x": 12.368, "y": 70.025, "band": 2}, {"x": 8.129, "y": 63.592, "band": 2}, {"x": 8.107, "y": 60.392, "band": 2}, {"x": 9.471, "y": 62.974, "band": 2}, {"x": 10.68, "y": 66.632, "band": 2}, {"x": 9.156, "y": 65.907, "band": 2}], "bands": ["Easy tasks", "Medium tasks", "Hard tasks"], "bandColors": ["#b06a16", "#2a8f8f", "#3a8f57"], "pooled": {"m": -2.284117139167666, "b": 89.97414688578759}, "bandFits": [{"m": 1.988015439303518, "b": 78.12288353948152}, {"m": 2.3484218557640255, "b": 59.61626573000608}, {"m": 1.64319659277741, "b": 49.31896276979635}], "xLabel": "Practice (hours per week)", "yLabel": "Test score", "title": "Does practice even help?", "lede": "Drag from <strong>Ignore difficulty</strong> to <strong>Group by difficulty</strong>. Overall, more practice looks like <em>lower</em> scores; inside each difficulty, practice clearly pays off.", "left": "Ignore difficulty", "right": "Group by difficulty", "calloutPooled": "\u2198 more practice, lower scores?!", "calloutSplit": "\u2197 within a difficulty, practice helps", "statePooled": "pooled view", "stateSplit": "held at one difficulty", "hint": "Illustrative synthetic data. Difficulty hides practice's real benefit.", "footer": "Data Curiosities \u00b7 05 \u2014 Suppression effect \u00b7 williamcatt.dev", "domain": {"x": [0.0, 13.822323525574832], "y": [49.02497607569735, 98.4509077859039]}};
+
+const svg = document.getElementById("chart");
+const NS = "http://www.w3.org/2000/svg";
+const W = 760, H = 470;
+const M = { l: 64, r: 18, t: 18, b: 52 };
+const plotW = W - M.l - M.r, plotH = H - M.t - M.b;
+
+const [x0, x1] = DATA.domain.x, [y0, y1] = DATA.domain.y;
+const sx = v => M.l + (v - x0) / (x1 - x0) * plotW;
+const sy = v => M.t + (1 - (v - y0) / (y1 - y0)) * plotH;
+
+const GREY = "#cdbfae", AMBER = "#b06a16", MUTED = "#7a6e63";
+
+function hexToRgb(h){ h=h.replace('#',''); return [0,2,4].map(i=>parseInt(h.slice(i,i+2),16)); }
+function lerp(a,b,t){ return a+(b-a)*t; }
+function mix(h1,h2,t){ const a=hexToRgb(h1),b=hexToRgb(h2);
+  return `rgb(${a.map((v,i)=>Math.round(lerp(v,b[i],t))).join(',')})`; }
+function el(name, attrs){ const e=document.createElementNS(NS,name);
+  for(const k in attrs) e.setAttribute(k, attrs[k]); return e; }
+
+function drawAxes(){
+  svg.appendChild(el("line",{class:"axis",x1:M.l,y1:M.t,x2:M.l,y2:M.t+plotH}));
+  svg.appendChild(el("line",{class:"axis",x1:M.l,y1:M.t+plotH,x2:M.l+plotW,y2:M.t+plotH}));
+  const xl = el("text",{class:"axislabel","text-anchor":"middle",x:M.l+plotW/2,y:H-12});
+  xl.textContent = DATA.xLabel; svg.appendChild(xl);
+  const yl = el("text",{class:"axislabel","text-anchor":"middle",
+    transform:`translate(15,${M.t+plotH/2}) rotate(-90)`});
+  yl.textContent = DATA.yLabel; svg.appendChild(yl);
+}
+
+const dyn = el("g",{});
+drawAxes();
+svg.appendChild(dyn);
+
+function lineSeg(m,b,xa,xb,color,opacity,width){
+  return el("line",{x1:sx(xa),y1:sy(m*xa+b),x2:sx(xb),y2:sy(m*xb+b),
+    stroke:color,"stroke-width":width,"stroke-opacity":opacity,"stroke-linecap":"round"});
+}
+function bandExtent(bi){
+  let lo=Infinity, hi=-Infinity;
+  for(const p of DATA.points) if(p.band===bi){ lo=Math.min(lo,p.x); hi=Math.max(hi,p.x); }
+  return [lo,hi];
+}
+
+function render(t){
+  dyn.replaceChildren();
+  for(const p of DATA.points){
+    const col = mix(GREY, DATA.bandColors[p.band], t);
+    dyn.appendChild(el("circle",{cx:sx(p.x),cy:sy(p.y),r:3.6,fill:col,"fill-opacity":0.9-0.05*t}));
+  }
+  if(t < 0.999){
+    dyn.appendChild(lineSeg(DATA.pooled.m, DATA.pooled.b, x0+0.4*(x1-x0)/8, x1-0.4*(x1-x0)/8, AMBER, 1-t, 3.4));
+  }
+  DATA.bandFits.forEach((f,i)=>{
+    const [xa,xb] = bandExtent(i);
+    dyn.appendChild(lineSeg(f.m, f.b, xa, xb, DATA.bandColors[i], t, 3.4));
+  });
+  const txt = el("text",{class:"callout","text-anchor":"end",x:W-M.r,y:M.t+plotH-10});
+  txt.textContent = t < 0.5 ? DATA.calloutPooled : DATA.calloutSplit;
+  txt.setAttribute("fill", t < 0.5 ? AMBER : MUTED);
+  dyn.appendChild(txt);
+}
+
+const slider = document.getElementById("reveal");
+const stateEl = document.getElementById("state");
+function update(){
+  const t = slider.value/100;
+  render(t);
+  stateEl.textContent = t<0.05 ? DATA.statePooled : t>0.95 ? DATA.stateSplit : `${slider.value}%`;
+}
+slider.addEventListener("input", update);
+update();
+</script>
+</body>
+</html>

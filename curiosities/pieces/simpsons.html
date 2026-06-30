@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simpson's Paradox · Data Curiosities</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <meta name="description" content="Simpson's Paradox, explained interactively: a trend that holds in every age group reverses once you pool them. Drag the age-reveal slider, then see the real kidney-stone surgery case." />
+  <link rel="canonical" href="https://williamcatt.dev/curiosities/pieces/simpsons.html" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <main>
+    <a class="back-link" href="../index.html">← Data Curiosities</a>
+    <header class="hub-hero" style="padding-bottom:0">
+      <p class="eyebrow"><a href="../index.html">Data Curiosities</a> · 01</p>
+      <h1>Simpson's Paradox</h1>
+    </header>
+
+    <article class="piece">
+      <p class="plain">A pattern that holds inside <em>every</em> group can point the opposite way once
+        you blend the groups into one pile. The trend doesn't change — what changes is whether you're
+        looking at the groups or the lump.</p>
+
+      <h2>Try it</h2>
+      <p>Picture a health study plotting weekly exercise against fasting blood sugar (a diabetes-risk
+        marker). Drag the slider from <strong>Ignore age</strong> to <strong>Reveal age</strong>.</p>
+      <iframe class="toy-frame" src="../assets/simpsons/toy.html" style="height:690px"
+        title="Interactive: exercise vs blood sugar, revealed by age"></iframe>
+
+      <h2>What's going on</h2>
+      <p>Ignore age and the line slopes up: more exercise, higher blood sugar — as if exercise were bad
+        for you. Split the same dots by age band and every band slopes down, the way you'd expect.
+        Nothing about the data changed; only whether we accounted for age did.</p>
+      <p>Age is wired to two things at once here. Older people in this sample <em>exercise more</em>, and
+        they <em>run higher blood sugar</em>. So when you ignore age, exercise quietly stands in for age,
+        and age drags blood sugar up. The pooled line measures the wrong thing. Hold age fixed by
+        splitting into bands and exercise gets to show its real, downward effect.</p>
+      <figure class="shot">
+        <img src="../assets/simpsons/fig_split.png" alt="The pooled trend slopes up while each age band slopes down." />
+        <figcaption>The dashed pooled line climbs; each age band slopes the other way.</figcaption>
+      </figure>
+
+      <h2>In the real world</h2>
+      <p>This is not just a teaching toy. In 1986 Charig and colleagues compared two kidney-stone
+        treatments in the <em>BMJ</em>. Keyhole surgery won overall, yet open surgery won for small
+        stones <em>and</em> for large stones — it took both subgroups but lost the total.</p>
+      <table class="metricbox">
+        <thead><tr><th>Group</th><th>Open surgery</th><th>Keyhole (PCNL)</th></tr></thead>
+        <tbody>
+          <tr><td>Small stones</td><td class="win">93% (81/87)</td><td>83% (234/270)</td></tr>
+          <tr><td>Large stones</td><td class="win">73% (192/263)</td><td>69% (55/80)</td></tr>
+          <tr class="total"><td>Overall</td><td>78% (273/350)</td><td class="win">83% (289/350)</td></tr>
+        </tbody>
+      </table>
+      <p>The confounder is which patients got which treatment: roughly three-quarters of the easy
+        (small) stones went to keyhole and three-quarters of the hard (large) stones went to open
+        surgery, so keyhole's overall figure was built from an easier caseload. The same shape made
+        headlines in the 1973 Berkeley admissions case, where the university looked biased against women
+        overall but slightly favoured them department by department.</p>
+
+      <h2>How not to get fooled</h2>
+      <p>Plot the subgroups, not just the pooled line. Ask what else changes along the x-axis — here, age
+        moved with exercise. And treat any overall rate as a mixture: the mixing proportions can flip the
+        headline. Whether to trust the pooled trend or the subgroups is a causal question about why the
+        confounder is there, not a numerical one.</p>
+
+      <h2>Sources</h2>
+      <ul class="sources">
+        <li>E. H. Simpson (1951), <em>The Interpretation of Interaction in Contingency Tables</em>, JRSS B, 13(2): 238–241.</li>
+        <li>C. R. Blyth (1972), <em>On Simpson's Paradox and the Sure-Thing Principle</em>, JASA, 67(338): 364–366. <a href="https://doi.org/10.1080/01621459.1972.10482387">doi</a></li>
+        <li>P. J. Bickel, E. A. Hammel &amp; J. W. O'Connell (1975), <em>Sex Bias in Graduate Admissions: Data from Berkeley</em>, Science, 187: 398–404. <a href="https://doi.org/10.1126/science.187.4175.398">doi</a></li>
+        <li>C. R. Charig et al. (1986), <em>Comparison of treatment of renal calculi…</em>, BMJ, 292: 879–882. <a href="https://doi.org/10.1136/bmj.292.6524.879">doi</a></li>
+        <li>R. A. Kievit et al. (2013), <em>Simpson's paradox in psychological science: a practical guide</em>, Front. Psychol., 4: 513. <a href="https://doi.org/10.3389/fpsyg.2013.00513">doi</a></li>
+      </ul>
+
+      <nav class="piece-nav">
+        <a href="../index.html">All curiosities</a>
+        <a href="confounding.html">Next: Confounding →</a>
+      </nav>
+    </article>
+  </main>
+</body>
+</html>

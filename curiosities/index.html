@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data Curiosities · William Catt</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <meta name="description" content="Data Curiosities — counterintuitive statistics, one chart at a time. Interactive explainers for Simpson's paradox, confounding, the ecological fallacy, Berkson's paradox / collider bias, and the suppression effect. By William Catt." />
+  <link rel="canonical" href="https://williamcatt.dev/curiosities/" />
+  <meta property="og:title" content="Data Curiosities — counterintuitive statistics, one chart at a time" />
+  <meta property="og:description" content="Drag a slider and watch a trend reverse, vanish, or appear. Plain-English explainers for the ways data fools us, each grounded in a real study." />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <main>
+    <a class="back-link" href="../index.html">← william_catt.portfolio</a>
+
+    <header class="hub-hero">
+      <p class="eyebrow">Data Curiosities</p>
+      <h1>The same numbers, two opposite stories.</h1>
+      <p class="lede">A growing set of small, interactive explainers for the ways data quietly
+        fools us — each one a single idea you can <em>drag a slider and watch happen</em>, in plain
+        English first, then grounded in a real study. <em>Start anywhere.</em></p>
+    </header>
+
+    <section class="hub-grid">
+
+      <!-- 01 · SIMPSON'S -->
+      <a class="tile" href="pieces/simpsons.html">
+        <span class="tile-thumb">
+          <svg viewBox="0 0 320 150" aria-hidden="true">
+            <line x1="32" y1="120" x2="288" y2="44" stroke="#cdbfae" stroke-width="2.5" stroke-dasharray="6 5"/>
+            <line x1="44" y1="96" x2="118" y2="112" stroke="#b06a16" stroke-width="3.4" stroke-linecap="round"/>
+            <line x1="124" y1="66" x2="198" y2="82" stroke="#2a8f8f" stroke-width="3.4" stroke-linecap="round"/>
+            <line x1="204" y1="40" x2="278" y2="56" stroke="#3a8f57" stroke-width="3.4" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <div class="tile-body">
+          <div class="tile-meta"><span class="tile-no">01</span><span>Simpson's Paradox</span>
+            <span class="chip-status live">Live</span></div>
+          <h3>A trend that flips when you zoom out</h3>
+          <p class="tile-tag">A pattern true in every group can reverse once you lump the groups together.</p>
+          <p>Exercise looks like it <em>raises</em> blood sugar — until you split by age and every band slopes the other way. With the real kidney-stone surgery case.</p>
+          <span class="tile-cta">Explore →</span>
+        </div>
+      </a>
+
+      <!-- 02 · CONFOUNDING -->
+      <a class="tile" href="pieces/confounding.html">
+        <span class="tile-thumb">
+          <svg viewBox="0 0 320 150" aria-hidden="true">
+            <line x1="100" y1="58" x2="74" y2="104" stroke="#b06a16" stroke-width="2.4" marker-end="url(#ca)"/>
+            <line x1="220" y1="58" x2="246" y2="104" stroke="#b06a16" stroke-width="2.4" marker-end="url(#ca)"/>
+            <line x1="92" y1="116" x2="228" y2="116" stroke="#cdbfae" stroke-width="2" stroke-dasharray="5 5"/>
+            <defs><marker id="ca" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 z" fill="#b06a16"/></marker></defs>
+            <circle cx="160" cy="44" r="15" fill="#b06a16"/><text x="160" y="49" text-anchor="middle" font-family="JetBrains Mono" font-size="13" fill="#fff" font-weight="700">Z</text>
+            <circle cx="80" cy="116" r="14" fill="#2a8f8f"/><text x="80" y="121" text-anchor="middle" font-family="JetBrains Mono" font-size="13" fill="#fff" font-weight="700">X</text>
+            <circle cx="240" cy="116" r="14" fill="#3a8f57"/><text x="240" y="121" text-anchor="middle" font-family="JetBrains Mono" font-size="13" fill="#fff" font-weight="700">Y</text>
+          </svg>
+        </span>
+        <div class="tile-body">
+          <div class="tile-meta"><span class="tile-no">02</span><span>Confounding</span>
+            <span class="chip-status live">Live</span></div>
+          <h3>The hidden cause behind a fake link</h3>
+          <p class="tile-tag">Two things rise together only because a lurking third thing drives both.</p>
+          <p>Ice-cream sales "cause" drownings — until you remember it's hot out. Hold the weather fixed and the link melts away.</p>
+          <span class="tile-cta">Explore →</span>
+        </div>
+      </a>
+
+      <!-- 03 · ECOLOGICAL FALLACY -->
+      <a class="tile" href="pieces/ecological-fallacy.html">
+        <span class="tile-thumb">
+          <svg viewBox="0 0 320 150" aria-hidden="true">
+            <line x1="40" y1="58" x2="280" y2="104" stroke="#b06a16" stroke-width="3" stroke-linecap="round"/>
+            <line x1="60" y1="112" x2="262" y2="50" stroke="#2a8f8f" stroke-width="3" stroke-linecap="round"/>
+            <g fill="#cdbfae" opacity=".7"><circle cx="70" cy="70" r="3"/><circle cx="110" cy="84" r="3"/><circle cx="150" cy="78" r="3"/><circle cx="190" cy="96" r="3"/><circle cx="230" cy="92" r="3"/><circle cx="258" cy="104" r="3"/></g>
+            <circle cx="70" cy="104" r="7" fill="#b06a16" stroke="#fff" stroke-width="1.5"/>
+            <circle cx="150" cy="80" r="7" fill="#2a8f8f" stroke="#fff" stroke-width="1.5"/>
+            <circle cx="240" cy="58" r="7" fill="#3a8f57" stroke="#fff" stroke-width="1.5"/>
+          </svg>
+        </span>
+        <div class="tile-body">
+          <div class="tile-meta"><span class="tile-no">03</span><span>Ecological Fallacy</span>
+            <span class="chip-status live">Live</span></div>
+          <h3>What's true of groups, but not of people</h3>
+          <p class="tile-tag">A pattern measured on whole groups need not hold for the individuals in them.</p>
+          <p>Robinson's 1950 puzzle: regions with more immigrants were <em>more</em> literate, while immigrants themselves were less so.</p>
+          <span class="tile-cta">Explore →</span>
+        </div>
+      </a>
+
+      <!-- 04 · BERKSON'S -->
+      <a class="tile" href="pieces/berksons.html">
+        <span class="tile-thumb">
+          <svg viewBox="0 0 320 150" aria-hidden="true">
+            <g fill="#cdbfae" opacity=".55"><circle cx="96" cy="96" r="3.4"/><circle cx="120" cy="74" r="3.4"/><circle cx="140" cy="104" r="3.4"/><circle cx="112" cy="112" r="3.4"/><circle cx="150" cy="84" r="3.4"/><circle cx="92" cy="78" r="3.4"/><circle cx="132" cy="90" r="3.4"/></g>
+            <g fill="#b06a16"><circle cx="178" cy="70" r="3.8"/><circle cx="200" cy="62" r="3.8"/><circle cx="220" cy="74" r="3.8"/><circle cx="206" cy="84" r="3.8"/><circle cx="240" cy="64" r="3.8"/><circle cx="186" cy="82" r="3.8"/></g>
+            <line x1="120" y1="128" x2="252" y2="40" stroke="#1a1714" stroke-width="1.6" stroke-dasharray="5 5" opacity=".5"/>
+            <line x1="176" y1="68" x2="244" y2="82" stroke="#b06a16" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <div class="tile-body">
+          <div class="tile-meta"><span class="tile-no">04</span><span>Berkson's Paradox</span>
+            <span class="chip-status live">Live</span></div>
+          <h3>A trade-off conjured by the filter</h3>
+          <p class="tile-tag">Selecting a group can invent a negative link between things that are actually unrelated.</p>
+          <p>Why do talented actors seem less good-looking? They aren't — you only ever see the famous, and fame needs one or the other.</p>
+          <span class="tile-cta">Explore →</span>
+        </div>
+      </a>
+
+      <!-- 05 · SUPPRESSION -->
+      <a class="tile" href="pieces/suppression.html">
+        <span class="tile-thumb">
+          <svg viewBox="0 0 320 150" aria-hidden="true">
+            <line x1="40" y1="80" x2="170" y2="86" stroke="#cdbfae" stroke-width="3" stroke-linecap="round"/>
+            <line x1="186" y1="112" x2="280" y2="44" stroke="#3a8f57" stroke-width="3.4" stroke-linecap="round" marker-end="url(#sa)"/>
+            <defs><marker id="sa" markerWidth="8" markerHeight="8" refX="5" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#3a8f57"/></marker></defs>
+            <text x="105" y="74" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#7a6e63">hidden</text>
+            <text x="232" y="98" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#3a8f57">revealed</text>
+          </svg>
+        </span>
+        <div class="tile-body">
+          <div class="tile-meta"><span class="tile-no">05</span><span>Suppression Effect</span>
+            <span class="chip-status live">Live</span></div>
+          <h3>An effect hiding in plain sight</h3>
+          <p class="tile-tag">A real effect can stay invisible until you account for something working against it.</p>
+          <p>Practice looks useless — even harmful — for your test score, because keen learners attempt harder tasks. Control for difficulty and the payoff appears.</p>
+          <span class="tile-cta">Explore →</span>
+        </div>
+      </a>
+
+      <!-- 06 · LORD'S (soon) -->
+      <div class="tile soon">
+        <span class="tile-thumb">
+          <svg viewBox="0 0 320 150" aria-hidden="true">
+            <circle cx="70" cy="75" r="8" fill="#7a6e63"/>
+            <line x1="82" y1="72" x2="250" y2="44" stroke="#b06a16" stroke-width="3" stroke-linecap="round" marker-end="url(#la)"/>
+            <line x1="82" y1="80" x2="250" y2="108" stroke="#2a8f8f" stroke-width="3" stroke-linecap="round" marker-end="url(#lb)"/>
+            <defs>
+              <marker id="la" markerWidth="8" markerHeight="8" refX="5" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#b06a16"/></marker>
+              <marker id="lb" markerWidth="8" markerHeight="8" refX="5" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#2a8f8f"/></marker>
+            </defs>
+          </svg>
+        </span>
+        <div class="tile-body">
+          <div class="tile-meta"><span class="tile-no">06</span><span>Lord's Paradox</span>
+            <span class="chip-status soon">Soon</span></div>
+          <h3>Two analysts, opposite conclusions</h3>
+          <p class="tile-tag">The same before-and-after data can show an effect, or none, depending on how you measure change.</p>
+          <span class="tile-cta">Coming soon</span>
+        </div>
+      </div>
+
+      <!-- 07 · M-BIAS (soon) -->
+      <div class="tile soon">
+        <span class="tile-thumb">
+          <svg viewBox="0 0 320 150" aria-hidden="true">
+            <g stroke="#7a6e63" stroke-width="2.2" fill="none">
+              <path d="M70 110 L120 50 L170 110 L220 50 L270 110"/>
+            </g>
+            <circle cx="70" cy="110" r="7" fill="#b06a16"/><circle cx="120" cy="50" r="7" fill="#7a6e63"/>
+            <circle cx="170" cy="110" r="7" fill="#1a1714"/><circle cx="220" cy="50" r="7" fill="#7a6e63"/>
+            <circle cx="270" cy="110" r="7" fill="#2a8f8f"/>
+          </svg>
+        </span>
+        <div class="tile-body">
+          <div class="tile-meta"><span class="tile-no">07</span><span>M-Bias</span>
+            <span class="chip-status soon">Soon</span></div>
+          <h3>When 'controlling for' backfires</h3>
+          <p class="tile-tag">Adjusting for the wrong variable can create bias rather than remove it.</p>
+          <span class="tile-cta">Coming soon</span>
+        </div>
+      </div>
+
+      <!-- 08 · NONCOLLAPSIBILITY (soon) -->
+      <div class="tile soon">
+        <span class="tile-thumb">
+          <svg viewBox="0 0 320 150" aria-hidden="true">
+            <rect x="60" y="52" width="70" height="46" rx="5" fill="none" stroke="#b06a16" stroke-width="3"/>
+            <rect x="150" y="40" width="46" height="70" rx="5" fill="none" stroke="#2a8f8f" stroke-width="3"/>
+            <rect x="216" y="62" width="58" height="26" rx="5" fill="none" stroke="#3a8f57" stroke-width="3"/>
+          </svg>
+        </span>
+        <div class="tile-body">
+          <div class="tile-meta"><span class="tile-no">08</span><span>Noncollapsibility</span>
+            <span class="chip-status soon">Soon</span></div>
+          <h3>An effect that changes size on adjustment</h3>
+          <p class="tile-tag">Some measures of effect shift when you account for a variable — even with no confounding at all.</p>
+          <span class="tile-cta">Coming soon</span>
+        </div>
+      </div>
+
+    </section>
+
+    <footer>
+      <p>Each piece: synthetic data built to isolate one effect, charts hand-styled to match, an
+        interactive you can drag, and a real documented case. Source in
+        <code>github.com/WillCatt/data-curiosities</code> · built alongside the Claude Skilljar course.</p>
+    </footer>
+  </main>
+</body>
+</html>

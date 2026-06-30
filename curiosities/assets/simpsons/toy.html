@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>More exercise, higher blood sugar?</title>
+<style>
+  :root {
+    --bg: #faf8f4; --ink: #1a1714; --muted: #7a6e63; --grid: #e6ded2;
+    --amber: #b06a16; --grey: #cdbfae;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: ui-sans-serif, system-ui, "Helvetica Neue", Arial, sans-serif;
+    display: flex; justify-content: center; padding: 28px 16px;
+  }
+  .card { width: 100%; max-width: 760px; }
+  h1 { font-size: 1.3rem; margin: 0 0 .25rem; }
+  p.lede { color: var(--muted); margin: 0 0 1.1rem; max-width: 62ch; }
+  p.lede strong { color: var(--ink); }
+  .controls { display: flex; align-items: center; gap: 14px; margin: 6px 0 4px; }
+  .controls label { font-weight: 600; font-size: .92rem; white-space: nowrap; }
+  input[type=range] { flex: 1; accent-color: var(--amber); }
+  .state { font-variant-numeric: tabular-nums; color: var(--muted); font-size: .9rem; min-width: 8ch; }
+  svg { width: 100%; height: auto; display: block; }
+  .axis { stroke: var(--grid); stroke-width: 1; }
+  .axislabel { fill: var(--muted); font-size: 12px; }
+  .callout { font-size: 13px; font-weight: 600; }
+  .hint { color: var(--muted); font-size: .85rem; margin-top: .4rem; }
+  footer { color: var(--muted); font-size: .8rem; margin-top: 1.2rem; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>More exercise, higher blood sugar?</h1>
+  <p class="lede">Drag from <strong>Ignore age</strong> to <strong>Reveal age</strong>. The single upward trend splits into three age bands — and every one slopes <em>down</em>.</p>
+
+  <div class="controls">
+    <label id="leftLabel">Ignore age</label>
+    <input id="reveal" type="range" min="0" max="100" value="0" />
+    <label id="rightLabel">Reveal age</label>
+  </div>
+  <div class="state" id="state"></div>
+
+  <svg id="chart" viewBox="0 0 760 470" role="img"></svg>
+  <div class="hint">Illustrative synthetic data — the real documented cases are in the write-up.</div>
+  <footer>Data Curiosities · 01 — Simpson's Paradox · williamcatt.dev</footer>
+</div>
+
+<script>
+const DATA = {"points": [{"x": 2.001, "y": 86.714, "band": 0}, {"x": 2.299, "y": 86.611, "band": 0}, {"x": 1.726, "y": 89.496, "band": 0}, {"x": 1.109, "y": 89.063, "band": 0}, {"x": 1.545, "y": 88.136, "band": 0}, {"x": 1.008, "y": 86.244, "band": 0}, {"x": 2.06, "y": 87.869, "band": 0}, {"x": 3.34, "y": 84.525, "band": 0}, {"x": 1.508, "y": 92.286, "band": 0}, {"x": 1.38, "y": 90.952, "band": 0}, {"x": 2.49, "y": 87.144, "band": 0}, {"x": 2.357, "y": 89.434, "band": 0}, {"x": 2.105, "y": 86.812, "band": 0}, {"x": 1.07, "y": 92.645, "band": 0}, {"x": 1.971, "y": 88.031, "band": 0}, {"x": 2.695, "y": 88.638, "band": 0}, {"x": 0.656, "y": 86.278, "band": 0}, {"x": 1.542, "y": 89.772, "band": 0}, {"x": 0.2, "y": 85.815, "band": 0}, {"x": 0.71, "y": 83.957, "band": 0}, {"x": 0.2, "y": 89.967, "band": 0}, {"x": 1.765, "y": 85.676, "band": 0}, {"x": 0.733, "y": 90.52, "band": 0}, {"x": 2.271, "y": 94.3, "band": 0}, {"x": 2.157, "y": 85.254, "band": 0}, {"x": 1.813, "y": 86.427, "band": 0}, {"x": 0.2, "y": 91.496, "band": 0}, {"x": 1.461, "y": 90.341, "band": 0}, {"x": 1.951, "y": 87.548, "band": 0}, {"x": 2.113, "y": 87.201, "band": 0}, {"x": 0.47, "y": 92.556, "band": 0}, {"x": 1.522, "y": 90.324, "band": 0}, {"x": 1.021, "y": 86.465, "band": 0}, {"x": 1.191, "y": 89.057, "band": 0}, {"x": 3.061, "y": 86.408, "band": 0}, {"x": 1.192, "y": 86.129, "band": 0}, {"x": 1.967, "y": 88.832, "band": 0}, {"x": 2.884, "y": 84.011, "band": 0}, {"x": 1.416, "y": 91.85, "band": 0}, {"x": 1.888, "y": 88.757, "band": 0}, {"x": 2.11, "y": 88.091, "band": 0}, {"x": 2.064, "y": 86.125, "band": 0}, {"x": 0.775, "y": 89.604, "band": 0}, {"x": 2.076, "y": 81.885, "band": 0}, {"x": 3.359, "y": 82.432, "band": 0}, {"x": 0.453, "y": 91.564, "band": 0}, {"x": 2.859, "y": 80.239, "band": 0}, {"x": 2.119, "y": 90.349, "band": 0}, {"x": 1.359, "y": 83.788, "band": 0}, {"x": 4.0, "y": 87.07, "band": 0}, {"x": 2.762, "y": 84.244, "band": 0}, {"x": 0.801, "y": 92.256, "band": 0}, {"x": 2.075, "y": 88.274, "band": 0}, {"x": 2.577, "y": 82.467, "band": 0}, {"x": 1.811, "y": 92.049, "band": 0}, {"x": 2.683, "y": 91.232, "band": 0}, {"x": 1.933, "y": 87.909, "band": 0}, {"x": 2.667, "y": 86.111, "band": 0}, {"x": 3.439, "y": 85.219, "band": 0}, {"x": 1.324, "y": 86.156, "band": 0}, {"x": 2.203, "y": 90.971, "band": 0}, {"x": 1.537, "y": 87.113, "band": 0}, {"x": 2.127, "y": 87.643, "band": 0}, {"x": 0.813, "y": 87.52, "band": 0}, {"x": 1.421, "y": 87.049, "band": 0}, {"x": 1.804, "y": 84.481, "band": 0}, {"x": 2.899, "y": 90.333, "band": 0}, {"x": 3.145, "y": 85.705, "band": 0}, {"x": 0.676, "y": 93.015, "band": 0}, {"x": 1.205, "y": 89.311, "band": 0}, {"x": 2.647, "y": 84.882, "band": 0}, {"x": 0.2, "y": 89.9, "band": 0}, {"x": 1.537, "y": 87.06, "band": 0}, {"x": 1.903, "y": 88.18, "band": 0}, {"x": 3.257, "y": 84.863, "band": 0}, {"x": 2.689, "y": 85.997, "band": 0}, {"x": 1.673, "y": 84.388, "band": 0}, {"x": 1.631, "y": 86.169, "band": 0}, {"x": 1.75, "y": 93.362, "band": 0}, {"x": 3.524, "y": 83.549, "band": 0}, {"x": 3.146, "y": 96.306, "band": 1}, {"x": 4.537, "y": 97.69, "band": 1}, {"x": 5.607, "y": 93.501, "band": 1}, {"x": 2.746, "y": 98.57, "band": 1}, {"x": 3.991, "y": 95.461, "band": 1}, {"x": 3.568, "y": 100.475, "band": 1}, {"x": 2.439, "y": 98.753, "band": 1}, {"x": 4.935, "y": 88.223, "band": 1}, {"x": 4.177, "y": 93.961, "band": 1}, {"x": 4.271, "y": 89.979, "band": 1}, {"x": 3.448, "y": 87.449, "band": 1}, {"x": 4.655, "y": 93.682, "band": 1}, {"x": 3.661, "y": 100.864, "band": 1}, {"x": 4.057, "y": 96.37, "band": 1}, {"x": 3.092, "y": 94.256, "band": 1}, {"x": 2.984, "y": 95.124, "band": 1}, {"x": 5.536, "y": 97.255, "band": 1}, {"x": 3.693, "y": 97.284, "band": 1}, {"x": 4.492, "y": 95.677, "band": 1}, {"x": 4.166, "y": 95.894, "band": 1}, {"x": 3.759, "y": 96.821, "band": 1}, {"x": 3.692, "y": 99.229, "band": 1}, {"x": 4.83, "y": 96.65, "band": 1}, {"x": 3.898, "y": 97.13, "band": 1}, {"x": 4.049, "y": 93.114, "band": 1}, {"x": 4.222, "y": 97.498, "band": 1}, {"x": 5.377, "y": 92.065, "band": 1}, {"x": 4.881, "y": 98.193, "band": 1}, {"x": 4.583, "y": 91.575, "band": 1}, {"x": 3.636, "y": 96.489, "band": 1}, {"x": 2.818, "y": 98.189, "band": 1}, {"x": 5.15, "y": 90.507, "band": 1}, {"x": 5.166, "y": 99.62, "band": 1}, {"x": 4.059, "y": 100.606, "band": 1}, {"x": 4.742, "y": 93.742, "band": 1}, {"x": 4.981, "y": 97.065, "band": 1}, {"x": 5.031, "y": 95.806, "band": 1}, {"x": 5.121, "y": 86.685, "band": 1}, {"x": 3.744, "y": 97.48, "band": 1}, {"x": 5.715, "y": 93.392, "band": 1}, {"x": 2.953, "y": 98.244, "band": 1}, {"x": 5.062, "y": 91.391, "band": 1}, {"x": 4.694, "y": 94.402, "band": 1}, {"x": 5.074, "y": 94.067, "band": 1}, {"x": 6.079, "y": 96.558, "band": 1}, {"x": 5.684, "y": 94.628, "band": 1}, {"x": 3.055, "y": 97.816, "band": 1}, {"x": 2.511, "y": 103.289, "band": 1}, {"x": 5.017, "y": 93.027, "band": 1}, {"x": 3.185, "y": 96.456, "band": 1}, {"x": 4.188, "y": 90.57, "band": 1}, {"x": 5.04, "y": 99.364, "band": 1}, {"x": 2.556, "y": 101.523, "band": 1}, {"x": 2.09, "y": 102.127, "band": 1}, {"x": 4.459, "y": 97.592, "band": 1}, {"x": 4.244, "y": 96.259, "band": 1}, {"x": 3.954, "y": 97.04, "band": 1}, {"x": 4.239, "y": 95.182, "band": 1}, {"x": 3.339, "y": 96.766, "band": 1}, {"x": 2.687, "y": 98.585, "band": 1}, {"x": 4.033, "y": 100.802, "band": 1}, {"x": 3.228, "y": 99.222, "band": 1}, {"x": 2.557, "y": 98.454, "band": 1}, {"x": 4.706, "y": 93.453, "band": 1}, {"x": 4.139, "y": 94.193, "band": 1}, {"x": 4.607, "y": 100.158, "band": 1}, {"x": 3.211, "y": 99.103, "band": 1}, {"x": 3.542, "y": 97.256, "band": 1}, {"x": 3.201, "y": 96.56, "band": 1}, {"x": 3.313, "y": 94.091, "band": 1}, {"x": 4.395, "y": 95.487, "band": 1}, {"x": 3.417, "y": 99.874, "band": 1}, {"x": 4.556, "y": 94.253, "band": 1}, {"x": 4.54, "y": 94.775, "band": 1}, {"x": 6.225, "y": 92.097, "band": 1}, {"x": 2.807, "y": 98.557, "band": 1}, {"x": 5.088, "y": 89.8, "band": 1}, {"x": 4.111, "y": 95.437, "band": 1}, {"x": 4.186, "y": 93.459, "band": 1}, {"x": 2.75, "y": 100.974, "band": 1}, {"x": 5.629, "y": 105.759, "band": 2}, {"x": 6.977, "y": 104.253, "band": 2}, {"x": 7.924, "y": 100.43, "band": 2}, {"x": 6.086, "y": 107.589, "band": 2}, {"x": 5.798, "y": 105.594, "band": 2}, {"x": 6.591, "y": 100.054, "band": 2}, {"x": 6.398, "y": 101.211, "band": 2}, {"x": 5.406, "y": 108.006, "band": 2}, {"x": 6.861, "y": 104.654, "band": 2}, {"x": 8.416, "y": 95.078, "band": 2}, {"x": 6.142, "y": 108.456, "band": 2}, {"x": 6.197, "y": 106.119, "band": 2}, {"x": 5.355, "y": 109.702, "band": 2}, {"x": 6.719, "y": 102.338, "band": 2}, {"x": 5.153, "y": 105.108, "band": 2}, {"x": 5.293, "y": 102.392, "band": 2}, {"x": 7.68, "y": 109.563, "band": 2}, {"x": 5.495, "y": 104.922, "band": 2}, {"x": 7.481, "y": 107.032, "band": 2}, {"x": 7.924, "y": 99.619, "band": 2}, {"x": 6.659, "y": 104.077, "band": 2}, {"x": 6.953, "y": 98.101, "band": 2}, {"x": 8.352, "y": 99.728, "band": 2}, {"x": 6.203, "y": 107.266, "band": 2}, {"x": 5.807, "y": 101.194, "band": 2}, {"x": 5.047, "y": 109.382, "band": 2}, {"x": 6.442, "y": 104.945, "band": 2}, {"x": 7.879, "y": 98.502, "band": 2}, {"x": 7.36, "y": 100.96, "band": 2}, {"x": 5.458, "y": 104.13, "band": 2}, {"x": 5.545, "y": 105.22, "band": 2}, {"x": 5.896, "y": 103.198, "band": 2}, {"x": 6.692, "y": 101.051, "band": 2}, {"x": 6.195, "y": 103.415, "band": 2}, {"x": 6.614, "y": 100.576, "band": 2}, {"x": 6.697, "y": 99.657, "band": 2}, {"x": 6.101, "y": 104.334, "band": 2}, {"x": 6.36, "y": 106.713, "band": 2}, {"x": 6.607, "y": 99.081, "band": 2}, {"x": 6.316, "y": 104.145, "band": 2}, {"x": 6.904, "y": 101.244, "band": 2}, {"x": 8.271, "y": 98.075, "band": 2}, {"x": 6.992, "y": 105.613, "band": 2}, {"x": 6.456, "y": 102.356, "band": 2}, {"x": 4.714, "y": 111.193, "band": 2}, {"x": 6.788, "y": 101.04, "band": 2}, {"x": 4.453, "y": 108.274, "band": 2}, {"x": 4.991, "y": 105.573, "band": 2}, {"x": 7.255, "y": 100.371, "band": 2}, {"x": 7.106, "y": 104.633, "band": 2}, {"x": 6.25, "y": 103.775, "band": 2}, {"x": 4.69, "y": 108.546, "band": 2}, {"x": 6.029, "y": 104.452, "band": 2}, {"x": 5.721, "y": 101.829, "band": 2}, {"x": 7.037, "y": 102.675, "band": 2}, {"x": 8.658, "y": 100.543, "band": 2}, {"x": 6.617, "y": 106.528, "band": 2}, {"x": 5.621, "y": 102.528, "band": 2}, {"x": 5.229, "y": 105.755, "band": 2}, {"x": 6.344, "y": 98.924, "band": 2}, {"x": 6.223, "y": 106.237, "band": 2}, {"x": 5.248, "y": 102.598, "band": 2}, {"x": 6.516, "y": 98.395, "band": 2}, {"x": 5.249, "y": 105.664, "band": 2}, {"x": 7.512, "y": 105.538, "band": 2}, {"x": 7.463, "y": 97.726, "band": 2}, {"x": 7.485, "y": 99.0, "band": 2}, {"x": 5.926, "y": 102.529, "band": 2}, {"x": 6.915, "y": 99.788, "band": 2}, {"x": 6.268, "y": 105.35, "band": 2}, {"x": 6.011, "y": 102.2, "band": 2}, {"x": 6.061, "y": 102.378, "band": 2}, {"x": 5.1, "y": 107.829, "band": 2}, {"x": 4.956, "y": 104.044, "band": 2}, {"x": 7.194, "y": 104.027, "band": 2}, {"x": 6.209, "y": 101.392, "band": 2}, {"x": 6.616, "y": 100.017, "band": 2}, {"x": 7.402, "y": 96.891, "band": 2}, {"x": 4.667, "y": 112.357, "band": 2}, {"x": 5.616, "y": 104.294, "band": 2}], "bands": ["Age 20\u201335", "Age 36\u201350", "Age 51\u201365"], "bandColors": ["#b06a16", "#2a8f8f", "#3a8f57"], "pooled": {"m": 2.4081328159306974, "b": 85.87605029156123}, "bandFits": [{"m": -1.4924448423633927, "b": 90.51741214144666}, {"m": -1.8598475828531957, "b": 103.62981297613086}, {"m": -2.2694198180647835, "b": 117.89922362113647}], "xLabel": "Exercise (hours per week)", "yLabel": "Fasting blood sugar (mg/dL)", "title": "More exercise, higher blood sugar?", "lede": "Drag from <strong>Ignore age</strong> to <strong>Reveal age</strong>. The single upward trend splits into three age bands \u2014 and every one slopes <em>down</em>.", "left": "Ignore age", "right": "Reveal age", "calloutPooled": "\u2197 pooled trend slopes up", "calloutSplit": "\u2198 every age band slopes down", "statePooled": "pooled view", "stateSplit": "split by age", "hint": "Illustrative synthetic data \u2014 the real documented cases are in the write-up.", "footer": "Data Curiosities \u00b7 01 \u2014 Simpson's Paradox \u00b7 williamcatt.dev", "domain": {"x": [-0.3, 9.157730532427532], "y": [75.239286573699, 117.3566203527609]}};
+
+const svg = document.getElementById("chart");
+const NS = "http://www.w3.org/2000/svg";
+const W = 760, H = 470;
+const M = { l: 64, r: 18, t: 18, b: 52 };
+const plotW = W - M.l - M.r, plotH = H - M.t - M.b;
+
+const [x0, x1] = DATA.domain.x, [y0, y1] = DATA.domain.y;
+const sx = v => M.l + (v - x0) / (x1 - x0) * plotW;
+const sy = v => M.t + (1 - (v - y0) / (y1 - y0)) * plotH;
+
+const GREY = "#cdbfae", AMBER = "#b06a16", MUTED = "#7a6e63";
+
+function hexToRgb(h){ h=h.replace('#',''); return [0,2,4].map(i=>parseInt(h.slice(i,i+2),16)); }
+function lerp(a,b,t){ return a+(b-a)*t; }
+function mix(h1,h2,t){ const a=hexToRgb(h1),b=hexToRgb(h2);
+  return `rgb(${a.map((v,i)=>Math.round(lerp(v,b[i],t))).join(',')})`; }
+function el(name, attrs){ const e=document.createElementNS(NS,name);
+  for(const k in attrs) e.setAttribute(k, attrs[k]); return e; }
+
+function drawAxes(){
+  svg.appendChild(el("line",{class:"axis",x1:M.l,y1:M.t,x2:M.l,y2:M.t+plotH}));
+  svg.appendChild(el("line",{class:"axis",x1:M.l,y1:M.t+plotH,x2:M.l+plotW,y2:M.t+plotH}));
+  const xl = el("text",{class:"axislabel","text-anchor":"middle",x:M.l+plotW/2,y:H-12});
+  xl.textContent = DATA.xLabel; svg.appendChild(xl);
+  const yl = el("text",{class:"axislabel","text-anchor":"middle",
+    transform:`translate(15,${M.t+plotH/2}) rotate(-90)`});
+  yl.textContent = DATA.yLabel; svg.appendChild(yl);
+}
+
+const dyn = el("g",{});
+drawAxes();
+svg.appendChild(dyn);
+
+function lineSeg(m,b,xa,xb,color,opacity,width){
+  return el("line",{x1:sx(xa),y1:sy(m*xa+b),x2:sx(xb),y2:sy(m*xb+b),
+    stroke:color,"stroke-width":width,"stroke-opacity":opacity,"stroke-linecap":"round"});
+}
+function bandExtent(bi){
+  let lo=Infinity, hi=-Infinity;
+  for(const p of DATA.points) if(p.band===bi){ lo=Math.min(lo,p.x); hi=Math.max(hi,p.x); }
+  return [lo,hi];
+}
+
+function render(t){
+  dyn.replaceChildren();
+  for(const p of DATA.points){
+    const col = mix(GREY, DATA.bandColors[p.band], t);
+    dyn.appendChild(el("circle",{cx:sx(p.x),cy:sy(p.y),r:3.6,fill:col,"fill-opacity":0.9-0.05*t}));
+  }
+  if(t < 0.999){
+    dyn.appendChild(lineSeg(DATA.pooled.m, DATA.pooled.b, x0+0.4*(x1-x0)/8, x1-0.4*(x1-x0)/8, AMBER, 1-t, 3.4));
+  }
+  DATA.bandFits.forEach((f,i)=>{
+    const [xa,xb] = bandExtent(i);
+    dyn.appendChild(lineSeg(f.m, f.b, xa, xb, DATA.bandColors[i], t, 3.4));
+  });
+  const txt = el("text",{class:"callout","text-anchor":"end",x:W-M.r,y:M.t+plotH-10});
+  txt.textContent = t < 0.5 ? DATA.calloutPooled : DATA.calloutSplit;
+  txt.setAttribute("fill", t < 0.5 ? AMBER : MUTED);
+  dyn.appendChild(txt);
+}
+
+const slider = document.getElementById("reveal");
+const stateEl = document.getElementById("state");
+function update(){
+  const t = slider.value/100;
+  render(t);
+  stateEl.textContent = t<0.05 ? DATA.statePooled : t>0.95 ? DATA.stateSplit : `${slider.value}%`;
+}
+slider.addEventListener("input", update);
+update();
+</script>
+</body>
+</html>

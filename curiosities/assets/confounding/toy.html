@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ice cream is linked to drownings?</title>
+<style>
+  :root {
+    --bg: #faf8f4; --ink: #1a1714; --muted: #7a6e63; --grid: #e6ded2;
+    --amber: #b06a16; --grey: #cdbfae;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: ui-sans-serif, system-ui, "Helvetica Neue", Arial, sans-serif;
+    display: flex; justify-content: center; padding: 28px 16px;
+  }
+  .card { width: 100%; max-width: 760px; }
+  h1 { font-size: 1.3rem; margin: 0 0 .25rem; }
+  p.lede { color: var(--muted); margin: 0 0 1.1rem; max-width: 62ch; }
+  p.lede strong { color: var(--ink); }
+  .controls { display: flex; align-items: center; gap: 14px; margin: 6px 0 4px; }
+  .controls label { font-weight: 600; font-size: .92rem; white-space: nowrap; }
+  input[type=range] { flex: 1; accent-color: var(--amber); }
+  .state { font-variant-numeric: tabular-nums; color: var(--muted); font-size: .9rem; min-width: 8ch; }
+  svg { width: 100%; height: auto; display: block; }
+  .axis { stroke: var(--grid); stroke-width: 1; }
+  .axislabel { fill: var(--muted); font-size: 12px; }
+  .callout { font-size: 13px; font-weight: 600; }
+  .hint { color: var(--muted); font-size: .85rem; margin-top: .4rem; }
+  footer { color: var(--muted); font-size: .8rem; margin-top: 1.2rem; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>Ice cream is linked to drownings?</h1>
+  <p class="lede">Drag from <strong>Ignore weather</strong> to <strong>Group by temperature</strong>. The strong upward link flattens out once each group shares the same weather.</p>
+
+  <div class="controls">
+    <label id="leftLabel">Ignore weather</label>
+    <input id="reveal" type="range" min="0" max="100" value="0" />
+    <label id="rightLabel">Group by temperature</label>
+  </div>
+  <div class="state" id="state"></div>
+
+  <svg id="chart" viewBox="0 0 760 470" role="img"></svg>
+  <div class="hint">Illustrative synthetic data. Temperature is the lurking cause of both.</div>
+  <footer>Data Curiosities · 02 — Confounding · williamcatt.dev</footer>
+</div>
+
+<script>
+const DATA = {"points": [{"x": 129.535, "y": 3.043, "band": 0}, {"x": 135.526, "y": 3.43, "band": 0}, {"x": 123.265, "y": 3.655, "band": 0}, {"x": 117.948, "y": 2.394, "band": 0}, {"x": 128.776, "y": 3.102, "band": 0}, {"x": 134.014, "y": 3.529, "band": 0}, {"x": 97.439, "y": 4.259, "band": 0}, {"x": 125.826, "y": 3.409, "band": 0}, {"x": 127.681, "y": 1.923, "band": 0}, {"x": 94.952, "y": 3.129, "band": 0}, {"x": 114.946, "y": 4.549, "band": 0}, {"x": 130.675, "y": 4.962, "band": 0}, {"x": 102.867, "y": 4.653, "band": 0}, {"x": 120.626, "y": 3.048, "band": 0}, {"x": 128.587, "y": 2.883, "band": 0}, {"x": 96.05, "y": 6.16, "band": 0}, {"x": 117.68, "y": 4.896, "band": 0}, {"x": 93.727, "y": 5.75, "band": 0}, {"x": 115.95, "y": 6.093, "band": 0}, {"x": 141.784, "y": 3.12, "band": 0}, {"x": 133.975, "y": 3.945, "band": 0}, {"x": 74.568, "y": 3.819, "band": 0}, {"x": 109.743, "y": 4.542, "band": 0}, {"x": 117.412, "y": 4.182, "band": 0}, {"x": 117.676, "y": 3.408, "band": 0}, {"x": 112.082, "y": 3.731, "band": 0}, {"x": 99.065, "y": 1.998, "band": 0}, {"x": 106.705, "y": 3.236, "band": 0}, {"x": 99.44, "y": 2.5, "band": 0}, {"x": 111.499, "y": 3.95, "band": 0}, {"x": 112.331, "y": 3.573, "band": 0}, {"x": 117.184, "y": 4.406, "band": 0}, {"x": 111.172, "y": 4.463, "band": 0}, {"x": 116.394, "y": 4.263, "band": 0}, {"x": 117.782, "y": 4.377, "band": 0}, {"x": 93.131, "y": 3.806, "band": 0}, {"x": 112.422, "y": 3.482, "band": 0}, {"x": 140.902, "y": 3.953, "band": 0}, {"x": 109.345, "y": 3.189, "band": 0}, {"x": 86.034, "y": 3.966, "band": 0}, {"x": 136.02, "y": 3.927, "band": 0}, {"x": 123.8, "y": 4.519, "band": 0}, {"x": 154.062, "y": 2.69, "band": 0}, {"x": 102.543, "y": 4.365, "band": 0}, {"x": 101.189, "y": 2.749, "band": 0}, {"x": 85.687, "y": 2.724, "band": 0}, {"x": 115.887, "y": 3.028, "band": 0}, {"x": 151.187, "y": 3.221, "band": 0}, {"x": 107.574, "y": 4.289, "band": 0}, {"x": 97.848, "y": 2.932, "band": 0}, {"x": 135.649, "y": 3.067, "band": 0}, {"x": 110.266, "y": 3.133, "band": 0}, {"x": 116.235, "y": 5.444, "band": 0}, {"x": 112.959, "y": 3.977, "band": 0}, {"x": 125.862, "y": 2.822, "band": 0}, {"x": 116.54, "y": 3.383, "band": 0}, {"x": 120.203, "y": 2.285, "band": 0}, {"x": 132.651, "y": 5.961, "band": 0}, {"x": 91.151, "y": 1.557, "band": 0}, {"x": 121.921, "y": 4.438, "band": 0}, {"x": 81.661, "y": 4.318, "band": 0}, {"x": 101.203, "y": 2.455, "band": 0}, {"x": 120.928, "y": 3.99, "band": 0}, {"x": 105.563, "y": 4.891, "band": 0}, {"x": 125.41, "y": 4.424, "band": 0}, {"x": 113.181, "y": 3.807, "band": 0}, {"x": 138.258, "y": 5.036, "band": 0}, {"x": 124.358, "y": 3.943, "band": 0}, {"x": 132.966, "y": 4.328, "band": 0}, {"x": 107.427, "y": 3.494, "band": 0}, {"x": 178.543, "y": 6.553, "band": 1}, {"x": 149.044, "y": 5.381, "band": 1}, {"x": 167.716, "y": 5.862, "band": 1}, {"x": 158.72, "y": 2.316, "band": 1}, {"x": 130.729, "y": 4.595, "band": 1}, {"x": 149.577, "y": 5.902, "band": 1}, {"x": 193.652, "y": 7.512, "band": 1}, {"x": 169.926, "y": 7.532, "band": 1}, {"x": 147.093, "y": 6.603, "band": 1}, {"x": 167.482, "y": 4.146, "band": 1}, {"x": 144.897, "y": 2.637, "band": 1}, {"x": 158.709, "y": 5.788, "band": 1}, {"x": 147.537, "y": 5.259, "band": 1}, {"x": 137.619, "y": 5.517, "band": 1}, {"x": 135.752, "y": 5.123, "band": 1}, {"x": 164.749, "y": 5.112, "band": 1}, {"x": 142.124, "y": 3.327, "band": 1}, {"x": 119.708, "y": 5.221, "band": 1}, {"x": 138.307, "y": 4.225, "band": 1}, {"x": 141.751, "y": 5.283, "band": 1}, {"x": 166.059, "y": 5.97, "band": 1}, {"x": 155.96, "y": 5.604, "band": 1}, {"x": 161.323, "y": 5.54, "band": 1}, {"x": 217.211, "y": 5.534, "band": 1}, {"x": 135.564, "y": 5.951, "band": 1}, {"x": 142.373, "y": 5.14, "band": 1}, {"x": 153.089, "y": 4.646, "band": 1}, {"x": 162.975, "y": 4.696, "band": 1}, {"x": 126.52, "y": 6.981, "band": 1}, {"x": 142.787, "y": 5.185, "band": 1}, {"x": 167.932, "y": 6.474, "band": 1}, {"x": 147.173, "y": 5.356, "band": 1}, {"x": 164.716, "y": 4.107, "band": 1}, {"x": 144.009, "y": 4.305, "band": 1}, {"x": 156.417, "y": 5.265, "band": 1}, {"x": 193.398, "y": 5.369, "band": 1}, {"x": 154.76, "y": 6.192, "band": 1}, {"x": 159.912, "y": 4.359, "band": 1}, {"x": 151.508, "y": 4.413, "band": 1}, {"x": 162.085, "y": 5.319, "band": 1}, {"x": 176.851, "y": 7.262, "band": 1}, {"x": 164.66, "y": 2.832, "band": 1}, {"x": 155.462, "y": 6.018, "band": 1}, {"x": 155.223, "y": 4.481, "band": 1}, {"x": 200.042, "y": 5.911, "band": 1}, {"x": 193.24, "y": 5.307, "band": 1}, {"x": 124.765, "y": 5.858, "band": 1}, {"x": 148.061, "y": 6.723, "band": 1}, {"x": 149.583, "y": 5.784, "band": 1}, {"x": 176.831, "y": 6.081, "band": 1}, {"x": 157.117, "y": 5.728, "band": 1}, {"x": 177.649, "y": 4.194, "band": 1}, {"x": 183.851, "y": 6.291, "band": 1}, {"x": 156.468, "y": 4.571, "band": 1}, {"x": 163.445, "y": 4.468, "band": 1}, {"x": 155.281, "y": 5.152, "band": 1}, {"x": 149.303, "y": 4.568, "band": 1}, {"x": 185.841, "y": 6.419, "band": 1}, {"x": 166.821, "y": 5.264, "band": 1}, {"x": 139.883, "y": 4.244, "band": 1}, {"x": 179.628, "y": 6.994, "band": 1}, {"x": 154.546, "y": 6.149, "band": 1}, {"x": 136.647, "y": 5.988, "band": 1}, {"x": 138.307, "y": 5.648, "band": 1}, {"x": 150.606, "y": 5.164, "band": 1}, {"x": 153.198, "y": 4.942, "band": 1}, {"x": 118.496, "y": 4.946, "band": 1}, {"x": 170.669, "y": 6.257, "band": 1}, {"x": 168.443, "y": 5.473, "band": 1}, {"x": 150.975, "y": 3.501, "band": 1}, {"x": 202.614, "y": 7.2, "band": 2}, {"x": 176.09, "y": 4.387, "band": 2}, {"x": 195.072, "y": 5.708, "band": 2}, {"x": 203.128, "y": 6.394, "band": 2}, {"x": 188.88, "y": 5.174, "band": 2}, {"x": 193.608, "y": 5.162, "band": 2}, {"x": 179.728, "y": 5.246, "band": 2}, {"x": 198.286, "y": 5.058, "band": 2}, {"x": 215.442, "y": 6.643, "band": 2}, {"x": 214.194, "y": 6.167, "band": 2}, {"x": 187.185, "y": 6.384, "band": 2}, {"x": 201.056, "y": 9.048, "band": 2}, {"x": 177.189, "y": 6.218, "band": 2}, {"x": 181.69, "y": 7.844, "band": 2}, {"x": 201.231, "y": 6.86, "band": 2}, {"x": 188.267, "y": 4.906, "band": 2}, {"x": 200.037, "y": 6.734, "band": 2}, {"x": 213.059, "y": 5.678, "band": 2}, {"x": 201.772, "y": 7.204, "band": 2}, {"x": 197.761, "y": 5.243, "band": 2}, {"x": 197.98, "y": 7.57, "band": 2}, {"x": 190.638, "y": 7.125, "band": 2}, {"x": 205.405, "y": 4.675, "band": 2}, {"x": 188.153, "y": 6.914, "band": 2}, {"x": 193.335, "y": 8.169, "band": 2}, {"x": 210.524, "y": 5.777, "band": 2}, {"x": 190.526, "y": 8.019, "band": 2}, {"x": 230.914, "y": 5.054, "band": 2}, {"x": 182.673, "y": 6.731, "band": 2}, {"x": 188.587, "y": 4.536, "band": 2}, {"x": 183.038, "y": 7.275, "band": 2}, {"x": 202.916, "y": 4.517, "band": 2}, {"x": 212.858, "y": 3.605, "band": 2}, {"x": 223.364, "y": 7.381, "band": 2}, {"x": 225.889, "y": 9.657, "band": 2}, {"x": 178.752, "y": 6.03, "band": 2}, {"x": 185.204, "y": 7.452, "band": 2}, {"x": 197.008, "y": 6.905, "band": 2}, {"x": 166.794, "y": 5.64, "band": 2}, {"x": 213.543, "y": 7.271, "band": 2}, {"x": 190.401, "y": 8.067, "band": 2}, {"x": 220.596, "y": 6.006, "band": 2}, {"x": 211.739, "y": 7.451, "band": 2}, {"x": 186.034, "y": 7.025, "band": 2}, {"x": 183.417, "y": 4.971, "band": 2}, {"x": 161.516, "y": 7.571, "band": 2}, {"x": 211.81, "y": 8.972, "band": 2}, {"x": 218.424, "y": 6.073, "band": 2}, {"x": 199.097, "y": 8.278, "band": 2}, {"x": 219.658, "y": 6.88, "band": 2}, {"x": 185.934, "y": 6.652, "band": 2}, {"x": 175.291, "y": 7.758, "band": 2}, {"x": 209.049, "y": 7.15, "band": 2}, {"x": 192.123, "y": 7.389, "band": 2}, {"x": 192.743, "y": 8.343, "band": 2}, {"x": 211.59, "y": 7.997, "band": 2}, {"x": 221.001, "y": 7.835, "band": 2}, {"x": 198.283, "y": 4.566, "band": 2}, {"x": 199.498, "y": 4.9, "band": 2}, {"x": 205.154, "y": 8.176, "band": 2}, {"x": 201.186, "y": 5.183, "band": 2}, {"x": 202.312, "y": 7.081, "band": 2}, {"x": 198.72, "y": 5.285, "band": 2}, {"x": 196.578, "y": 5.732, "band": 2}, {"x": 191.839, "y": 5.16, "band": 2}, {"x": 180.122, "y": 8.082, "band": 2}, {"x": 200.934, "y": 5.581, "band": 2}, {"x": 195.125, "y": 6.091, "band": 2}, {"x": 214.836, "y": 6.729, "band": 2}, {"x": 193.089, "y": 7.69, "band": 2}], "bands": ["Cool days", "Mild days", "Hot days"], "bandColors": ["#b06a16", "#2a8f8f", "#3a8f57"], "pooled": {"m": 0.028579755740645463, "b": 0.7286048439333789}, "bandFits": [{"m": -0.0006078574450510259, "b": 3.84127326434758}, {"m": 0.013279345483590665, "b": 3.2328350401857233}, {"m": 0.006241906439384843, "b": 5.310988037721016}], "xLabel": "Ice-cream sales (index)", "yLabel": "Drowning incidents", "title": "Ice cream is linked to drownings?", "lede": "Drag from <strong>Ignore weather</strong> to <strong>Group by temperature</strong>. The strong upward link flattens out once each group shares the same weather.", "left": "Ignore weather", "right": "Group by temperature", "calloutPooled": "\u2197 more ice cream, more drownings", "calloutSplit": "\u2192 within a temperature, no link", "statePooled": "pooled view", "stateSplit": "held at one temperature", "hint": "Illustrative synthetic data. Temperature is the lurking cause of both.", "footer": "Data Curiosities \u00b7 02 \u2014 Confounding \u00b7 williamcatt.dev", "domain": {"x": [74.06831616380938, 231.41428414179444], "y": [0.7574040789941725, 10.457394863719276]}};
+
+const svg = document.getElementById("chart");
+const NS = "http://www.w3.org/2000/svg";
+const W = 760, H = 470;
+const M = { l: 64, r: 18, t: 18, b: 52 };
+const plotW = W - M.l - M.r, plotH = H - M.t - M.b;
+
+const [x0, x1] = DATA.domain.x, [y0, y1] = DATA.domain.y;
+const sx = v => M.l + (v - x0) / (x1 - x0) * plotW;
+const sy = v => M.t + (1 - (v - y0) / (y1 - y0)) * plotH;
+
+const GREY = "#cdbfae", AMBER = "#b06a16", MUTED = "#7a6e63";
+
+function hexToRgb(h){ h=h.replace('#',''); return [0,2,4].map(i=>parseInt(h.slice(i,i+2),16)); }
+function lerp(a,b,t){ return a+(b-a)*t; }
+function mix(h1,h2,t){ const a=hexToRgb(h1),b=hexToRgb(h2);
+  return `rgb(${a.map((v,i)=>Math.round(lerp(v,b[i],t))).join(',')})`; }
+function el(name, attrs){ const e=document.createElementNS(NS,name);
+  for(const k in attrs) e.setAttribute(k, attrs[k]); return e; }
+
+function drawAxes(){
+  svg.appendChild(el("line",{class:"axis",x1:M.l,y1:M.t,x2:M.l,y2:M.t+plotH}));
+  svg.appendChild(el("line",{class:"axis",x1:M.l,y1:M.t+plotH,x2:M.l+plotW,y2:M.t+plotH}));
+  const xl = el("text",{class:"axislabel","text-anchor":"middle",x:M.l+plotW/2,y:H-12});
+  xl.textContent = DATA.xLabel; svg.appendChild(xl);
+  const yl = el("text",{class:"axislabel","text-anchor":"middle",
+    transform:`translate(15,${M.t+plotH/2}) rotate(-90)`});
+  yl.textContent = DATA.yLabel; svg.appendChild(yl);
+}
+
+const dyn = el("g",{});
+drawAxes();
+svg.appendChild(dyn);
+
+function lineSeg(m,b,xa,xb,color,opacity,width){
+  return el("line",{x1:sx(xa),y1:sy(m*xa+b),x2:sx(xb),y2:sy(m*xb+b),
+    stroke:color,"stroke-width":width,"stroke-opacity":opacity,"stroke-linecap":"round"});
+}
+function bandExtent(bi){
+  let lo=Infinity, hi=-Infinity;
+  for(const p of DATA.points) if(p.band===bi){ lo=Math.min(lo,p.x); hi=Math.max(hi,p.x); }
+  return [lo,hi];
+}
+
+function render(t){
+  dyn.replaceChildren();
+  for(const p of DATA.points){
+    const col = mix(GREY, DATA.bandColors[p.band], t);
+    dyn.appendChild(el("circle",{cx:sx(p.x),cy:sy(p.y),r:3.6,fill:col,"fill-opacity":0.9-0.05*t}));
+  }
+  if(t < 0.999){
+    dyn.appendChild(lineSeg(DATA.pooled.m, DATA.pooled.b, x0+0.4*(x1-x0)/8, x1-0.4*(x1-x0)/8, AMBER, 1-t, 3.4));
+  }
+  DATA.bandFits.forEach((f,i)=>{
+    const [xa,xb] = bandExtent(i);
+    dyn.appendChild(lineSeg(f.m, f.b, xa, xb, DATA.bandColors[i], t, 3.4));
+  });
+  const txt = el("text",{class:"callout","text-anchor":"end",x:W-M.r,y:M.t+plotH-10});
+  txt.textContent = t < 0.5 ? DATA.calloutPooled : DATA.calloutSplit;
+  txt.setAttribute("fill", t < 0.5 ? AMBER : MUTED);
+  dyn.appendChild(txt);
+}
+
+const slider = document.getElementById("reveal");
+const stateEl = document.getElementById("state");
+function update(){
+  const t = slider.value/100;
+  render(t);
+  stateEl.textContent = t<0.05 ? DATA.statePooled : t>0.95 ? DATA.stateSplit : `${slider.value}%`;
+}
+slider.addEventListener("input", update);
+update();
+</script>
+</body>
+</html>
