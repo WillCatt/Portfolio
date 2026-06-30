@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>M-Bias · Data Curiosities</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <meta name="description" content="M-bias, explained interactively: controlling for a pre-treatment variable can create bias instead of removing it, when that variable is a collider. Test prep, GPA and SAT — drag to watch adjusting invent a link." />
+  <link rel="canonical" href="https://williamcatt.dev/curiosities/pieces/m-bias.html" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <main>
+    <a class="back-link" href="../index.html">← Data Curiosities</a>
+    <header class="hub-hero" style="padding-bottom:0">
+      <p class="eyebrow"><a href="../index.html">Data Curiosities</a> · 07</p>
+      <h1>M-Bias</h1>
+    </header>
+
+    <article class="piece">
+      <p class="plain">"Control for everything you measured before the treatment" sounds safe. Sometimes
+        it's the opposite: adjusting for the wrong pre-treatment variable can <em>create</em> a bias that
+        wasn't there to begin with.</p>
+
+      <h2>Try it</h2>
+      <p>Does test prep raise your college GPA? Suppose it truly does nothing. Drag from
+        <strong>Ignore SAT</strong> to <strong>Adjust for SAT</strong> — the move most analysts would make
+        without thinking.</p>
+      <iframe class="toy-frame" src="../assets/m-bias/toy.html" style="height:700px"
+        title="Interactive: test prep vs GPA, unadjusted vs adjusted for SAT"></iframe>
+
+      <h2>What's going on</h2>
+      <p>Ignore SAT and there's no link between prep and GPA — which is the truth here. Adjust for SAT (by
+        comparing students with similar scores) and a downward link appears: among students with the same
+        SAT, the ones who did more prep have lower GPAs. It looks like prep <em>hurts</em>. It doesn't.</p>
+      <p>SAT is a <em>collider</em>. Two hidden things feed into it: family wealth (which also buys test
+        prep) and innate ability (which also lifts GPA). Prep and GPA have no path between them — until you
+        hold SAT fixed. Among students at the same SAT, a high prep count implies they got there partly on
+        wealth, which means less of the ability that drives GPA. Conditioning on the collider opens a
+        back-door path and links two unrelated things. The DAG looks like an "M", which is where the name
+        comes from.</p>
+      <figure class="shot">
+        <img src="../assets/m-bias/fig_split.png" alt="Pooled prep-GPA trend is flat; within each SAT band it slopes down." />
+        <figcaption>The pooled trend is flat (the truth); within each SAT band a spurious downward link appears — manufactured by adjusting.</figcaption>
+      </figure>
+      <p>This is the mirror of <a href="confounding.html">confounding</a>. There, adjusting for a common
+        cause removes a fake link; here, adjusting for a common <em>effect</em> creates one. The same
+        keystroke — "control for SAT" — is the cure in one case and the disease in the other.</p>
+
+      <h2>In the real world</h2>
+      <p>M-bias is the cautionary case against the habit of throwing every available pre-treatment covariate
+        into a regression. Sander Greenland formalised it as "collider-stratification bias" in 2003; later
+        work (Ding &amp; Miratrix) showed that in practice its size is usually modest unless the collider is
+        strongly driven by both hidden causes — but the direction of the lesson stands: <em>which</em>
+        variables you adjust for has to come from a causal model, not from what happens to be in the
+        spreadsheet.</p>
+
+      <h2>How not to get fooled</h2>
+      <p>"Adjust for everything" is not a strategy. A variable is only safe to control for if you know its
+        place in the causal structure; adjusting for a collider (or anything downstream of the treatment)
+        can do harm. When you can, sketch the diagram first and let it tell you what to condition on.</p>
+
+      <h2>Sources</h2>
+      <ul class="sources">
+        <li>S. Greenland (2003), <em>Quantifying biases in causal models: classical confounding vs collider-stratification bias</em>, Epidemiology, 14(3): 300–306. <a href="https://doi.org/10.1097/01.EDE.0000042804.12056.6C">doi</a></li>
+        <li>P. Ding &amp; L. W. Miratrix (2015), <em>To Adjust or Not to Adjust? Sensitivity Analysis of M-Bias and Butterfly-Bias</em>, Journal of Causal Inference, 3(1): 41–57. <a href="https://doi.org/10.1515/jci-2013-0021">doi</a></li>
+        <li>J. Pearl (2009), <em>Causality</em> (2nd ed.), Cambridge University Press — colliders and the back-door criterion.</li>
+      </ul>
+
+      <nav class="piece-nav">
+        <a href="lords.html">← Lord's paradox</a>
+        <a href="../index.html">All curiosities</a>
+        <a href="noncollapsibility.html">Next: Noncollapsibility →</a>
+      </nav>
+    </article>
+  </main>
+</body>
+</html>

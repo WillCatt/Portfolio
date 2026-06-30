@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Noncollapsibility · Data Curiosities</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <meta name="description" content="Noncollapsibility, explained interactively: an odds ratio can change size when you adjust for a variable that isn't a confounder at all. Drag to see the marginal OR drift below the conditional OR with no confounding." />
+  <link rel="canonical" href="https://williamcatt.dev/curiosities/pieces/noncollapsibility.html" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <main>
+    <a class="back-link" href="../index.html">← Data Curiosities</a>
+    <header class="hub-hero" style="padding-bottom:0">
+      <p class="eyebrow"><a href="../index.html">Data Curiosities</a> · 08</p>
+      <h1>Noncollapsibility</h1>
+    </header>
+
+    <article class="piece">
+      <p class="plain">We expect that "adjusting" for something only matters when it's a confounder.
+        For the odds ratio that's not quite true: it can change size when you account for a variable that
+        has nothing to do with confounding — purely because of the arithmetic of odds.</p>
+
+      <h2>Try it</h2>
+      <p>A drug is tested in low-risk and high-risk patients, assigned at random — so there is
+        <strong>no confounding</strong> — with the <strong>same odds ratio (2.0)</strong> in each group.
+        Drag to make the two groups more different.</p>
+      <iframe class="toy-frame" src="../assets/noncollapsibility/toy.html" style="height:560px"
+        title="Interactive: conditional vs marginal odds ratio as the two risk groups diverge"></iframe>
+
+      <h2>What's going on</h2>
+      <p>Inside each group the odds ratio is exactly 2.0. Pool the two groups into one big table and the
+        combined odds ratio comes out <em>below</em> 2.0 — and the more the groups differ in baseline risk,
+        the further it drops. No confounding was added; no mistake was made. The odds ratio simply doesn't
+        average the way you'd expect.</p>
+      <p>This is <em>noncollapsibility</em>. The odds ratio is a non-linear summary, and the odds of an
+        average isn't the average of the odds. So the "whole population" odds ratio is a different number
+        from the within-group one, even when the within-group value is identical everywhere. Crucially this
+        isn't bias — both numbers are correct answers to slightly different questions ("the effect for a
+        patient like this" versus "the effect across this whole mix of patients").</p>
+      <figure class="shot">
+        <img src="../assets/noncollapsibility/fig_split.png" alt="Conditional odds ratio flat at 2.0; marginal odds ratio falls as the groups diverge." />
+        <figcaption>The within-group odds ratio stays at 2.0; the combined odds ratio falls as the two patient groups diverge — with no confounding anywhere.</figcaption>
+      </figure>
+      <p>The risk difference and the risk ratio don't behave this way: their combined value is just a
+        weighted average of the group values. It's the odds ratio (and the hazard ratio) that are
+        non-collapsible — which is why a perfectly correct adjusted odds ratio can look "stronger" than the
+        unadjusted one with no confounder in sight.</p>
+
+      <h2>In the real world</h2>
+      <p>This bites in everyday practice. Add a strong prognostic variable to a logistic regression and the
+        treatment's odds ratio can move even if that variable is balanced across treatment groups —
+        tempting an analyst to call it "confounding" when it isn't. It also means odds ratios from models
+        with different covariates aren't directly comparable. Greenland, Robins and Pearl (1999) is the
+        standard reference untangling collapsibility from confounding.</p>
+
+      <h2>How not to get fooled</h2>
+      <p>A change in the odds ratio on adjustment is not proof of confounding — check whether the covariate
+        is actually associated with the treatment before calling it that. Report the conditioning set
+        alongside any odds ratio, and if you want an effect measure that collapses cleanly, the risk
+        difference or risk ratio is the safer summary.</p>
+
+      <h2>Sources</h2>
+      <ul class="sources">
+        <li>S. Greenland, J. M. Robins &amp; J. Pearl (1999), <em>Confounding and Collapsibility in Causal Inference</em>, Statistical Science, 14(1): 29–46. <a href="https://doi.org/10.1214/ss/1009211805">doi</a></li>
+        <li>M. A. Hernán &amp; J. M. Robins (2020), <em>Causal Inference: What If</em>, Chapman &amp; Hall/CRC — collapsibility and effect measures.</li>
+        <li>R. M. Daniel, J. Zhang &amp; D. Farewell (2021), <em>Making apples from oranges: comparing noncollapsibility and confounding</em>, American Journal of Epidemiology, 190(5): 697–700. <a href="https://doi.org/10.1093/aje/kwaa185">doi</a></li>
+      </ul>
+
+      <nav class="piece-nav">
+        <a href="m-bias.html">← M-bias</a>
+        <a href="../index.html">All curiosities</a>
+      </nav>
+    </article>
+  </main>
+</body>
+</html>

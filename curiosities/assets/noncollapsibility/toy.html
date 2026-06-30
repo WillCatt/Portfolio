@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>An effect that shrinks when you combine groups</title>
+<style>
+  :root { --bg:#faf8f4; --panel:#fffdfa; --ink:#1a1714; --muted:#7a6e63; --grid:#e6ded2;
+    --amber:#b06a16; --teal:#2a8f8f; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+    font-family: ui-sans-serif, system-ui, "Helvetica Neue", Arial, sans-serif;
+    display:flex; justify-content:center; padding:28px 16px; }
+  .card { width:100%; max-width:760px; }
+  h1 { font-size:1.3rem; margin:0 0 .25rem; }
+  p.lede { color:var(--muted); margin:0 0 1.1rem; max-width:62ch; }
+  p.lede strong { color:var(--ink); }
+  .controls { display:flex; align-items:center; gap:14px; margin:8px 0 18px; }
+  .controls label { font-weight:600; font-size:.9rem; white-space:nowrap; color:var(--muted); }
+  input[type=range] { flex:1; accent-color:var(--amber); }
+  .strata { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .panel { background:var(--panel); border:1px solid var(--grid); border-radius:12px; padding:14px 16px; }
+  .panel.wide { grid-column:1 / -1; }
+  .panel h3 { margin:0 0 10px; font-size:14px; }
+  .bar-row { display:flex; align-items:center; gap:8px; margin:6px 0; font-size:12.5px; }
+  .bar-row .tag { width:58px; color:var(--muted); }
+  .track { flex:1; height:16px; background:#efe7da; border-radius:5px; overflow:hidden; }
+  .fill { height:100%; border-radius:5px; }
+  .fill.ctrl { background:var(--muted); }
+  .fill.trt { background:var(--amber); }
+  .bar-row .pct { width:42px; text-align:right; font-variant-numeric:tabular-nums; }
+  .or { margin-top:8px; font-size:12.5px; color:var(--ink); font-weight:600; }
+  .bignum { font-size:30px; font-weight:700; letter-spacing:-.02em; }
+  .bignum.teal { color:var(--teal); }
+  .compare { display:flex; gap:28px; align-items:baseline; margin-top:6px; flex-wrap:wrap; }
+  .compare .lbl { font-size:12.5px; color:var(--muted); }
+  .verdict { font-size:13.5px; color:var(--ink); margin-top:10px; }
+  .verdict strong { color:var(--teal); }
+  .hint { color:var(--muted); font-size:.85rem; margin-top:1rem; }
+  footer { color:var(--muted); font-size:.8rem; margin-top:1.1rem; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>An effect that shrinks when you combine groups</h1>
+  <p class="lede">A drug with the <strong>same odds ratio (2.0)</strong> in low-risk and high-risk patients, assigned at random so there's no confounding. Drag to spread the two groups apart.</p>
+  <div class="controls">
+    <label>Identical patients</label>
+    <input id="gap" type="range" min="0" max="100" value="55" />
+    <label>Very different patients</label>
+  </div>
+
+  <div class="strata">
+    <div class="panel" id="pL"></div>
+    <div class="panel" id="pH"></div>
+    <div class="panel wide" id="pC"></div>
+  </div>
+
+  <div class="hint">The combined odds ratio sits below 2.0 with no confounding present. The risk difference and risk ratio stay collapsible — it's the odds ratio that misbehaves.</div>
+  <footer>Data Curiosities · 08 — Noncollapsibility · williamcatt.dev</footer>
+</div>
+<script>
+const DATA = {"conditionalOR": 2.0, "baseRisk": 0.3, "gapMax": 0.26, "lowLabel": "Low-risk patients", "highLabel": "High-risk patients", "combinedLabel": "Everyone combined", "title": "An effect that shrinks when you combine groups", "lede": "A drug with the <strong>same odds ratio (2.0)</strong> in low-risk and high-risk patients, assigned at random so there's no confounding. Drag to spread the two groups apart.", "left": "Identical patients", "right": "Very different patients", "hint": "The combined odds ratio sits below 2.0 with no confounding present. The risk difference and risk ratio stay collapsible \u2014 it's the odds ratio that misbehaves.", "footer": "Data Curiosities \u00b7 08 \u2014 Noncollapsibility \u00b7 williamcatt.dev"};
+const OR = DATA.conditionalOR, BASE = DATA.baseRisk, GMAX = DATA.gapMax;
+
+const odds = p => p/(1-p), risk = o => o/(1+o);
+function treated(p0){ return risk(OR*odds(p0)); }   // apply the constant conditional OR
+function pct(p){ return (100*p).toFixed(0)+"%"; }
+
+function bars(title, p0, p1){
+  return `<h3>${title}</h3>
+    <div class="bar-row"><span class="tag">Control</span><span class="track"><span class="fill ctrl" style="width:${100*p0}%"></span></span><span class="pct">${pct(p0)}</span></div>
+    <div class="bar-row"><span class="tag">Treated</span><span class="track"><span class="fill trt" style="width:${100*p1}%"></span></span><span class="pct">${pct(p1)}</span></div>
+    <div class="or">odds ratio here = ${OR.toFixed(2)}</div>`;
+}
+
+function render(frac){
+  const gap = frac * GMAX;
+  const p0L = Math.max(0.01, BASE - gap), p0H = Math.min(0.97, BASE + gap);
+  const p1L = treated(p0L), p1H = treated(p0H);
+  document.getElementById("pL").innerHTML = bars(DATA.lowLabel, p0L, p1L);
+  document.getElementById("pH").innerHTML = bars(DATA.highLabel, p0H, p1H);
+
+  const P0 = (p0L + p0H) / 2, P1 = (p1L + p1H) / 2;          // equal-sized strata, 50% treated
+  const margOR = odds(P1) / odds(P0);
+  const margRR = P1 / P0, condRR_L = p1L/p0L, condRR_H = p1H/p0H;
+  document.getElementById("pC").innerHTML = `<h3>${DATA.combinedLabel}</h3>
+    <div class="bar-row"><span class="tag">Control</span><span class="track"><span class="fill ctrl" style="width:${100*P0}%"></span></span><span class="pct">${pct(P0)}</span></div>
+    <div class="bar-row"><span class="tag">Treated</span><span class="track"><span class="fill trt" style="width:${100*P1}%"></span></span><span class="pct">${pct(P1)}</span></div>
+    <div class="compare">
+      <div><div class="lbl">combined odds ratio</div><div class="bignum teal">${margOR.toFixed(2)}</div></div>
+      <div><div class="lbl">within each group</div><div class="bignum">${OR.toFixed(2)}</div></div>
+    </div>
+    <div class="verdict">${margOR < OR - 0.02
+      ? `The combined odds ratio (<strong>${margOR.toFixed(2)}</strong>) is pulled below the ${OR.toFixed(2)} found in <em>both</em> groups — yet nothing is confounded.`
+      : `With identical groups, combined and within-group odds ratios agree (${OR.toFixed(2)}).`}</div>`;
+}
+const slider = document.getElementById("gap");
+slider.addEventListener("input", ()=>render(slider.value/100));
+render(slider.value/100);
+</script>
+</body>
+</html>

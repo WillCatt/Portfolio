@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lord's Paradox · Data Curiosities</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <meta name="description" content="Lord's paradox, explained interactively: the same before-and-after data gives two analysts opposite answers — comparing change scores vs adjusting for baseline (ANCOVA). Drag to watch the conclusion flip." />
+  <link rel="canonical" href="https://williamcatt.dev/curiosities/pieces/lords.html" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <main>
+    <a class="back-link" href="../index.html">← Data Curiosities</a>
+    <header class="hub-hero" style="padding-bottom:0">
+      <p class="eyebrow"><a href="../index.html">Data Curiosities</a> · 06</p>
+      <h1>Lord's Paradox</h1>
+    </header>
+
+    <article class="piece">
+      <p class="plain">Give the same before-and-after data to two careful analysts and they can reach
+        opposite conclusions about whether something had an effect — not from any mistake, but because
+        they quietly asked different questions.</p>
+
+      <h2>Try it</h2>
+      <p>Students on two diets are weighed at the start and end of term. Did the diet matter? Drag from
+        <strong>Compare the gain</strong> to <strong>Adjust for the start</strong>.</p>
+      <iframe class="toy-frame" src="../assets/lords/toy.html" style="height:700px"
+        title="Interactive: start vs end weight, change-score view vs baseline-adjusted view"></iframe>
+
+      <h2>What's going on</h2>
+      <p>The first analyst compares the average <em>weight gained</em>. Both diets gained about the same —
+        near zero — so they see no difference. Their evidence is the no-change diagonal: each diet's cloud
+        sits squarely on it.</p>
+      <p>The second analyst adjusts for starting weight: among students who began at the <em>same</em>
+        weight, which diet ended heavier? Because heavier students tend to drift back toward the middle
+        (the within-group line is flatter than the diagonal), and Diet B's students started heavier, at any
+        fixed starting weight Diet B ends a couple of kilograms above Diet A. They see a clear effect.</p>
+      <figure class="shot">
+        <img src="../assets/lords/fig_split.png" alt="Equal gains on the diagonal, but a vertical gap between the diet lines at a fixed starting weight." />
+        <figcaption>Both diets straddle the no-change diagonal (equal gains), yet at a fixed starting weight the diet lines sit ~2.7 kg apart.</figcaption>
+      </figure>
+      <p>Neither analyst miscalculated. They computed different things: "is the average change the same?"
+        and "at equal baseline, is the outcome the same?" Those are different questions, and with
+        observational groups they can have different answers. Which one is right depends on what you
+        actually want to know and what you're willing to assume about why the groups differ — a causal
+        judgement, not a statistical one.</p>
+
+      <h2>In the real world</h2>
+      <p>Frederic Lord posed this in 1967 with a university example: boys and girls weighed at the start
+        and end of the year. One statistician found the sexes' average gains identical; another, adjusting
+        for initial weight, found a difference. The puzzle launched decades of work on analysing change.
+        The modern resolution (Holland &amp; Rubin; Pearl) is that the change-score and ANCOVA estimates
+        answer different causal questions, and the right choice follows from the causal diagram — for a
+        randomised treatment, the baseline-adjusted estimate is usually the one you want.</p>
+
+      <h2>How not to get fooled</h2>
+      <p>Before analysing change, write down the question in causal terms: the effect of what, holding what
+        fixed? "Difference in gains" and "difference at equal baseline" are not interchangeable. When
+        groups weren't randomised, neither is automatically correct — state your assumptions, and notice
+        that the method can decide the headline.</p>
+
+      <h2>Sources</h2>
+      <ul class="sources">
+        <li>F. M. Lord (1967), <em>A paradox in the interpretation of group comparisons</em>, Psychological Bulletin, 68(5): 304–305. <a href="https://doi.org/10.1037/h0025105">doi</a></li>
+        <li>P. W. Holland &amp; D. B. Rubin (1983), <em>On Lord's Paradox</em>, in <em>Principals of Modern Psychological Measurement</em>.</li>
+        <li>J. Pearl (2016), <em>Lord's Paradox Revisited — (Oh Lord! Kumbaya!)</em>, Journal of Causal Inference, 4(2). <a href="https://doi.org/10.1515/jci-2016-0021">doi</a></li>
+      </ul>
+
+      <nav class="piece-nav">
+        <a href="suppression.html">← Suppression effect</a>
+        <a href="../index.html">All curiosities</a>
+        <a href="m-bias.html">Next: M-bias →</a>
+      </nav>
+    </article>
+  </main>
+</body>
+</html>
