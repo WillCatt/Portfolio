@@ -3,7 +3,7 @@
     "asof": "2026-06-10",
     "n_teams": 32,
     "n_ties": 32,
-    "n_played": 1,
+    "n_played": 18,
     "sims": 40000,
     "model": "Dixon-Coles bivariate-Poisson, exponential time-decay (frozen pre-tournament)"
   },
@@ -123,9 +123,12 @@
           "home_raw": "Germany",
           "away_raw": "Paraguay",
           "known": true,
-          "played": false,
-          "score": null,
-          "winner": null,
+          "played": true,
+          "score": [
+            1,
+            1
+          ],
+          "winner": "Paraguay",
           "host_edge": [],
           "p_home": 0.5443,
           "p_draw": 0.2658,
@@ -219,9 +222,12 @@
           "home_raw": "Netherlands",
           "away_raw": "Morocco",
           "known": true,
-          "played": false,
-          "score": null,
-          "winner": null,
+          "played": true,
+          "score": [
+            1,
+            1
+          ],
+          "winner": "Morocco",
           "host_edge": [],
           "p_home": 0.3354,
           "p_draw": 0.3314,
@@ -315,9 +321,12 @@
           "home_raw": "Brazil",
           "away_raw": "Japan",
           "known": true,
-          "played": false,
-          "score": null,
-          "winner": null,
+          "played": true,
+          "score": [
+            2,
+            1
+          ],
+          "winner": "Brazil",
           "host_edge": [],
           "p_home": 0.4825,
           "p_draw": 0.2788,
@@ -411,9 +420,12 @@
           "home_raw": "France",
           "away_raw": "Sweden",
           "known": true,
-          "played": false,
-          "score": null,
-          "winner": null,
+          "played": true,
+          "score": [
+            3,
+            0
+          ],
+          "winner": "France",
           "host_edge": [],
           "p_home": 0.6594,
           "p_draw": 0.2043,
@@ -507,9 +519,12 @@
           "home_raw": "Ivory Coast",
           "away_raw": "Norway",
           "known": true,
-          "played": false,
-          "score": null,
-          "winner": null,
+          "played": true,
+          "score": [
+            1,
+            2
+          ],
+          "winner": "Norway",
           "host_edge": [],
           "p_home": 0.2295,
           "p_draw": 0.2904,
@@ -603,9 +618,12 @@
           "home_raw": "Mexico",
           "away_raw": "Ecuador",
           "known": true,
-          "played": false,
-          "score": null,
-          "winner": null,
+          "played": true,
+          "score": [
+            2,
+            0
+          ],
+          "winner": "Mexico",
           "host_edge": [
             "Mexico"
           ],
@@ -701,9 +719,12 @@
           "home_raw": "England",
           "away_raw": "DR Congo",
           "known": true,
-          "played": false,
-          "score": null,
-          "winner": null,
+          "played": true,
+          "score": [
+            2,
+            1
+          ],
+          "winner": "England",
           "host_edge": [],
           "p_home": 0.6245,
           "p_draw": 0.2731,
@@ -797,9 +818,12 @@
           "home_raw": "USA",
           "away_raw": "Bosnia & Herzegovina",
           "known": true,
-          "played": false,
-          "score": null,
-          "winner": null,
+          "played": true,
+          "score": [
+            2,
+            0
+          ],
+          "winner": "United States",
           "host_edge": [],
           "p_home": 0.5116,
           "p_draw": 0.2726,
@@ -893,9 +917,12 @@
           "home_raw": "Belgium",
           "away_raw": "Senegal",
           "known": true,
-          "played": false,
-          "score": null,
-          "winner": null,
+          "played": true,
+          "score": [
+            2,
+            2
+          ],
+          "winner": "Senegal",
           "host_edge": [],
           "p_home": 0.412,
           "p_draw": 0.2898,
@@ -989,9 +1016,12 @@
           "home_raw": "Portugal",
           "away_raw": "Croatia",
           "known": true,
-          "played": false,
-          "score": null,
-          "winner": null,
+          "played": true,
+          "score": [
+            2,
+            1
+          ],
+          "winner": "Portugal",
           "host_edge": [],
           "p_home": 0.4792,
           "p_draw": 0.2754,
@@ -1085,9 +1115,12 @@
           "home_raw": "Spain",
           "away_raw": "Austria",
           "known": true,
-          "played": false,
-          "score": null,
-          "winner": null,
+          "played": true,
+          "score": [
+            3,
+            0
+          ],
+          "winner": "Spain",
           "host_edge": [],
           "p_home": 0.6048,
           "p_draw": 0.2424,
@@ -1181,9 +1214,12 @@
           "home_raw": "Switzerland",
           "away_raw": "Algeria",
           "known": true,
-          "played": false,
-          "score": null,
-          "winner": null,
+          "played": true,
+          "score": [
+            2,
+            0
+          ],
+          "winner": "Switzerland",
           "host_edge": [],
           "p_home": 0.4419,
           "p_draw": 0.2688,
@@ -1277,9 +1313,12 @@
           "home_raw": "Argentina",
           "away_raw": "Cape Verde",
           "known": true,
-          "played": false,
-          "score": null,
-          "winner": null,
+          "played": true,
+          "score": [
+            1,
+            1
+          ],
+          "winner": "Cape Verde",
           "host_edge": [],
           "p_home": 0.8095,
           "p_draw": 0.1505,
@@ -1373,9 +1412,12 @@
           "home_raw": "Colombia",
           "away_raw": "Ghana",
           "known": true,
-          "played": false,
-          "score": null,
-          "winner": null,
+          "played": true,
+          "score": [
+            1,
+            0
+          ],
+          "winner": "Colombia",
           "host_edge": [],
           "p_home": 0.7576,
           "p_draw": 0.1687,
@@ -1469,9 +1511,12 @@
           "home_raw": "Australia",
           "away_raw": "Egypt",
           "known": true,
-          "played": false,
-          "score": null,
-          "winner": null,
+          "played": true,
+          "score": [
+            1,
+            1
+          ],
+          "winner": "Egypt",
           "host_edge": [],
           "p_home": 0.3521,
           "p_draw": 0.3531,
@@ -1566,14 +1611,97 @@
           "kickoff": "2026-07-04T21:00:00Z",
           "ground": "Philadelphia",
           "country": "United States",
-          "home": null,
-          "away": null,
-          "home_raw": "W74",
-          "away_raw": "W77",
-          "known": false,
-          "played": false,
-          "score": null,
-          "winner": null
+          "home": "Paraguay",
+          "away": "France",
+          "home_raw": "Paraguay",
+          "away_raw": "France",
+          "known": true,
+          "played": true,
+          "score": [
+            0,
+            1
+          ],
+          "winner": "France",
+          "host_edge": [],
+          "p_home": 0.1456,
+          "p_draw": 0.272,
+          "p_away": 0.5824,
+          "exp_home": 0.62,
+          "exp_away": 1.5,
+          "adv_home": 0.2816,
+          "adv_away": 0.7184,
+          "top_scores": [
+            {
+              "h": 0,
+              "a": 1,
+              "p": 0.1747
+            },
+            {
+              "h": 0,
+              "a": 2,
+              "p": 0.1357
+            },
+            {
+              "h": 0,
+              "a": 0,
+              "p": 0.1263
+            },
+            {
+              "h": 1,
+              "a": 1,
+              "p": 0.1172
+            }
+          ],
+          "grid": [
+            [
+              0.1263,
+              0.1747,
+              0.1357,
+              0.068,
+              0.0255,
+              0.0077
+            ],
+            [
+              0.0681,
+              0.1172,
+              0.0836,
+              0.0418,
+              0.0157,
+              0.0047
+            ],
+            [
+              0.0228,
+              0.0342,
+              0.0257,
+              0.0129,
+              0.0048,
+              0.0015
+            ],
+            [
+              0.0047,
+              0.007,
+              0.0053,
+              0.0026,
+              0.001,
+              0.0003
+            ],
+            [
+              0.0007,
+              0.0011,
+              0.0008,
+              0.0004,
+              0.0002,
+              0.0
+            ],
+            [
+              0.0001,
+              0.0001,
+              0.0001,
+              0.0001,
+              0.0,
+              0.0
+            ]
+          ]
         },
         {
           "num": 90,
@@ -1582,14 +1710,97 @@
           "kickoff": "2026-07-04T17:00:00Z",
           "ground": "Houston",
           "country": "United States",
-          "home": null,
-          "away": null,
-          "home_raw": "W73",
-          "away_raw": "W75",
-          "known": false,
-          "played": false,
-          "score": null,
-          "winner": null
+          "home": "Canada",
+          "away": "Morocco",
+          "home_raw": "Canada",
+          "away_raw": "Morocco",
+          "known": true,
+          "played": true,
+          "score": [
+            0,
+            3
+          ],
+          "winner": "Morocco",
+          "host_edge": [],
+          "p_home": 0.1778,
+          "p_draw": 0.3445,
+          "p_away": 0.4777,
+          "exp_home": 0.54,
+          "exp_away": 1.08,
+          "adv_home": 0.3501,
+          "adv_away": 0.6499,
+          "top_scores": [
+            {
+              "h": 0,
+              "a": 1,
+              "p": 0.2073
+            },
+            {
+              "h": 0,
+              "a": 0,
+              "p": 0.2048
+            },
+            {
+              "h": 1,
+              "a": 1,
+              "p": 0.1218
+            },
+            {
+              "h": 0,
+              "a": 2,
+              "p": 0.1148
+            }
+          ],
+          "grid": [
+            [
+              0.2048,
+              0.2073,
+              0.1148,
+              0.0412,
+              0.0111,
+              0.0024
+            ],
+            [
+              0.1013,
+              0.1218,
+              0.0621,
+              0.0223,
+              0.006,
+              0.0013
+            ],
+            [
+              0.0291,
+              0.0313,
+              0.0168,
+              0.006,
+              0.0016,
+              0.0003
+            ],
+            [
+              0.0052,
+              0.0056,
+              0.003,
+              0.0011,
+              0.0003,
+              0.0001
+            ],
+            [
+              0.0007,
+              0.0008,
+              0.0004,
+              0.0001,
+              0.0,
+              0.0
+            ],
+            [
+              0.0001,
+              0.0001,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          ]
         },
         {
           "num": 91,
@@ -1598,14 +1809,94 @@
           "kickoff": "2026-07-05T20:00:00Z",
           "ground": "New York/New Jersey (East Rutherford)",
           "country": "",
-          "home": null,
-          "away": null,
-          "home_raw": "W76",
-          "away_raw": "W78",
-          "known": false,
+          "home": "Brazil",
+          "away": "Norway",
+          "home_raw": "Brazil",
+          "away_raw": "Norway",
+          "known": true,
           "played": false,
           "score": null,
-          "winner": null
+          "winner": null,
+          "host_edge": [],
+          "p_home": 0.5375,
+          "p_draw": 0.2447,
+          "p_away": 0.2177,
+          "exp_home": 1.78,
+          "exp_away": 1.06,
+          "adv_home": 0.6599,
+          "adv_away": 0.3401,
+          "top_scores": [
+            {
+              "h": 1,
+              "a": 1,
+              "p": 0.1161
+            },
+            {
+              "h": 1,
+              "a": 0,
+              "p": 0.0984
+            },
+            {
+              "h": 2,
+              "a": 1,
+              "p": 0.0981
+            },
+            {
+              "h": 2,
+              "a": 0,
+              "p": 0.0929
+            }
+          ],
+          "grid": [
+            [
+              0.0645,
+              0.056,
+              0.0327,
+              0.0115,
+              0.003,
+              0.0006
+            ],
+            [
+              0.0984,
+              0.1161,
+              0.0582,
+              0.0205,
+              0.0054,
+              0.0011
+            ],
+            [
+              0.0929,
+              0.0981,
+              0.0518,
+              0.0183,
+              0.0048,
+              0.001
+            ],
+            [
+              0.0551,
+              0.0583,
+              0.0308,
+              0.0108,
+              0.0029,
+              0.0006
+            ],
+            [
+              0.0245,
+              0.0259,
+              0.0137,
+              0.0048,
+              0.0013,
+              0.0003
+            ],
+            [
+              0.0087,
+              0.0092,
+              0.0049,
+              0.0017,
+              0.0005,
+              0.0001
+            ]
+          ]
         },
         {
           "num": 92,
@@ -1614,14 +1905,96 @@
           "kickoff": "2026-07-06T00:00:00Z",
           "ground": "Mexico City",
           "country": "Mexico",
-          "home": null,
-          "away": null,
-          "home_raw": "W79",
-          "away_raw": "W80",
-          "known": false,
+          "home": "Mexico",
+          "away": "England",
+          "home_raw": "Mexico",
+          "away_raw": "England",
+          "known": true,
           "played": false,
           "score": null,
-          "winner": null
+          "winner": null,
+          "host_edge": [
+            "Mexico"
+          ],
+          "p_home": 0.2011,
+          "p_draw": 0.2875,
+          "p_away": 0.5114,
+          "exp_home": 0.78,
+          "exp_away": 1.4,
+          "adv_home": 0.3448,
+          "adv_away": 0.6552,
+          "top_scores": [
+            {
+              "h": 0,
+              "a": 1,
+              "p": 0.152
+            },
+            {
+              "h": 1,
+              "a": 1,
+              "p": 0.1299
+            },
+            {
+              "h": 0,
+              "a": 0,
+              "p": 0.1197
+            },
+            {
+              "h": 0,
+              "a": 2,
+              "p": 0.1112
+            }
+          ],
+          "grid": [
+            [
+              0.1197,
+              0.152,
+              0.1112,
+              0.052,
+              0.0182,
+              0.0051
+            ],
+            [
+              0.0813,
+              0.1299,
+              0.0864,
+              0.0404,
+              0.0142,
+              0.004
+            ],
+            [
+              0.0341,
+              0.0479,
+              0.0336,
+              0.0157,
+              0.0055,
+              0.0015
+            ],
+            [
+              0.0088,
+              0.0124,
+              0.0087,
+              0.0041,
+              0.0014,
+              0.0004
+            ],
+            [
+              0.0017,
+              0.0024,
+              0.0017,
+              0.0008,
+              0.0003,
+              0.0001
+            ],
+            [
+              0.0003,
+              0.0004,
+              0.0003,
+              0.0001,
+              0.0,
+              0.0
+            ]
+          ]
         },
         {
           "num": 93,
@@ -1630,14 +2003,94 @@
           "kickoff": "2026-07-06T19:00:00Z",
           "ground": "Dallas (Arlington)",
           "country": "United States",
-          "home": null,
-          "away": null,
-          "home_raw": "W83",
-          "away_raw": "W84",
-          "known": false,
+          "home": "Portugal",
+          "away": "Spain",
+          "home_raw": "Portugal",
+          "away_raw": "Spain",
+          "known": true,
           "played": false,
           "score": null,
-          "winner": null
+          "winner": null,
+          "host_edge": [],
+          "p_home": 0.2708,
+          "p_draw": 0.2729,
+          "p_away": 0.4563,
+          "exp_home": 1.09,
+          "exp_away": 1.48,
+          "adv_home": 0.4072,
+          "adv_away": 0.5928,
+          "top_scores": [
+            {
+              "h": 1,
+              "a": 1,
+              "p": 0.1301
+            },
+            {
+              "h": 0,
+              "a": 1,
+              "p": 0.107
+            },
+            {
+              "h": 1,
+              "a": 2,
+              "p": 0.0915
+            },
+            {
+              "h": 0,
+              "a": 2,
+              "p": 0.0842
+            }
+          ],
+          "grid": [
+            [
+              0.0833,
+              0.107,
+              0.0842,
+              0.0416,
+              0.0154,
+              0.0046
+            ],
+            [
+              0.0766,
+              0.1301,
+              0.0915,
+              0.0452,
+              0.0167,
+              0.005
+            ],
+            [
+              0.0452,
+              0.067,
+              0.0497,
+              0.0245,
+              0.0091,
+              0.0027
+            ],
+            [
+              0.0164,
+              0.0242,
+              0.018,
+              0.0089,
+              0.0033,
+              0.001
+            ],
+            [
+              0.0044,
+              0.0066,
+              0.0049,
+              0.0024,
+              0.0009,
+              0.0003
+            ],
+            [
+              0.001,
+              0.0014,
+              0.0011,
+              0.0005,
+              0.0002,
+              0.0001
+            ]
+          ]
         },
         {
           "num": 94,
@@ -1646,14 +2099,96 @@
           "kickoff": "2026-07-07T00:00:00Z",
           "ground": "Seattle",
           "country": "United States",
-          "home": null,
-          "away": null,
-          "home_raw": "W81",
-          "away_raw": "W82",
-          "known": false,
+          "home": "United States",
+          "away": "Belgium",
+          "home_raw": "USA",
+          "away_raw": "Belgium",
+          "known": true,
           "played": false,
           "score": null,
-          "winner": null
+          "winner": null,
+          "host_edge": [
+            "United States"
+          ],
+          "p_home": 0.2451,
+          "p_draw": 0.2384,
+          "p_away": 0.5165,
+          "exp_home": 1.22,
+          "exp_away": 1.85,
+          "adv_home": 0.3643,
+          "adv_away": 0.6357,
+          "top_scores": [
+            {
+              "h": 1,
+              "a": 1,
+              "p": 0.1103
+            },
+            {
+              "h": 1,
+              "a": 2,
+              "p": 0.0969
+            },
+            {
+              "h": 0,
+              "a": 1,
+              "p": 0.0802
+            },
+            {
+              "h": 0,
+              "a": 2,
+              "p": 0.0795
+            }
+          ],
+          "grid": [
+            [
+              0.0519,
+              0.0802,
+              0.0795,
+              0.0491,
+              0.0227,
+              0.0084
+            ],
+            [
+              0.0508,
+              0.1103,
+              0.0969,
+              0.0599,
+              0.0277,
+              0.0103
+            ],
+            [
+              0.0344,
+              0.0638,
+              0.0591,
+              0.0365,
+              0.0169,
+              0.0063
+            ],
+            [
+              0.014,
+              0.0259,
+              0.024,
+              0.0148,
+              0.0069,
+              0.0025
+            ],
+            [
+              0.0043,
+              0.0079,
+              0.0073,
+              0.0045,
+              0.0021,
+              0.0008
+            ],
+            [
+              0.001,
+              0.0019,
+              0.0018,
+              0.0011,
+              0.0005,
+              0.0002
+            ]
+          ]
         },
         {
           "num": 95,
@@ -1662,14 +2197,94 @@
           "kickoff": "2026-07-07T16:00:00Z",
           "ground": "Atlanta",
           "country": "United States",
-          "home": null,
-          "away": null,
-          "home_raw": "W86",
-          "away_raw": "W88",
-          "known": false,
+          "home": "Argentina",
+          "away": "Egypt",
+          "home_raw": "Argentina",
+          "away_raw": "Egypt",
+          "known": true,
           "played": false,
           "score": null,
-          "winner": null
+          "winner": null,
+          "host_edge": [],
+          "p_home": 0.6419,
+          "p_draw": 0.2656,
+          "p_away": 0.0924,
+          "exp_home": 1.49,
+          "exp_away": 0.4,
+          "adv_home": 0.7748,
+          "adv_away": 0.2252,
+          "top_scores": [
+            {
+              "h": 1,
+              "a": 0,
+              "p": 0.2205
+            },
+            {
+              "h": 2,
+              "a": 0,
+              "p": 0.1675
+            },
+            {
+              "h": 0,
+              "a": 0,
+              "p": 0.1563
+            },
+            {
+              "h": 1,
+              "a": 1,
+              "p": 0.095
+            }
+          ],
+          "grid": [
+            [
+              0.1563,
+              0.0558,
+              0.0121,
+              0.0016,
+              0.0002,
+              0.0
+            ],
+            [
+              0.2205,
+              0.095,
+              0.018,
+              0.0024,
+              0.0002,
+              0.0
+            ],
+            [
+              0.1675,
+              0.067,
+              0.0134,
+              0.0018,
+              0.0002,
+              0.0
+            ],
+            [
+              0.0831,
+              0.0332,
+              0.0066,
+              0.0009,
+              0.0001,
+              0.0
+            ],
+            [
+              0.0309,
+              0.0124,
+              0.0025,
+              0.0003,
+              0.0,
+              0.0
+            ],
+            [
+              0.0092,
+              0.0037,
+              0.0007,
+              0.0001,
+              0.0,
+              0.0
+            ]
+          ]
         },
         {
           "num": 96,
@@ -1678,14 +2293,94 @@
           "kickoff": "2026-07-07T20:00:00Z",
           "ground": "Vancouver",
           "country": "Canada",
-          "home": null,
-          "away": null,
-          "home_raw": "W85",
-          "away_raw": "W87",
-          "known": false,
+          "home": "Switzerland",
+          "away": "Colombia",
+          "home_raw": "Switzerland",
+          "away_raw": "Colombia",
+          "known": true,
           "played": false,
           "score": null,
-          "winner": null
+          "winner": null,
+          "host_edge": [],
+          "p_home": 0.2686,
+          "p_draw": 0.2669,
+          "p_away": 0.4645,
+          "exp_home": 1.11,
+          "exp_away": 1.54,
+          "adv_home": 0.4021,
+          "adv_away": 0.5979,
+          "top_scores": [
+            {
+              "h": 1,
+              "a": 1,
+              "p": 0.1272
+            },
+            {
+              "h": 0,
+              "a": 1,
+              "p": 0.1019
+            },
+            {
+              "h": 1,
+              "a": 2,
+              "p": 0.0929
+            },
+            {
+              "h": 0,
+              "a": 2,
+              "p": 0.0834
+            }
+          ],
+          "grid": [
+            [
+              0.0769,
+              0.1019,
+              0.0834,
+              0.0428,
+              0.0165,
+              0.0051
+            ],
+            [
+              0.072,
+              0.1272,
+              0.0929,
+              0.0477,
+              0.0183,
+              0.0056
+            ],
+            [
+              0.0437,
+              0.0673,
+              0.0518,
+              0.0266,
+              0.0102,
+              0.0031
+            ],
+            [
+              0.0162,
+              0.025,
+              0.0192,
+              0.0099,
+              0.0038,
+              0.0012
+            ],
+            [
+              0.0045,
+              0.007,
+              0.0054,
+              0.0027,
+              0.0011,
+              0.0003
+            ],
+            [
+              0.001,
+              0.0016,
+              0.0012,
+              0.0006,
+              0.0002,
+              0.0001
+            ]
+          ]
         }
       ]
     },
@@ -1839,254 +2534,254 @@
   "tournament": [
     {
       "team": "Argentina",
-      "r16": 0.8856,
-      "qf": 0.6833,
-      "sf": 0.4675,
-      "final": 0.3008,
-      "champ": 0.1903
+      "r16": 1.0,
+      "qf": 0.7779,
+      "sf": 0.5133,
+      "final": 0.3187,
+      "champ": 0.1899
     },
     {
       "team": "Spain",
-      "r16": 0.723,
-      "qf": 0.4585,
-      "sf": 0.3436,
-      "final": 0.2258,
-      "champ": 0.1348
+      "r16": 1.0,
+      "qf": 0.5947,
+      "sf": 0.4373,
+      "final": 0.2607,
+      "champ": 0.1488
     },
     {
       "team": "France",
-      "r16": 0.7608,
-      "qf": 0.4752,
-      "sf": 0.2893,
-      "final": 0.1585,
-      "champ": 0.0808
+      "r16": 1.0,
+      "qf": 1.0,
+      "sf": 0.5438,
+      "final": 0.2764,
+      "champ": 0.1356
     },
     {
       "team": "Brazil",
-      "r16": 0.6212,
-      "qf": 0.4315,
-      "sf": 0.2609,
-      "final": 0.1391,
-      "champ": 0.0793
+      "r16": 1.0,
+      "qf": 0.6583,
+      "sf": 0.3874,
+      "final": 0.1994,
+      "champ": 0.1049
     },
     {
       "team": "England",
-      "r16": 0.7599,
-      "qf": 0.4748,
-      "sf": 0.2727,
-      "final": 0.1426,
-      "champ": 0.0761
-    },
-    {
-      "team": "Colombia",
-      "r16": 0.8423,
-      "qf": 0.5276,
-      "sf": 0.2539,
-      "final": 0.1331,
-      "champ": 0.067
-    },
-    {
-      "team": "Portugal",
-      "r16": 0.6153,
-      "qf": 0.2905,
-      "sf": 0.1939,
-      "final": 0.1106,
-      "champ": 0.055
-    },
-    {
-      "team": "Netherlands",
-      "r16": 0.5015,
-      "qf": 0.3478,
-      "sf": 0.1806,
-      "final": 0.0881,
-      "champ": 0.0406
-    },
-    {
-      "team": "Germany",
-      "r16": 0.678,
-      "qf": 0.3325,
-      "sf": 0.1812,
-      "final": 0.0849,
-      "champ": 0.0379
+      "r16": 1.0,
+      "qf": 0.655,
+      "sf": 0.353,
+      "final": 0.1806,
+      "champ": 0.0944
     },
     {
       "team": "Morocco",
-      "r16": 0.4985,
-      "qf": 0.3249,
-      "sf": 0.1656,
-      "final": 0.0803,
-      "champ": 0.0379
+      "r16": 1.0,
+      "qf": 1.0,
+      "sf": 0.4561,
+      "final": 0.2095,
+      "champ": 0.0943
+    },
+    {
+      "team": "Portugal",
+      "r16": 1.0,
+      "qf": 0.4053,
+      "sf": 0.2625,
+      "final": 0.1361,
+      "champ": 0.068
+    },
+    {
+      "team": "Colombia",
+      "r16": 1.0,
+      "qf": 0.5988,
+      "sf": 0.2656,
+      "final": 0.1279,
+      "champ": 0.06
     },
     {
       "team": "Belgium",
-      "r16": 0.5601,
-      "qf": 0.3913,
-      "sf": 0.1522,
-      "final": 0.072,
-      "champ": 0.0299
-    },
-    {
-      "team": "Norway",
-      "r16": 0.621,
-      "qf": 0.245,
-      "sf": 0.114,
-      "final": 0.0456,
-      "champ": 0.0201
-    },
-    {
-      "team": "Ecuador",
-      "r16": 0.5319,
-      "qf": 0.2479,
-      "sf": 0.1127,
-      "final": 0.047,
-      "champ": 0.0194
+      "r16": 1.0,
+      "qf": 0.6367,
+      "sf": 0.2189,
+      "final": 0.092,
+      "champ": 0.0371
     },
     {
       "team": "Switzerland",
-      "r16": 0.5731,
-      "qf": 0.2651,
-      "sf": 0.1056,
-      "final": 0.0461,
-      "champ": 0.0188
+      "r16": 1.0,
+      "qf": 0.4012,
+      "sf": 0.1475,
+      "final": 0.0594,
+      "champ": 0.022
     },
     {
-      "team": "Japan",
-      "r16": 0.3787,
-      "qf": 0.2124,
-      "sf": 0.1034,
-      "final": 0.0439,
-      "champ": 0.0184
+      "team": "Norway",
+      "r16": 1.0,
+      "qf": 0.3417,
+      "sf": 0.1487,
+      "final": 0.0561,
+      "champ": 0.0211
     },
     {
-      "team": "Senegal",
-      "r16": 0.4399,
-      "qf": 0.2772,
-      "sf": 0.0974,
-      "final": 0.0409,
-      "champ": 0.0152
+      "team": "Mexico",
+      "r16": 1.0,
+      "qf": 0.345,
+      "sf": 0.1109,
+      "final": 0.0355,
+      "champ": 0.0113
     },
     {
-      "team": "Croatia",
-      "r16": 0.3846,
-      "qf": 0.1404,
-      "sf": 0.0784,
-      "final": 0.0347,
-      "champ": 0.0135
+      "team": "Egypt",
+      "r16": 1.0,
+      "qf": 0.2221,
+      "sf": 0.0736,
+      "final": 0.0224,
+      "champ": 0.0065
+    },
+    {
+      "team": "United States",
+      "r16": 1.0,
+      "qf": 0.3633,
+      "sf": 0.0814,
+      "final": 0.0254,
+      "champ": 0.006
+    },
+    {
+      "team": "Algeria",
+      "r16": 0.0,
+      "qf": 0.0,
+      "sf": 0.0,
+      "final": 0.0,
+      "champ": 0.0
+    },
+    {
+      "team": "Australia",
+      "r16": 0.0,
+      "qf": 0.0,
+      "sf": 0.0,
+      "final": 0.0,
+      "champ": 0.0
+    },
+    {
+      "team": "Austria",
+      "r16": 0.0,
+      "qf": 0.0,
+      "sf": 0.0,
+      "final": 0.0,
+      "champ": 0.0
+    },
+    {
+      "team": "Bosnia and Herzegovina",
+      "r16": 0.0,
+      "qf": 0.0,
+      "sf": 0.0,
+      "final": 0.0,
+      "champ": 0.0
     },
     {
       "team": "Canada",
       "r16": 1.0,
-      "qf": 0.3273,
-      "sf": 0.1116,
-      "final": 0.0353,
-      "champ": 0.0103
-    },
-    {
-      "team": "Austria",
-      "r16": 0.277,
-      "qf": 0.1106,
-      "sf": 0.0563,
-      "final": 0.023,
-      "champ": 0.0086
-    },
-    {
-      "team": "Mexico",
-      "r16": 0.4682,
-      "qf": 0.1923,
-      "sf": 0.0688,
-      "final": 0.0232,
-      "champ": 0.0078
-    },
-    {
-      "team": "Algeria",
-      "r16": 0.4269,
-      "qf": 0.168,
-      "sf": 0.056,
-      "final": 0.0205,
-      "champ": 0.0074
-    },
-    {
-      "team": "Australia",
-      "r16": 0.527,
-      "qf": 0.1486,
-      "sf": 0.0544,
-      "final": 0.0199,
-      "champ": 0.0067
-    },
-    {
-      "team": "United States",
-      "r16": 0.6484,
-      "qf": 0.2536,
-      "sf": 0.0669,
-      "final": 0.0228,
-      "champ": 0.006
-    },
-    {
-      "team": "Egypt",
-      "r16": 0.4731,
-      "qf": 0.129,
-      "sf": 0.0468,
-      "final": 0.0152,
-      "champ": 0.0046
-    },
-    {
-      "team": "Paraguay",
-      "r16": 0.322,
-      "qf": 0.107,
-      "sf": 0.0407,
-      "final": 0.0129,
-      "champ": 0.0046
-    },
-    {
-      "team": "Ivory Coast",
-      "r16": 0.379,
-      "qf": 0.1111,
-      "sf": 0.0429,
-      "final": 0.0136,
-      "champ": 0.0045
-    },
-    {
-      "team": "Sweden",
-      "r16": 0.2392,
-      "qf": 0.0853,
-      "sf": 0.0309,
-      "final": 0.0087,
-      "champ": 0.0024
-    },
-    {
-      "team": "DR Congo",
-      "r16": 0.2401,
-      "qf": 0.085,
-      "sf": 0.0247,
-      "final": 0.0061,
-      "champ": 0.0016
-    },
-    {
-      "team": "Ghana",
-      "r16": 0.1577,
-      "qf": 0.0392,
-      "sf": 0.0075,
-      "final": 0.0014,
-      "champ": 0.0003
+      "qf": 0.0,
+      "sf": 0.0,
+      "final": 0.0,
+      "champ": 0.0
     },
     {
       "team": "Cape Verde",
-      "r16": 0.1144,
-      "qf": 0.0391,
-      "sf": 0.0083,
-      "final": 0.0018,
-      "champ": 0.0002
+      "r16": 0.0,
+      "qf": 0.0,
+      "sf": 0.0,
+      "final": 0.0,
+      "champ": 0.0
     },
     {
-      "team": "Bosnia and Herzegovina",
-      "r16": 0.3516,
-      "qf": 0.0778,
-      "sf": 0.0114,
-      "final": 0.0016,
-      "champ": 0.0002
+      "team": "Croatia",
+      "r16": 0.0,
+      "qf": 0.0,
+      "sf": 0.0,
+      "final": 0.0,
+      "champ": 0.0
+    },
+    {
+      "team": "DR Congo",
+      "r16": 0.0,
+      "qf": 0.0,
+      "sf": 0.0,
+      "final": 0.0,
+      "champ": 0.0
+    },
+    {
+      "team": "Ecuador",
+      "r16": 0.0,
+      "qf": 0.0,
+      "sf": 0.0,
+      "final": 0.0,
+      "champ": 0.0
+    },
+    {
+      "team": "Germany",
+      "r16": 0.0,
+      "qf": 0.0,
+      "sf": 0.0,
+      "final": 0.0,
+      "champ": 0.0
+    },
+    {
+      "team": "Ghana",
+      "r16": 0.0,
+      "qf": 0.0,
+      "sf": 0.0,
+      "final": 0.0,
+      "champ": 0.0
+    },
+    {
+      "team": "Ivory Coast",
+      "r16": 0.0,
+      "qf": 0.0,
+      "sf": 0.0,
+      "final": 0.0,
+      "champ": 0.0
+    },
+    {
+      "team": "Japan",
+      "r16": 0.0,
+      "qf": 0.0,
+      "sf": 0.0,
+      "final": 0.0,
+      "champ": 0.0
+    },
+    {
+      "team": "Netherlands",
+      "r16": 0.0,
+      "qf": 0.0,
+      "sf": 0.0,
+      "final": 0.0,
+      "champ": 0.0
+    },
+    {
+      "team": "Paraguay",
+      "r16": 1.0,
+      "qf": 0.0,
+      "sf": 0.0,
+      "final": 0.0,
+      "champ": 0.0
+    },
+    {
+      "team": "Senegal",
+      "r16": 0.0,
+      "qf": 0.0,
+      "sf": 0.0,
+      "final": 0.0,
+      "champ": 0.0
     },
     {
       "team": "South Africa",
+      "r16": 0.0,
+      "qf": 0.0,
+      "sf": 0.0,
+      "final": 0.0,
+      "champ": 0.0
+    },
+    {
+      "team": "Sweden",
       "r16": 0.0,
       "qf": 0.0,
       "sf": 0.0,
