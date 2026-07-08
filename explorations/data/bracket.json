@@ -3,7 +3,7 @@
     "asof": "2026-06-10",
     "n_teams": 32,
     "n_ties": 32,
-    "n_played": 21,
+    "n_played": 24,
     "sims": 40000,
     "model": "Dixon-Coles bivariate-Poisson, exponential time-decay (frozen pre-tournament)"
   },
@@ -2113,9 +2113,12 @@
           "home_raw": "USA",
           "away_raw": "Belgium",
           "known": true,
-          "played": false,
-          "score": null,
-          "winner": null,
+          "played": true,
+          "score": [
+            1,
+            4
+          ],
+          "winner": "Belgium",
           "host_edge": [
             "United States"
           ],
@@ -2211,9 +2214,12 @@
           "home_raw": "Argentina",
           "away_raw": "Egypt",
           "known": true,
-          "played": false,
-          "score": null,
-          "winner": null,
+          "played": true,
+          "score": [
+            3,
+            2
+          ],
+          "winner": "Argentina",
           "host_edge": [],
           "p_home": 0.6419,
           "p_draw": 0.2656,
@@ -2307,9 +2313,12 @@
           "home_raw": "Switzerland",
           "away_raw": "Colombia",
           "known": true,
-          "played": false,
-          "score": null,
-          "winner": null,
+          "played": true,
+          "score": [
+            0,
+            0
+          ],
+          "winner": "Colombia",
           "host_edge": [],
           "p_home": 0.2686,
           "p_draw": 0.2669,
@@ -2500,14 +2509,94 @@
           "kickoff": "2026-07-10T19:00:00Z",
           "ground": "Los Angeles (Inglewood)",
           "country": "United States",
-          "home": null,
-          "away": null,
-          "home_raw": "W93",
-          "away_raw": "W94",
-          "known": false,
+          "home": "Spain",
+          "away": "Belgium",
+          "home_raw": "Spain",
+          "away_raw": "Belgium",
+          "known": true,
           "played": false,
           "score": null,
-          "winner": null
+          "winner": null,
+          "host_edge": [],
+          "p_home": 0.5662,
+          "p_draw": 0.2423,
+          "p_away": 0.1914,
+          "exp_home": 1.79,
+          "exp_away": 0.95,
+          "adv_home": 0.6874,
+          "adv_away": 0.3126,
+          "top_scores": [
+            {
+              "h": 1,
+              "a": 1,
+              "p": 0.1155
+            },
+            {
+              "h": 1,
+              "a": 0,
+              "p": 0.1095
+            },
+            {
+              "h": 2,
+              "a": 0,
+              "p": 0.1035
+            },
+            {
+              "h": 2,
+              "a": 1,
+              "p": 0.0983
+            }
+          ],
+          "grid": [
+            [
+              0.0702,
+              0.0552,
+              0.029,
+              0.0092,
+              0.0022,
+              0.0004
+            ],
+            [
+              0.1095,
+              0.1155,
+              0.0521,
+              0.0165,
+              0.0039,
+              0.0007
+            ],
+            [
+              0.1035,
+              0.0983,
+              0.0467,
+              0.0148,
+              0.0035,
+              0.0007
+            ],
+            [
+              0.0619,
+              0.0588,
+              0.0279,
+              0.0088,
+              0.0021,
+              0.0004
+            ],
+            [
+              0.0277,
+              0.0263,
+              0.0125,
+              0.004,
+              0.0009,
+              0.0002
+            ],
+            [
+              0.0099,
+              0.0095,
+              0.0045,
+              0.0014,
+              0.0003,
+              0.0001
+            ]
+          ]
         },
         {
           "num": 99,
@@ -2702,92 +2791,68 @@
   },
   "tournament": [
     {
+      "team": "Argentina",
+      "r16": 1.0,
+      "qf": 1.0,
+      "sf": 0.63,
+      "final": 0.3961,
+      "champ": 0.2299
+    },
+    {
       "team": "Spain",
       "r16": 1.0,
       "qf": 1.0,
-      "sf": 0.7326,
-      "final": 0.4355,
-      "champ": 0.2481
-    },
-    {
-      "team": "Argentina",
-      "r16": 1.0,
-      "qf": 0.7737,
-      "sf": 0.5149,
-      "final": 0.3226,
-      "champ": 0.1872
+      "sf": 0.6915,
+      "final": 0.4135,
+      "champ": 0.2288
     },
     {
       "team": "England",
       "r16": 1.0,
       "qf": 1.0,
-      "sf": 0.6299,
-      "final": 0.3217,
-      "champ": 0.1621
+      "sf": 0.6325,
+      "final": 0.2937,
+      "champ": 0.1474
     },
     {
       "team": "France",
       "r16": 1.0,
       "qf": 1.0,
-      "sf": 0.5419,
-      "final": 0.2622,
-      "champ": 0.1313
+      "sf": 0.5506,
+      "final": 0.2594,
+      "champ": 0.125
     },
     {
       "team": "Morocco",
       "r16": 1.0,
       "qf": 1.0,
-      "sf": 0.4581,
-      "final": 0.1997,
-      "champ": 0.093
+      "sf": 0.4494,
+      "final": 0.1966,
+      "champ": 0.0868
     },
     {
       "team": "Colombia",
       "r16": 1.0,
-      "qf": 0.5952,
-      "sf": 0.2616,
-      "final": 0.1298,
-      "champ": 0.0593
+      "qf": 1.0,
+      "sf": 0.37,
+      "final": 0.1873,
+      "champ": 0.0861
+    },
+    {
+      "team": "Belgium",
+      "r16": 1.0,
+      "qf": 1.0,
+      "sf": 0.3085,
+      "final": 0.1305,
+      "champ": 0.0502
     },
     {
       "team": "Norway",
       "r16": 1.0,
       "qf": 1.0,
-      "sf": 0.3701,
-      "final": 0.1414,
-      "champ": 0.0524
-    },
-    {
-      "team": "Belgium",
-      "r16": 1.0,
-      "qf": 0.6358,
-      "sf": 0.1956,
-      "final": 0.0806,
-      "champ": 0.0321
-    },
-    {
-      "team": "Switzerland",
-      "r16": 1.0,
-      "qf": 0.4048,
-      "sf": 0.1476,
-      "final": 0.0603,
-      "champ": 0.0221
-    },
-    {
-      "team": "Egypt",
-      "r16": 1.0,
-      "qf": 0.2263,
-      "sf": 0.0759,
-      "final": 0.0242,
-      "champ": 0.007
-    },
-    {
-      "team": "United States",
-      "r16": 1.0,
-      "qf": 0.3643,
-      "sf": 0.0717,
-      "final": 0.022,
-      "champ": 0.0054
+      "sf": 0.3675,
+      "final": 0.1229,
+      "champ": 0.0458
     },
     {
       "team": "Algeria",
@@ -2864,6 +2929,14 @@
     {
       "team": "Ecuador",
       "r16": 0.0,
+      "qf": 0.0,
+      "sf": 0.0,
+      "final": 0.0,
+      "champ": 0.0
+    },
+    {
+      "team": "Egypt",
+      "r16": 1.0,
       "qf": 0.0,
       "sf": 0.0,
       "final": 0.0,
@@ -2952,6 +3025,22 @@
     {
       "team": "Sweden",
       "r16": 0.0,
+      "qf": 0.0,
+      "sf": 0.0,
+      "final": 0.0,
+      "champ": 0.0
+    },
+    {
+      "team": "Switzerland",
+      "r16": 1.0,
+      "qf": 0.0,
+      "sf": 0.0,
+      "final": 0.0,
+      "champ": 0.0
+    },
+    {
+      "team": "United States",
+      "r16": 1.0,
       "qf": 0.0,
       "sf": 0.0,
       "final": 0.0,
