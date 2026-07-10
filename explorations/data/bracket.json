@@ -3,7 +3,7 @@
     "asof": "2026-06-10",
     "n_teams": 32,
     "n_ties": 32,
-    "n_played": 24,
+    "n_played": 25,
     "sims": 40000,
     "model": "Dixon-Coles bivariate-Poisson, exponential time-decay (frozen pre-tournament)"
   },
@@ -2418,9 +2418,12 @@
           "home_raw": "France",
           "away_raw": "Morocco",
           "known": true,
-          "played": false,
-          "score": null,
-          "winner": null,
+          "played": true,
+          "score": [
+            2,
+            0
+          ],
+          "winner": "France",
           "host_edge": [],
           "p_home": 0.3715,
           "p_draw": 0.3496,
@@ -2874,65 +2877,57 @@
       "team": "Argentina",
       "r16": 1.0,
       "qf": 1.0,
-      "sf": 0.7126,
-      "final": 0.4499,
-      "champ": 0.2617
-    },
-    {
-      "team": "Spain",
-      "r16": 1.0,
-      "qf": 1.0,
-      "sf": 0.6915,
-      "final": 0.4135,
-      "champ": 0.2306
-    },
-    {
-      "team": "England",
-      "r16": 1.0,
-      "qf": 1.0,
-      "sf": 0.6325,
-      "final": 0.3022,
-      "champ": 0.1519
+      "sf": 0.7129,
+      "final": 0.4463,
+      "champ": 0.2591
     },
     {
       "team": "France",
       "r16": 1.0,
       "qf": 1.0,
-      "sf": 0.5506,
-      "final": 0.2594,
-      "champ": 0.1261
+      "sf": 1.0,
+      "final": 0.4767,
+      "champ": 0.2318
     },
     {
-      "team": "Morocco",
+      "team": "Spain",
       "r16": 1.0,
       "qf": 1.0,
-      "sf": 0.4494,
-      "final": 0.1966,
-      "champ": 0.0876
+      "sf": 0.6869,
+      "final": 0.4007,
+      "champ": 0.224
+    },
+    {
+      "team": "England",
+      "r16": 1.0,
+      "qf": 1.0,
+      "sf": 0.6316,
+      "final": 0.3043,
+      "champ": 0.1502
     },
     {
       "team": "Belgium",
       "r16": 1.0,
       "qf": 1.0,
-      "sf": 0.3085,
-      "final": 0.1305,
-      "champ": 0.0506
+      "sf": 0.313,
+      "final": 0.1226,
+      "champ": 0.0474
     },
     {
       "team": "Norway",
       "r16": 1.0,
       "qf": 1.0,
-      "sf": 0.3675,
-      "final": 0.1297,
-      "champ": 0.0481
+      "sf": 0.3684,
+      "final": 0.1295,
+      "champ": 0.0456
     },
     {
       "team": "Switzerland",
       "r16": 1.0,
       "qf": 1.0,
-      "sf": 0.2874,
-      "final": 0.1183,
-      "champ": 0.0434
+      "sf": 0.2871,
+      "final": 0.1199,
+      "champ": 0.042
     },
     {
       "team": "Algeria",
@@ -3066,6 +3061,14 @@
       "team": "Mexico",
       "r16": 1.0,
       "qf": 0.0,
+      "sf": 0.0,
+      "final": 0.0,
+      "champ": 0.0
+    },
+    {
+      "team": "Morocco",
+      "r16": 1.0,
+      "qf": 1.0,
       "sf": 0.0,
       "final": 0.0,
       "champ": 0.0
