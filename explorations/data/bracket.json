@@ -3,7 +3,7 @@
     "asof": "2026-06-10",
     "n_teams": 32,
     "n_ties": 32,
-    "n_played": 26,
+    "n_played": 27,
     "sims": 40000,
     "model": "Dixon-Coles bivariate-Poisson, exponential time-decay (frozen pre-tournament)"
   },
@@ -2616,9 +2616,12 @@
           "home_raw": "Norway",
           "away_raw": "England",
           "known": true,
-          "played": false,
-          "score": null,
-          "winner": null,
+          "played": true,
+          "score": [
+            1,
+            1
+          ],
+          "winner": "England",
           "host_edge": [],
           "p_home": 0.2257,
           "p_draw": 0.2817,
@@ -2809,14 +2812,94 @@
           "kickoff": "2026-07-14T19:00:00Z",
           "ground": "Dallas (Arlington)",
           "country": "United States",
-          "home": null,
-          "away": null,
-          "home_raw": "W97",
-          "away_raw": "W98",
-          "known": false,
+          "home": "France",
+          "away": "Spain",
+          "home_raw": "France",
+          "away_raw": "Spain",
+          "known": true,
           "played": false,
           "score": null,
-          "winner": null
+          "winner": null,
+          "host_edge": [],
+          "p_home": 0.2785,
+          "p_draw": 0.2821,
+          "p_away": 0.4394,
+          "exp_home": 1.06,
+          "exp_away": 1.39,
+          "adv_home": 0.4195,
+          "adv_away": 0.5805,
+          "top_scores": [
+            {
+              "h": 1,
+              "a": 1,
+              "p": 0.1339
+            },
+            {
+              "h": 0,
+              "a": 1,
+              "p": 0.1133
+            },
+            {
+              "h": 0,
+              "a": 0,
+              "p": 0.093
+            },
+            {
+              "h": 1,
+              "a": 2,
+              "p": 0.0885
+            }
+          ],
+          "grid": [
+            [
+              0.093,
+              0.1133,
+              0.0837,
+              0.0389,
+              0.0136,
+              0.0038
+            ],
+            [
+              0.0843,
+              0.1339,
+              0.0885,
+              0.0411,
+              0.0143,
+              0.004
+            ],
+            [
+              0.0482,
+              0.0672,
+              0.0468,
+              0.0217,
+              0.0076,
+              0.0021
+            ],
+            [
+              0.017,
+              0.0237,
+              0.0165,
+              0.0077,
+              0.0027,
+              0.0007
+            ],
+            [
+              0.0045,
+              0.0063,
+              0.0044,
+              0.002,
+              0.0007,
+              0.0002
+            ],
+            [
+              0.0009,
+              0.0013,
+              0.0009,
+              0.0004,
+              0.0001,
+              0.0
+            ]
+          ]
         },
         {
           "num": 102,
@@ -2881,48 +2964,40 @@
       "r16": 1.0,
       "qf": 1.0,
       "sf": 1.0,
-      "final": 0.5793,
-      "champ": 0.3216
+      "final": 0.5837,
+      "champ": 0.3134
     },
     {
       "team": "Argentina",
       "r16": 1.0,
       "qf": 1.0,
-      "sf": 0.7119,
-      "final": 0.4459,
-      "champ": 0.2494
+      "sf": 0.715,
+      "final": 0.4153,
+      "champ": 0.2304
+    },
+    {
+      "team": "England",
+      "r16": 1.0,
+      "qf": 1.0,
+      "sf": 1.0,
+      "final": 0.4808,
+      "champ": 0.2289
     },
     {
       "team": "France",
       "r16": 1.0,
       "qf": 1.0,
       "sf": 1.0,
-      "final": 0.4207,
-      "champ": 0.2035
-    },
-    {
-      "team": "England",
-      "r16": 1.0,
-      "qf": 1.0,
-      "sf": 0.6332,
-      "final": 0.3058,
-      "champ": 0.1428
-    },
-    {
-      "team": "Norway",
-      "r16": 1.0,
-      "qf": 1.0,
-      "sf": 0.3668,
-      "final": 0.1293,
-      "champ": 0.0435
+      "final": 0.4163,
+      "champ": 0.1944
     },
     {
       "team": "Switzerland",
       "r16": 1.0,
       "qf": 1.0,
-      "sf": 0.288,
-      "final": 0.1191,
-      "champ": 0.0392
+      "sf": 0.285,
+      "final": 0.1039,
+      "champ": 0.0329
     },
     {
       "team": "Algeria",
@@ -3080,6 +3155,14 @@
       "team": "Netherlands",
       "r16": 0.0,
       "qf": 0.0,
+      "sf": 0.0,
+      "final": 0.0,
+      "champ": 0.0
+    },
+    {
+      "team": "Norway",
+      "r16": 1.0,
+      "qf": 1.0,
       "sf": 0.0,
       "final": 0.0,
       "champ": 0.0
