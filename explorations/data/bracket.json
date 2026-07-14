@@ -3,7 +3,7 @@
     "asof": "2026-06-10",
     "n_teams": 32,
     "n_ties": 32,
-    "n_played": 27,
+    "n_played": 28,
     "sims": 40000,
     "model": "Dixon-Coles bivariate-Poisson, exponential time-decay (frozen pre-tournament)"
   },
@@ -2715,9 +2715,12 @@
           "home_raw": "Argentina",
           "away_raw": "Switzerland",
           "known": true,
-          "played": false,
-          "score": null,
-          "winner": null,
+          "played": true,
+          "score": [
+            1,
+            1
+          ],
+          "winner": "Switzerland",
           "host_edge": [],
           "p_home": 0.5813,
           "p_draw": 0.2652,
@@ -2908,14 +2911,94 @@
           "kickoff": "2026-07-15T19:00:00Z",
           "ground": "Atlanta",
           "country": "United States",
-          "home": null,
-          "away": null,
-          "home_raw": "W99",
-          "away_raw": "W100",
-          "known": false,
+          "home": "England",
+          "away": "Argentina",
+          "home_raw": "England",
+          "away_raw": "Argentina",
+          "known": true,
           "played": false,
           "score": null,
-          "winner": null
+          "winner": null,
+          "host_edge": [],
+          "p_home": 0.2463,
+          "p_draw": 0.3456,
+          "p_away": 0.4081,
+          "exp_home": 0.72,
+          "exp_away": 1.01,
+          "adv_home": 0.4191,
+          "adv_away": 0.5809,
+          "top_scores": [
+            {
+              "h": 0,
+              "a": 0,
+              "p": 0.1845
+            },
+            {
+              "h": 0,
+              "a": 1,
+              "p": 0.1725
+            },
+            {
+              "h": 1,
+              "a": 1,
+              "p": 0.1357
+            },
+            {
+              "h": 1,
+              "a": 0,
+              "p": 0.1206
+            }
+          ],
+          "grid": [
+            [
+              0.1845,
+              0.1725,
+              0.0907,
+              0.0305,
+              0.0077,
+              0.0016
+            ],
+            [
+              0.1206,
+              0.1357,
+              0.0651,
+              0.0219,
+              0.0055,
+              0.0011
+            ],
+            [
+              0.0458,
+              0.0462,
+              0.0234,
+              0.0079,
+              0.002,
+              0.0004
+            ],
+            [
+              0.0109,
+              0.0111,
+              0.0056,
+              0.0019,
+              0.0005,
+              0.0001
+            ],
+            [
+              0.002,
+              0.002,
+              0.001,
+              0.0003,
+              0.0001,
+              0.0
+            ],
+            [
+              0.0003,
+              0.0003,
+              0.0001,
+              0.0,
+              0.0,
+              0.0
+            ]
+          ]
         }
       ]
     },
@@ -2960,44 +3043,36 @@
   },
   "tournament": [
     {
+      "team": "Argentina",
+      "r16": 1.0,
+      "qf": 1.0,
+      "sf": 1.0,
+      "final": 0.5821,
+      "champ": 0.3238
+    },
+    {
       "team": "Spain",
       "r16": 1.0,
       "qf": 1.0,
       "sf": 1.0,
-      "final": 0.5837,
-      "champ": 0.3134
-    },
-    {
-      "team": "Argentina",
-      "r16": 1.0,
-      "qf": 1.0,
-      "sf": 0.715,
-      "final": 0.4153,
-      "champ": 0.2304
+      "final": 0.5785,
+      "champ": 0.2933
     },
     {
       "team": "England",
       "r16": 1.0,
       "qf": 1.0,
       "sf": 1.0,
-      "final": 0.4808,
-      "champ": 0.2289
+      "final": 0.4179,
+      "champ": 0.1993
     },
     {
       "team": "France",
       "r16": 1.0,
       "qf": 1.0,
       "sf": 1.0,
-      "final": 0.4163,
-      "champ": 0.1944
-    },
-    {
-      "team": "Switzerland",
-      "r16": 1.0,
-      "qf": 1.0,
-      "sf": 0.285,
-      "final": 0.1039,
-      "champ": 0.0329
+      "final": 0.4215,
+      "champ": 0.1836
     },
     {
       "team": "Algeria",
@@ -3203,6 +3278,14 @@
       "team": "Sweden",
       "r16": 0.0,
       "qf": 0.0,
+      "sf": 0.0,
+      "final": 0.0,
+      "champ": 0.0
+    },
+    {
+      "team": "Switzerland",
+      "r16": 1.0,
+      "qf": 1.0,
       "sf": 0.0,
       "final": 0.0,
       "champ": 0.0
