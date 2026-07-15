@@ -3,7 +3,7 @@
     "asof": "2026-06-10",
     "n_teams": 32,
     "n_ties": 32,
-    "n_played": 28,
+    "n_played": 29,
     "sims": 40000,
     "model": "Dixon-Coles bivariate-Poisson, exponential time-decay (frozen pre-tournament)"
   },
@@ -2820,9 +2820,12 @@
           "home_raw": "France",
           "away_raw": "Spain",
           "known": true,
-          "played": false,
-          "score": null,
-          "winner": null,
+          "played": true,
+          "score": [
+            0,
+            2
+          ],
+          "winner": "Spain",
           "host_edge": [],
           "p_home": 0.2785,
           "p_draw": 0.2821,
@@ -3043,36 +3046,36 @@
   },
   "tournament": [
     {
-      "team": "Argentina",
-      "r16": 1.0,
-      "qf": 1.0,
-      "sf": 1.0,
-      "final": 0.5821,
-      "champ": 0.3238
-    },
-    {
       "team": "Spain",
       "r16": 1.0,
       "qf": 1.0,
       "sf": 1.0,
-      "final": 0.5785,
-      "champ": 0.2933
+      "final": 1.0,
+      "champ": 0.5093
+    },
+    {
+      "team": "Argentina",
+      "r16": 1.0,
+      "qf": 1.0,
+      "sf": 1.0,
+      "final": 0.5788,
+      "champ": 0.3059
     },
     {
       "team": "England",
       "r16": 1.0,
       "qf": 1.0,
       "sf": 1.0,
-      "final": 0.4179,
-      "champ": 0.1993
+      "final": 0.4212,
+      "champ": 0.1848
     },
     {
       "team": "France",
       "r16": 1.0,
       "qf": 1.0,
       "sf": 1.0,
-      "final": 0.4215,
-      "champ": 0.1836
+      "final": 0.0,
+      "champ": 0.0
     },
     {
       "team": "Algeria",
