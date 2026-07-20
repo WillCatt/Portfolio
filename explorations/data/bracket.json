@@ -3,7 +3,7 @@
     "asof": "2026-06-10",
     "n_teams": 32,
     "n_ties": 32,
-    "n_played": 30,
+    "n_played": 31,
     "sims": 40000,
     "model": "Dixon-Coles bivariate-Poisson, exponential time-decay (frozen pre-tournament)"
   },
@@ -3123,9 +3123,12 @@
     "home_raw": "France",
     "away_raw": "England",
     "known": true,
-    "played": false,
-    "score": null,
-    "winner": null,
+    "played": true,
+    "score": [
+      4,
+      6
+    ],
+    "winner": "England",
     "host_edge": [],
     "p_home": 0.3299,
     "p_draw": 0.3152,
@@ -3214,7 +3217,7 @@
       "qf": 1.0,
       "sf": 1.0,
       "final": 1.0,
-      "champ": 0.5285
+      "champ": 0.5264
     },
     {
       "team": "Spain",
@@ -3222,7 +3225,7 @@
       "qf": 1.0,
       "sf": 1.0,
       "final": 1.0,
-      "champ": 0.4715
+      "champ": 0.4736
     },
     {
       "team": "England",
